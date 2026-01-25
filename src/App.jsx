@@ -5,6 +5,7 @@ import Hero from "./components/sections/Hero";
 import GamesSection from "./components/sections/Games";
 import AboutSection from "./components/sections/About";
 import ContactSection from "./components/sections/Contact";
+import Carousel from "./components/common/Carousel";
 import "./styles/global.css";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
       <Header onNavigate={scrollToSection} />
       <main>
         <Hero onNavigate={scrollToSection} />
+        <Carousel />
         <GamesSection />
         <AboutSection />
         <ContactSection />

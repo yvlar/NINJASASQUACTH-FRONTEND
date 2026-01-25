@@ -1,0 +1,259 @@
+/* 📦 Wrapper externe */
+.wrapper {
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 0 20px;
+}
+
+.container {
+  position: relative;
+}
+
+/* 🖼️ Container principal du carousel */
+.hero {
+  position: relative;
+  width: 100%;
+  min-height: 300px;
+  height: 50vh;
+  max-height: 600px;
+  border: 3px solid #142d17;
+  overflow: hidden;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* 🖼️ Image */
+.heroImage {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ✨ Animation slide vers la droite */
+.slideInRight {
+  animation: slideInRight 0.5s ease-in-out;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ✨ Animation slide vers la gauche */
+.slideInLeft {
+  animation: slideInLeft 0.5s ease-in-out;
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 🏷️ Label (nom du jeu) */
+.heroLabel {
+  position: absolute;
+  right: 30px;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 233, 0.95);
+  padding: 16px 24px;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  font-size: 1.2rem;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  border-radius: 8px;
+  color: #142d17;
+  border: 3px solid #9b5824;
+  z-index: 2;
+  backdrop-filter: blur(10px);
+}
+
+/* 🔘 Boutons de navigation */
+.carouselBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background-color: rgba(255, 255, 233, 0.95);
+  border: 3px solid #9b5824;
+  color: #142d17;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 3;
+  backdrop-filter: blur(5px);
+}
+
+.carouselBtn:hover {
+  background-color: #077e16;
+  color: white;
+  border-color: #077e16;
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 4px 12px rgba(7, 126, 22, 0.4);
+}
+
+.carouselBtn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+.btnLeft {
+  left: 20px;
+}
+
+.btnRight {
+  right: 20px;
+}
+
+/* 🔘 Indicateurs (points) */
+.indicators {
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  margin-top: 24px;
+}
+
+.indicator {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  transition: all 0.2s ease;
+}
+
+.indicator:hover {
+  transform: scale(1.3);
+}
+
+.indicator.active {
+  transform: scale(1.4);
+}
+
+/* 🔢 Compteur */
+.counter {
+  text-align: center;
+  margin-top: 12px;
+  color: #142d17;
+  font-weight: 700;
+  font-size: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+/* ▶️ Contrôle Play/Pause */
+.controls {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+}
+
+.playPauseBtn {
+  background-color: #077e16;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  font-family: "Poppins", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.playPauseBtn:hover {
+  background-color: #065d11;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.playPauseBtn:active {
+  transform: translateY(0);
+}
+
+/* 📱 Responsive - Tablette */
+@media (max-width: 768px) {
+  .wrapper {
+    padding: 0 15px;
+    margin: 20px auto;
+  }
+
+  .hero {
+    height: 45vh;
+    min-height: 250px;
+  }
+
+  .heroLabel {
+    right: 15px;
+    padding: 12px 18px;
+    font-size: 1rem;
+  }
+
+  .carouselBtn {
+    width: 45px;
+    height: 45px;
+  }
+
+  .btnLeft {
+    left: 12px;
+  }
+
+  .btnRight {
+    right: 12px;
+  }
+}
+
+/* 📱 Responsive - Mobile */
+@media (max-width: 480px) {
+  .hero {
+    height: 300px;
+    min-height: 250px;
+  }
+
+  .heroLabel {
+    position: static;
+    transform: none;
+    margin: 12px auto 0;
+    display: block;
+    text-align: center;
+    font-size: 0.95rem;
+    max-width: 90%;
+  }
+
+  .carouselBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .btnLeft {
+    left: 8px;
+  }
+
+  .btnRight {
+    right: 8px;
+  }
+
+  .indicators {
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .playPauseBtn {
+    padding: 8px 16px;
+    font-size: 0.9rem;
+  }
+}

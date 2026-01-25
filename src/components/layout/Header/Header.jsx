@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Menu, X } from "lucide-react";
 import styles from "./Header.module.css";
+import Logo from "../../common/Logo";
 
 export default function Header({ onNavigate }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -13,10 +14,7 @@ export default function Header({ onNavigate }) {
   return (
     <nav className={styles.header}>
       <div className={styles.container}>
-        <div className={styles.logo}>
-          <span className={styles.logoNinja}>Ninja </span>
-          <span className={styles.logoSasquatch}>Sasquatch</span>
-        </div>
+        <Logo />
 
         <div className={styles.navDesktop}>
           <button
