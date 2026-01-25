@@ -1,0 +1,57 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "games": "Nos Jeux",
+    "universe": "Notre Univers",
+    "contact": "Contact"
+  },
+  "hero": {
+    "title": "Origines Mystérieuses",
+    "subtitle": "L'univers de Ninja Sasquatch Games",
+    "description": "Une jeune compagnie québécoise qui sort des sentiers battus pour vous offrir des jeux de société originaux, amusants et accessibles à tous.",
+    "mission": "Ici, on allie créativité, rires, une touche de mystère, et des valeurs fortes pour l'environnement. Nos jeux sont conçus pour transformer vos soirées en moments mémorables, que ce soit en famille ou entre amis.",
+    "cta": "Découvrir nos jeux"
+  },
+  "games": {
+    "title": "Nos Créations",
+    "description": "Chaque jeu est pensé avec passion pour offrir une expérience unique, amusante et respectueuse de l'environnement.",
+    "players": "joueurs",
+    "eco": "100% compostable et écoresponsable",
+    "backToGames": "Retour aux jeux",
+    "characteristics": "Caractéristiques",
+    "category": "Catégorie",
+    "materials": "Matériaux 100% compostables et écoresponsables",
+    "madeIn": "Conçu et fabriqué au Québec",
+    "rules": "Règles claires et accessibles à tous",
+    "commitment": "Engagement environnemental garanti"
+  },
+  "about": {
+    "title": "Notre Mission",
+    "p1": "Ninja Sasquatch Games est née de la passion de créer des moments inoubliables autour de la table. Nous croyons fermement que les jeux de société ont le pouvoir de rassembler les gens et de créer des souvenirs durables.",
+    "p2": "Notre engagement environnemental n'est pas qu'une promesse : tous nos jeux sont fabriqués avec des matériaux 100% compostables. Parce que s'amuser ne devrait jamais se faire au détriment de notre planète.",
+    "p3": "Basés au Québec, nous puisons notre inspiration dans les légendes locales, la nature mystérieuse et l'esprit d'aventure qui caractérise notre belle province.",
+    "ecoTitle": "Engagement Écoresponsable",
+    "ecoDesc": "Chaque jeu Ninja Sasquatch est conçu dans le respect de l'environnement, avec des matériaux compostables et une production responsable.",
+    "stats": {
+      "compostable": "Compostable",
+      "quebec": "Fait au Québec",
+      "accessible": "Accessible à tous",
+      "fun": "Rires garantis"
+    }
+  },
+  "contact": {
+    "title": "Contactez-nous",
+    "description": "Une question ? Un projet de collaboration ? Envie de découvrir nos jeux ? Écrivez-nous !",
+    "name": "Nom",
+    "email": "Email",
+    "message": "Message",
+    "namePlaceholder": "Votre nom",
+    "emailPlaceholder": "votre@email.com",
+    "messagePlaceholder": "Votre message...",
+    "send": "Envoyer le message"
+  },
+  "footer": {
+    "rights": "Tous droits réservés.",
+    "tagline": "Fièrement québécois et 100% compostable"
+  }
+}

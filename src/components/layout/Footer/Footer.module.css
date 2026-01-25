@@ -1,0 +1,43 @@
+.footer {
+  background-color: #142d17;
+  color: white;
+  padding: 2rem 0;
+  text-align: center;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.brand {
+  font-size: 1.125rem;
+  margin-bottom: 0.5rem;
+  font-family: "Poppins", sans-serif;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.brandNinja {
+  color: #9b5824;
+}
+
+.brandSasquatch {
+  color: #ffffe9;
+}
+
+.copyright {
+  color: #ffffe9;
+  opacity: 0.8;
+  margin-bottom: 0.5rem;
+}
+
+.tagline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: #077e16;
+  margin-top: 0.5rem;
+}
