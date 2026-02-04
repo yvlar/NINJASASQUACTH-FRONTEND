@@ -1,0 +1,94 @@
+{
+  "games": [
+    {
+      "id": 1,
+      "title": "Heroes Rising",
+      "category": ["stratégie", "deck-building"],
+      "image": "public/Vignette jeux-20260131T195357Z-3-001/Vignette jeux/Vignette Heroes Rising.png",
+      "logo": "public/Logo jeux/Heroes-Rising-Sun.png",
+      "shortDesc": "Sauvez Darkopolis dans ce deck-building coopératif stratégique intense.",
+      "players": "1-4",
+      "duration": "60-90 min",
+      "age": "15+",
+      "fullDesc": "Heroes Rising : bien plus qu'un deck-building, c'est une mission coopérative pour sauver Darkopolis du chaos.\n\nVOTRE MISSION\nIncarnez des héros aux pouvoirs uniques. Chacun possède ses propres cartes, améliorations et capacités spéciales. Construisez votre deck, affinez votre stratégie, et travaillez ensemble pour triompher.\n\nLE DÉFI\nDes Vilains impitoyables, des Épreuves changeantes, des Emplacements dangereux. Mais le véritable défi héroïque? Sauver les citoyens pris au piège. Ici, vaincre les méchants ne suffit pas.\n\nL'EXPÉRIENCE\n- Héros variés avec styles de jeu distincts\n- Niveaux de difficulté multiples\n- Scénarios modulaires pour une rejouabilité infinie\n- Chaque partie raconte une histoire différente",
+      "eco": true,
+      "complexity": "Moyenne"
+    },
+    {
+      "id": 2,
+      "title": "Burgle Jack",
+      "category": ["famille", "party"],
+      "image": "public/Vignette jeux-20260131T195357Z-3-001/Vignette jeux/vignette-BurgleJack-JeuxdeCartes.png",
+      "logo": "public/Logo jeux/Burgle-Jack-Black-transparent.png",
+      "shortDesc": "Transformez le Blackjack en braquage coopératif palpitant!",
+      "players": "4-12",
+      "duration": "~20 min",
+      "age": "10+",
+      "fullDesc": "Un jeu familial léger et amusant pour 4 à 12 joueurs basé sur le Blackjack classique. Burgle Jack : un party game coopératif qui transforme le Blackjack en film de braquage palpitant!\n\nVOTRE MISSION\nRéalisez le casse parfait en 5 rounds de Blackjack : du repérage à la grande évasion. Chaque joueur a un rôle, des cartes spéciales et une mission commune : atteindre la cible sans que personne ne saute!\n\nLE DÉFI\nLa cible commence à 17 et augmente de +1 à chaque round... jusqu'à atteindre 21 pour la fuite finale. La moitié de l'équipe doit réussir pour que le braquage soit un succès. Coopérez, bluffez, et gérez le risque ensemble!\n\nL'EXPÉRIENCE\nUn jeu familial léger et amusant pour 4 à 12 joueurs basé sur le Blackjack classique.\n- Règles simples - on joue en 2 minutes\n- Rôles qui pimentent le jeu\n- Tension crescendo à chaque round\n- Rires et suspense garantis!",
+      "eco": true,
+      "complexity": "Facile"
+    },
+    {
+      "id": 3,
+      "title": "FlickleMania",
+      "category": ["party", "famille"],
+      "image": "public/Vignette jeux-20260131T195357Z-3-001/Vignette jeux/Vignette FlickleMania.png",
+      "logo": "public/Logo jeux/logo-FlickeMania (1).png",
+      "shortDesc": "Pichenotte, coups signatures et actions spectaculaires dans ce jeu de lutte familial!",
+      "players": "2-6",
+      "duration": "15-30 min",
+      "age": "12+",
+      "fullDesc": "FlickleMania : un jeu de pichenotte explosif où vos lutteurs s'affrontent pour devenir champion du ring!\n\nVOTRE MISSION\nPrenez le contrôle d'un lutteur unique et utilisez vos cartes de Mouvements pour picocher votre disque à travers le ring. Gagnez la Faveur de la Foule avec des coups réussis, puis déclenchez vos Finishers dévastateurs pour éjecter vos adversaires hors du ring!\n\nLE DÉFI\nChaque lutteur possède ses propres capacités spéciales. Maîtrisez la pichenotte, gérez vos cartes stratégiquement, et lisez le jeu pour anticiper vos adversaires. Un mauvais coup et vous pourriez vous retrouver hors du ring!\n\nL'EXPÉRIENCE\nUn jeu de lutte dynamique pour toute la famille, recommandé 10+.\n- Parties rapides de 20-30 minutes\n- Mode Apprenti pour les débutants\n- Modes variés : Mêlée générale, Tag Team, Coopératif\n- Capacités uniques pour chaque lutteur\n- Gros rires, gros coups, grosse ambiance!",
+      "eco": true,
+      "complexity": "Facile"
+    }
+  ],
+  "categories": [
+    {
+      "id": "tous",
+      "label": "Tous nos jeux",
+      "icon": null,
+      "colors": null
+    },
+    {
+      "id": "famille",
+      "label": "Famille",
+      "icon": "Users",
+      "colors": {
+        "bg": "rgba(7, 126, 22, 0.15)",
+        "border": "#077e16",
+        "text": "#077e16"
+      }
+    },
+    {
+      "id": "stratégie",
+      "label": "Stratégie",
+      "icon": "Brain",
+      "colors": {
+        "bg": "rgba(211, 84, 0, 0.15)",
+        "border": "#d35400",
+        "text": "#d35400"
+      }
+    },
+    {
+      "id": "party",
+      "label": "Party Game",
+      "icon": "Zap",
+      "colors": {
+        "bg": "rgba(20, 45, 23, 0.15)",
+        "border": "#142d17",
+        "text": "#142d17"
+      }
+    },
+    {
+      "id": "deck-building",
+      "label": "Deck-Building",
+      "icon": "Gamepad2",
+      "colors": {
+        "bg": "rgba(155, 88, 36, 0.15)",
+        "border": "#9b5824",
+        "text": "#9b5824"
+      }
+    }
+  ]
+}

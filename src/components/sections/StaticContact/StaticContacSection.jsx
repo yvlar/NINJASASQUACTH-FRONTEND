@@ -1,6 +1,6 @@
 import React from "react";
-import { Instagram, Facebook, Mail, Youtube } from "lucide-react";
-import styles from "./Contact.module.css";
+import { Instagram, Facebook, Mail } from "lucide-react";
+import styles from "./StaticContact.module.css";
 
 export default function ContactSection() {
   return (
@@ -49,30 +49,13 @@ export default function ContactSection() {
         </div>
 
         <div className={styles.socialLinks}>
-          <a
-            href="https://www.youtube.com/@JimmyGaulin"
-            className={styles.socialLink}
-            aria-label="Youtube"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Youtube size={28} />
+          <a href="#" className={styles.socialLink} aria-label="Instagram">
+            <Instagram size={28} />
           </a>
-          <a
-            href="https://www.facebook.com/NinjaSasquatch"
-            className={styles.socialLink}
-            aria-label="Facebook"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <a href="#" className={styles.socialLink} aria-label="Facebook">
             <Facebook size={28} />
           </a>
-
-          <a
-            href="mailto:jimmy@ninjasasquatch.com"
-            className={styles.socialLink}
-            aria-label="Email"
-          >
+          <a href="#" className={styles.socialLink} aria-label="Email">
             <Mail size={28} />
           </a>
         </div>

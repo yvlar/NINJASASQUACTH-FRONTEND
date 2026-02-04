@@ -6,7 +6,7 @@ export default function Hero({ onNavigate }) {
     <section id="accueil" className={styles.hero}>
       <div className={styles.container}>
         <div className={styles.content}>
-          <h1 className={styles.title}>Origines Mystérieuses</h1>
+          <h1 className={styles.title}>Origines Mystérieuses </h1>
           <h2 className={styles.subtitle}>
             L'univers de Ninja Sasquatch Games
           </h2>

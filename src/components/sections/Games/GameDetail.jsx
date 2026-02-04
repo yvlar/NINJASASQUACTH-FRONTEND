@@ -3,6 +3,16 @@ import { Users, Clock, Star, Leaf } from "lucide-react";
 import styles from "./Games.module.css";
 
 export default function GameDetail({ game, onBack }) {
+  // Formater le texte avec les sauts de ligne
+  const formatDescription = (text) => {
+    return text.split("\n").map((line, index) => (
+      <React.Fragment key={index}>
+        {line}
+        {index < text.split("\n").length - 1 && <br />}
+      </React.Fragment>
+    ));
+  };
+
   return (
     <div className={styles.detailContainer}>
       <div className={styles.detailContent}>
@@ -16,6 +26,10 @@ export default function GameDetail({ game, onBack }) {
               src={game.image}
               alt={game.title}
               className={styles.detailImage}
+              onError={(e) => {
+                e.target.src =
+                  "https://via.placeholder.com/600x400?text=Image+non+disponible";
+              }}
             />
             {game.eco && (
               <div className={styles.ecoLabel}>
@@ -26,7 +40,14 @@ export default function GameDetail({ game, onBack }) {
           </div>
 
           <div>
-            <h1 className={styles.detailTitle}>{game.title}</h1>
+            {/* ✅ Logo centré */}
+            <div className={styles.logoContainer}>
+              <img
+                src={game.logo}
+                alt={`${game.title} Logo`}
+                className={styles.logoDetail}
+              />
+            </div>
 
             <div className={styles.detailMeta}>
               <div className={styles.metaItem}>
@@ -43,16 +64,26 @@ export default function GameDetail({ game, onBack }) {
               </div>
             </div>
 
-            <p className={styles.detailDesc}>{game.fullDesc}</p>
+            <div className={styles.detailDesc}>
+              {formatDescription(game.fullDesc)}
+            </div>
+
+            {/* Description formatée avec sauts de ligne */}
+            <div className={styles.detailDesc}>
+              {formatDescription(game.fullDesc)}
+            </div>
 
             <div className={styles.characteristics}>
               <h3 className={styles.characteristicsTitle}>Caractéristiques</h3>
               <ul className={styles.characteristicsList}>
+                {/* Affichage des catégories (tableau) */}
                 <li>
-                  • Catégorie:{" "}
-                  {game.category.charAt(0).toUpperCase() +
-                    game.category.slice(1)}
+                  • Catégorie{game.category.length > 1 ? "s" : ""}:{" "}
+                  {game.category
+                    .map((cat) => cat.charAt(0).toUpperCase() + cat.slice(1))
+                    .join(", ")}
                 </li>
+                <li>• Complexité: {game.complexity}</li>
                 <li>• Matériaux 100% compostables et écoresponsables</li>
                 <li>• Conçu et fabriqué au Québec</li>
                 <li>• Règles claires et accessibles à tous</li>

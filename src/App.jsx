@@ -5,8 +5,8 @@ import Hero from "./components/sections/Hero";
 import GamesSection from "./components/sections/Games";
 import AboutSection from "./components/sections/About";
 import ContactSection from "./components/sections/Contact";
-import Carousel from "./components/common/Carousel";
 import "./styles/global.css";
+import Banner from "./components/layout/Banner";
 
 function App() {
   const scrollToSection = (id) => {
@@ -19,9 +19,10 @@ function App() {
   return (
     <div style={{ backgroundColor: "#ffffe9", minHeight: "100vh" }}>
       <Header onNavigate={scrollToSection} />
+
       <main>
         <Hero onNavigate={scrollToSection} />
-        <Carousel />
+
         <GamesSection />
         <AboutSection />
         <ContactSection />

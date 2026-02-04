@@ -14,7 +14,7 @@ export default function Header({ onNavigate }) {
   return (
     <nav className={styles.header}>
       <div className={styles.container}>
-        <Logo />
+        <Logo source="/public/Logo jeux/Logo-Site-Web Transparent.png" />
 
         <div className={styles.navDesktop}>
           <button
