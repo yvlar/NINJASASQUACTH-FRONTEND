@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import gamesData from "../../../data/game.json";
+import gamesData from "../../data/game.json";
 import GameCard from "./GameCard";
 import GameDetail from "./GameDetail";
 import CategoryFilter from "./CategoryFiltes";

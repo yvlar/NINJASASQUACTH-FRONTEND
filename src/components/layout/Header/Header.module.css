@@ -54,6 +54,8 @@
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.3s;
+  text-decoration: none;
+  display: inline-block; /* Important pour que le Link se comporte comme un button */
 }
 
 .navLink:hover {
@@ -92,6 +94,8 @@
   padding: 0.75rem 0;
   cursor: pointer;
   transition: opacity 0.3s;
+  text-decoration: none;
+  display: block; /* Important pour que le Link prenne toute la largeur */
 }
 
 .mobileNavLink:hover {

@@ -1,0 +1,202 @@
+.section {
+  padding: 5rem 0;
+  background-color: #ffffe9;
+}
+
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  margin-bottom: 1rem;
+  text-align: center;
+  font-family: "Poppins", sans-serif;
+  color: #9b5824;
+}
+
+@media (min-width: 768px) {
+  .title {
+    font-size: 3rem;
+  }
+}
+
+.description {
+  text-align: center;
+  margin-bottom: 3rem;
+  max-width: 42rem;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.125rem;
+  color: #142d17;
+}
+
+/* Grille de cartes de contact */
+.contactGrid {
+  display: grid;
+  gap: 2rem;
+  grid-template-columns: 1fr;
+  margin-bottom: 3rem;
+}
+
+@media (min-width: 640px) {
+  .contactGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .contactGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Carte de contact */
+.contactCard {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 2px solid transparent;
+}
+
+.contactCard:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  border-color: #077e16;
+}
+
+.iconWrapper {
+  background-color: rgba(7, 126, 22, 0.1);
+  padding: 1rem;
+  border-radius: 50%;
+  margin-bottom: 1rem;
+  color: #077e16;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.contactCard:hover .iconWrapper {
+  background-color: #077e16;
+  color: white;
+}
+
+.cardTitle {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #9b5824;
+  font-family: "Poppins", sans-serif;
+}
+
+.cardText {
+  color: #142d17;
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.cardCta {
+  color: #077e16;
+  font-weight: 600;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+}
+
+.contactCard:hover .cardCta {
+  transform: translateX(4px);
+  display: inline-block;
+}
+
+/* Call to action box */
+.ctaBox {
+  background: linear-gradient(
+    135deg,
+    rgba(7, 126, 22, 0.1) 0%,
+    rgba(155, 88, 36, 0.1) 100%
+  );
+  border-radius: 1rem;
+  padding: 3rem 2rem;
+  text-align: center;
+  border: 2px solid #077e16;
+  position: relative;
+  overflow: hidden;
+}
+
+.ctaBox::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(255, 255, 255, 0.1) 0%,
+    transparent 70%
+  );
+  animation: pulse 4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.3;
+  }
+}
+
+.bellIcon {
+  color: #077e16;
+  margin-bottom: 1rem;
+  animation: ring 2s ease-in-out infinite;
+}
+
+@keyframes ring {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  10%,
+  30% {
+    transform: rotate(-10deg);
+  }
+  20%,
+  40% {
+    transform: rotate(10deg);
+  }
+  50% {
+    transform: rotate(0deg);
+  }
+}
+
+.ctaTitle {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #9b5824;
+  margin-bottom: 1rem;
+  font-family: "Poppins", sans-serif;
+}
+
+.ctaText {
+  font-size: 1.1rem;
+  color: #142d17;
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.7;
+}

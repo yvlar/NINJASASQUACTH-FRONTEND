@@ -1,13 +1,13 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import { Menu, X } from "lucide-react";
 import styles from "./Header.module.css";
 import Logo from "../../common/Logo";
 
-export default function Header({ onNavigate }) {
+export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  const handleNavClick = (sectionId) => {
-    onNavigate(sectionId);
+  const handleNavClick = () => {
     setIsMenuOpen(false);
   };
 
@@ -17,30 +17,18 @@ export default function Header({ onNavigate }) {
         <Logo source="/public/Logo jeux/Logo-Site-Web Transparent.png" />
 
         <div className={styles.navDesktop}>
-          <button
-            onClick={() => handleNavClick("accueil")}
-            className={styles.navLink}
-          >
+          <Link to="/" className={styles.navLink}>
             Accueil
-          </button>
-          <button
-            onClick={() => handleNavClick("jeux")}
-            className={styles.navLink}
-          >
+          </Link>
+          <Link to="/games" className={styles.navLink}>
             Nos Jeux
-          </button>
-          <button
-            onClick={() => handleNavClick("univers")}
-            className={styles.navLink}
-          >
+          </Link>
+          <Link to="/about" className={styles.navLink}>
             Notre Univers
-          </button>
-          <button
-            onClick={() => handleNavClick("contact")}
-            className={styles.navLink}
-          >
+          </Link>
+          <Link to="/contact" className={styles.navLink}>
             Contact
-          </button>
+          </Link>
         </div>
 
         <button
@@ -53,30 +41,34 @@ export default function Header({ onNavigate }) {
 
       {isMenuOpen && (
         <div className={styles.mobileMenu}>
-          <button
-            onClick={() => handleNavClick("accueil")}
+          <Link
+            to="/"
+            onClick={handleNavClick}
             className={styles.mobileNavLink}
           >
             Accueil
-          </button>
-          <button
-            onClick={() => handleNavClick("jeux")}
+          </Link>
+          <Link
+            to="/games"
+            onClick={handleNavClick}
             className={styles.mobileNavLink}
           >
             Nos Jeux
-          </button>
-          <button
-            onClick={() => handleNavClick("univers")}
+          </Link>
+          <Link
+            to="/about"
+            onClick={handleNavClick}
             className={styles.mobileNavLink}
           >
             Notre Univers
-          </button>
-          <button
-            onClick={() => handleNavClick("contact")}
+          </Link>
+          <Link
+            to="/contact"
+            onClick={handleNavClick}
             className={styles.mobileNavLink}
           >
             Contact
-          </button>
+          </Link>
         </div>
       )}
     </nav>

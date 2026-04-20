@@ -2,7 +2,7 @@ import React from "react";
 import { Users, Clock, Star, Leaf } from "lucide-react";
 import styles from "./Games.module.css";
 
-export default function GameDetail({ game, onBack }) {
+export default function GameDetail({ game }) {
   // Formater le texte avec les sauts de ligne
   const formatDescription = (text) => {
     return text.split("\n").map((line, index) => (
@@ -16,10 +16,6 @@ export default function GameDetail({ game, onBack }) {
   return (
     <div className={styles.detailContainer}>
       <div className={styles.detailContent}>
-        <button onClick={onBack} className={styles.backButton}>
-          ← Retour aux jeux
-        </button>
-
         <div className={styles.detailGrid}>
           <div>
             <img

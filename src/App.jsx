@@ -1,34 +1,25 @@
-import React from "react";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
-import Hero from "./components/sections/Hero";
-import GamesSection from "./components/sections/Games";
-import AboutSection from "./components/sections/About";
-import ContactSection from "./components/sections/Contact";
-import "./styles/global.css";
-import Banner from "./components/layout/Banner";
+import Hero from "./pages/Hero";
+import About from "./pages/About";
+import Games from "./pages/Games";
+import Contact from "./pages/Contact";
 
 function App() {
-  const scrollToSection = (id) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  };
-
   return (
-    <div style={{ backgroundColor: "#ffffe9", minHeight: "100vh" }}>
-      <Header onNavigate={scrollToSection} />
-
+    <BrowserRouter>
+      <Header />
       <main>
-        <Hero onNavigate={scrollToSection} />
-
-        <GamesSection />
-        <AboutSection />
-        <ContactSection />
+        <Routes>
+          <Route path="/" element={<Hero />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/games" element={<Games />} />
+          <Route path="/contact" element={<Contact />} />
+        </Routes>
       </main>
       <Footer />
-    </div>
+    </BrowserRouter>
   );
 }
 

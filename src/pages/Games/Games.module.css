@@ -1,3 +1,11 @@
+/* =============================================================================
+   GAMES SECTION - STYLES PROFESSIONNELS
+   ============================================================================= */
+
+/* =============================================================================
+   1. SECTION PRINCIPALE & LAYOUT
+   ============================================================================= */
+
 .section {
   padding: 5rem 0;
   background-color: #ffffe9;
@@ -21,14 +29,18 @@
   }
 }
 
+/* =============================================================================
+   2. TYPOGRAPHIE
+   ============================================================================= */
+
 .title {
   font-size: 2.5rem;
   font-weight: 800;
-  margin-bottom: 1rem;
-  text-align: center;
   font-family: "Poppins", sans-serif;
   letter-spacing: -0.01em;
   color: #9b5824;
+  text-align: center;
+  margin-bottom: 1rem;
 }
 
 @media (min-width: 768px) {
@@ -38,14 +50,16 @@
 }
 
 .description {
-  text-align: center;
-  margin-bottom: 3rem;
   max-width: 42rem;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto 3rem;
   font-size: 1.125rem;
   color: #142d17;
+  text-align: center;
 }
+
+/* =============================================================================
+   3. FILTRES
+   ============================================================================= */
 
 .filterContainer {
   display: flex;
@@ -57,13 +71,13 @@
 
 .filterButton {
   padding: 0.5rem 1.5rem;
-  border-radius: 9999px;
-  font-weight: 500;
   border: none;
-  cursor: pointer;
-  transition: all 0.3s ease;
+  border-radius: 9999px;
   background-color: rgba(155, 88, 36, 0.2);
   color: #142d17;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .filterButton:hover {
@@ -76,10 +90,14 @@
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 
+/* =============================================================================
+   4. GRILLE DE CARTES
+   ============================================================================= */
+
 .grid {
   display: grid;
-  gap: 2rem;
   grid-template-columns: 1fr;
+  gap: 2rem;
 }
 
 @media (min-width: 640px) {
@@ -94,13 +112,20 @@
   }
 }
 
+/* =============================================================================
+   5. CARTES DE JEUX
+   ============================================================================= */
+
+/* --- Structure de base --- */
 .card {
-  cursor: pointer;
-  transition: transform 0.3s ease;
   background: white;
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .card:hover {
@@ -108,6 +133,7 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* --- Image et badge écologique --- */
 .imageContainer {
   position: relative;
   overflow: hidden;
@@ -129,21 +155,35 @@
   position: absolute;
   top: 0.75rem;
   right: 0.75rem;
-  background-color: #077e16;
-  padding: 0.5rem;
-  border-radius: 50%;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
+  padding: 0.5rem;
+  background-color: #077e16;
+  border-radius: 50%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
-/* ✅ NOUVEAU : Styles pour le contenu de la carte */
+/* --- Contenu de la carte --- */
 .cardContent {
   padding: 1.5rem;
 }
 
-/* ✅ NOUVEAU : Container des catégories */
+.cardTitle {
+  font-size: 1.25rem;
+  font-weight: 700;
+  font-family: "Poppins", sans-serif;
+  color: #9b5824;
+  margin-bottom: 0.5rem;
+}
+
+.cardDesc {
+  color: #142d17;
+  line-height: 1.6;
+  margin-bottom: 0.75rem;
+}
+
+/* --- Catégories avec icônes --- */
 .categories {
   display: flex;
   flex-wrap: wrap;
@@ -151,16 +191,15 @@
   margin-bottom: 0.75rem;
 }
 
-/* ✅ NOUVEAU : Tags de catégories avec icônes */
 .categoryTag {
   display: inline-flex;
   align-items: center;
-  gap: 0.4rem; /* Espace entre icône et texte */
+  gap: 0.4rem;
   padding: 0.35rem 0.9rem;
+  border: 1px solid;
   border-radius: 12px;
   font-size: 0.8rem;
   font-weight: 600;
-  border: 1px solid;
   white-space: nowrap;
   transition:
     transform 0.2s ease,
@@ -172,28 +211,15 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
 }
 
-.cardTitle {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 0.5rem;
-  font-family: "Poppins", sans-serif;
-  color: #9b5824;
-}
-
-.cardDesc {
-  margin-bottom: 0.75rem;
-  color: #142d17;
-  line-height: 1.6;
-}
-
+/* --- Informations de la carte --- */
 .cardInfo {
   display: flex;
   gap: 1rem;
-  font-size: 0.875rem;
-  color: #142d17;
   padding-top: 0.75rem;
   margin-top: 0.75rem;
   border-top: 1px solid rgba(20, 45, 23, 0.1);
+  font-size: 0.875rem;
+  color: #142d17;
 }
 
 .infoItem {
@@ -207,11 +233,15 @@
   color: #077e16;
 }
 
-/* Detail View */
+/* =============================================================================
+   6. VUE DÉTAILLÉE D'UN JEU
+   ============================================================================= */
+
+/* --- Container principal --- */
 .detailContainer {
   min-height: 100vh;
+  padding: 4rem 0 2rem;
   background-color: #ffffe9;
-  padding-top: 4rem;
 }
 
 .detailContent {
@@ -220,30 +250,55 @@
   padding: 2rem 1rem;
 }
 
+/* --- Bouton retour --- */
 .backButton {
   background: none;
   border: none;
   color: #142d17;
+  font-size: 1rem;
   font-weight: 500;
   margin-bottom: 1.5rem;
   cursor: pointer;
   transition: opacity 0.3s ease;
-  font-size: 1rem;
 }
 
 .backButton:hover {
   opacity: 0.8;
 }
 
+/* --- Grille du détail --- */
 .detailGrid {
   display: grid;
-  gap: 2rem;
   grid-template-columns: 1fr;
+  gap: 2rem;
 }
 
 @media (min-width: 768px) {
   .detailGrid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* --- Image et logo --- */
+.logoContainer {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.logoDetail {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 340px;
+  max-height: 240px;
+  object-fit: contain;
+}
+
+@media (min-width: 768px) {
+  .logoDetail {
+    max-width: 600px;
+    max-height: 400px;
   }
 }
 
@@ -256,32 +311,33 @@
 }
 
 .ecoLabel {
-  margin-top: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-top: 1rem;
   padding: 0.5rem 1rem;
-  border-radius: 0.5rem;
   background-color: #077e16;
   color: #ffffe9;
   font-weight: 500;
+  border-radius: 0.5rem;
 }
 
+/* --- Contenu textuel --- */
 .detailTitle {
   font-size: 2.25rem;
   font-weight: 800;
-  margin-bottom: 1rem;
   font-family: "Poppins", sans-serif;
   letter-spacing: -0.01em;
   color: #9b5824;
+  margin-bottom: 1rem;
 }
 
 .detailMeta {
   display: flex;
+  flex-wrap: wrap;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
   color: #142d17;
-  flex-wrap: wrap;
 }
 
 .metaItem {
@@ -293,76 +349,60 @@
 
 .detailDesc {
   font-size: 1.125rem;
-  margin-bottom: 1.5rem;
   line-height: 1.8;
   color: #142d17;
-  white-space: pre-line; /* ✅ Pour afficher les \n du JSON */
+  margin-bottom: 1.5rem;
+  white-space: pre-line;
 }
 
+/* --- Caractéristiques --- */
 .characteristics {
   padding: 1.5rem;
-  border-radius: 0.5rem;
   background-color: rgba(7, 126, 22, 0.1);
   border-left: 4px solid #077e16;
+  border-radius: 0.5rem;
 }
 
 .characteristicsTitle {
-  font-weight: 600;
-  margin-bottom: 0.75rem;
-  color: #142d17;
   font-size: 1.125rem;
+  font-weight: 600;
+  color: #142d17;
+  margin-bottom: 0.75rem;
 }
 
 .characteristicsList {
-  list-style: none;
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
   color: #142d17;
+  list-style: none;
 }
 
-.loading,
-.error {
-  text-align: center;
+/* =============================================================================
+   7. ÉTATS (LOADING, ERROR, NO GAMES)
+   ============================================================================= */
+
+.loading {
   padding: 4rem 2rem;
   font-size: 1.2rem;
   color: #142d17;
+  text-align: center;
 }
 
 .error {
-  color: #d32f2f;
-  background-color: #ffebee;
-  border-radius: 12px;
-  padding: 2rem;
   margin: 2rem 0;
+  padding: 2rem;
+  background-color: #ffebee;
+  color: #d32f2f;
+  font-size: 1.2rem;
+  text-align: center;
+  border-radius: 12px;
 }
 
 .noGames {
   grid-column: 1 / -1;
-  text-align: center;
   padding: 3rem 2rem;
-  color: #142d17;
   font-size: 1.1rem;
-}
-
-.logoContainer {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 1rem;
-}
-
-.logoDetail {
-  max-height: 240px;
-  max-width: 340px;
-  width: auto;
-  height: auto;
-  display: block;
-  object-fit: contain;
-}
-
-@media (min-width: 768px) {
-  .logoDetail {
-    max-height: 400px;
-    max-width: 600px;
-  }
+  color: #142d17;
+  text-align: center;
 }
