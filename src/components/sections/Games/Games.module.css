@@ -103,6 +103,13 @@
   transform: scale(1.02);
 }
 
+/* La carte est focalisable au clavier (role="button") : focus visible requis. */
+.card:focus-visible {
+  outline: 3px solid var(--color-eco-green);
+  outline-offset: 4px;
+  border-radius: 0.5rem;
+}
+
 .imageContainer {
   position: relative;
   overflow: hidden;
