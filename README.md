@@ -27,6 +27,21 @@ Stack : React 19 + Vite 7, CSS Modules, `lucide-react`. Pas de backend, pas de
 routeur, pas de TypeScript — voir `CLAUDE.md` pour l'architecture et les
 conventions de code.
 
+## Déploiement (Vercel)
+
+Le site est un build statique Vite (`npm run build` → `dist/`), prêt à être
+déployé sur Vercel sans configuration particulière (framework détecté
+automatiquement, aucune variable d'environnement requise). Deux voies :
+
+- **Intégration Git (recommandé)** : importer le dépôt GitHub dans le
+  tableau de bord Vercel (« Add New… → Project »). Chaque push sur `main`
+  déclenche alors un déploiement de production, et chaque branche une preview.
+- **CLI** : `npx vercel deploy --prod` depuis la racine du projet
+  (authentification `vercel login` ou variable `VERCEL_TOKEN` requise).
+
+La CI GitHub Actions (`.github/workflows/ci.yml`) reste la garde qualité
+(lint + tests + build) en amont de tout déploiement.
+
 ## Documentation
 
 - `ROADMAP.md` — source de vérité du workflow : sprints, découvertes, changelog,
