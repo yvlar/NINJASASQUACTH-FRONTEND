@@ -28,9 +28,10 @@ export default function GameDetail({ game, onBack }) {
           </div>
 
           <div>
-            <h1 className={styles.detailTitle}>
+            {/* h2 (pas h1) : le h1 unique de la page est celui du hero (D9) */}
+            <h2 className={styles.detailTitle}>
               {t(`games.items.${game.id}.title`)}
-            </h1>
+            </h2>
 
             <div className={styles.detailMeta}>
               <div className={styles.metaItem}>
