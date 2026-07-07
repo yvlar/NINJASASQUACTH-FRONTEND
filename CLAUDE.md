@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Single-page marketing site for **Ninja Sasquatch Games**, a Québec board-game company. Content is French-first (the live UI hardcodes French strings). React 19 + Vite, no backend.
+Single-page marketing site for **Ninja Sasquatch Games**, a Québec board-game company. Content is French-first (the live UI hardcodes French strings).
+
+Stack: **React 19** + **Vite 7**, `lucide-react` for icons. No backend, no router, no state-management library, no CSS framework, no TypeScript.
 
 ## Commands
 
@@ -30,9 +32,11 @@ Entry: `src/main.jsx` mounts `<App>` in `StrictMode`. `src/App.jsx` is the whole
 
 Import components by folder (`import Header from "./components/layout/Header"`), which resolves through the barrel. Follow this exact pattern when adding components.
 
-**Games feature.** `GamesSection` holds `selectedCategory` and `selectedGame` state. It filters `games` by category and renders `GameCard`s; clicking a card sets `selectedGame`, which swaps the entire section view to `GameDetail` (with a back button) — there's no modal or route.
+**Games feature.** `GamesSection` holds `selectedCategory` (defaults to `"tous"`, i.e. all) and `selectedGame` state. It filters `games` by category and renders `GameCard`s; clicking a card sets `selectedGame`, which swaps the entire section view to `GameDetail` (with a back button) — there's no modal or route.
 
-**Data layer.** `src/data/games.js` exports `games` and `categories` arrays — this is the single source of truth for game content. Category IDs include accented values (e.g. `"stratégie"`); filtering matches on these exact strings, so the `categories` IDs and each game's `category` must agree byte-for-byte.
+**Data layer.** `src/data/games.js` exports `games` and `categories` arrays — this is the single source of truth for game content. Each `game` object has: `id, title, category, image, shortDesc, players, duration, age, fullDesc, eco` (images are remote Unsplash URLs). The four category IDs are `tous`, `famille`, `stratégie`, `party`. Category IDs include accented values (e.g. `"stratégie"`); filtering matches on these exact strings, so the `categories` IDs and each game's `category` must agree byte-for-byte.
+
+**Icons.** Pulled from `lucide-react` as named imports (e.g. `Menu`/`X` in `Header`, `Leaf` in `About`/`Footer`/`GameCard`, `Users`/`Clock`/`Star` in the Games components, `Instagram`/`Facebook`/`Mail` in `Contact`).
 
 ## Styling
 
