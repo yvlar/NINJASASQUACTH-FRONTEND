@@ -16,7 +16,7 @@
 
 - **Dernière mise à jour** : 2026-07-07 — Sprint 4 en cours : **déploiement Vercel vérifié et consigné** (item 4.2, D13 résolu) — le site est en ligne et public à `https://ninjasasquacth-frontend.vercel.app` (confirmé live, build identique à `main`). Restent dans le Sprint 4 : garde-fou a11y (4.1, exécutable) et contenu réel (4.3/4.4, Décisions requises).
 - **Sprint courant** : **Sprint 4 — Accessibilité, mise en ligne et contenu réel** (items 4.1 → 4.4 ci-dessous ; **4.2 fait** — site en ligne ; 4.1 exécutable sans action utilisateur ; 4.3/4.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
-- **État des tests** : **21/21 verts** (8 fichiers dans `src/__tests__/`, sortie réelle de `npm test` recalibrée à la clôture du Sprint 3 — inchangée depuis le Sprint 2 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **État des tests** : **24/24 verts** (9 fichiers dans `src/__tests__/`, sortie réelle de `npm test` après l'item 4.1 — Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -209,16 +209,17 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > par l'utilisateur, URL vérifiée et consignée) ; reste 4.1 (exécutable) et
 > 4.3/4.4 (Décisions requises).
 
-- [ ] **4.1** **Garde-fou a11y dans le lint** — brancher `eslint-plugin-jsx-a11y`
-  (préréglage `recommended`) dans le flat config (`eslint.config.js:1-29`) pour
-  attraper mécaniquement les régressions d'accessibilité JSX (alt manquant,
-  ancres invalides, aria incohérents) ; corriger toute violation existante
-  révélée par le préréglage, en respectant l'architecture (i18n via `t()`,
-  pattern de composant).
-  **Prérequis d'accès** : aucun (npm registry seulement).
-  **Acceptation** : plugin actif dans `eslint.config.js`, `npm run lint` vert
-  (zéro erreur, zéro warning) avec le préréglage `recommended`, tests/build
-  inchangés et verts.
+- [x] **4.1** **Garde-fou a11y dans le lint** → `6b445c5`
+  `eslint-plugin-jsx-a11y` (préréglage `recommended`) branché dans le flat
+  config (`eslint.config.js`). Le préréglage a révélé 4 erreurs : cartes de
+  jeu cliquables mais inaccessibles au clavier (`GameCard.jsx`) — corrigé
+  (role=button, tabIndex 0, Entrée/Espace, focus visible) et verrouillé par
+  3 tests rouges avant le fix (`src/__tests__/game-card-a11y.test.jsx`) ;
+  les deux `href="#"` Instagram/Facebook = placeholders D12 (item 4.4,
+  Décision requise) — verrou `anchor-is-valid` suspendu localement avec
+  commentaire pointant 4.4, à retirer en résolvant la décision.
+  **Acceptation SATISFAITE** : plugin actif, lint vert (zéro erreur, zéro
+  warning), 24/24 tests verts, build OK, audit high = 0.
 - [x] **4.2** (D13) **Déployer sur Vercel** → **URL de production** :
   `https://ninjasasquacth-frontend.vercel.app`
   Intégration Git Vercel en place (décision du 2026-07-07). Site vérifié **en
