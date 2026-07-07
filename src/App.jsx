@@ -1,4 +1,3 @@
-import React from "react";
 import Header from "./components/layout/Header";
 import Footer from "./components/layout/Footer";
 import Hero from "./components/sections/Hero";
@@ -16,7 +15,7 @@ function App() {
   };
 
   return (
-    <div style={{ backgroundColor: "#ffffe9", minHeight: "100vh" }}>
+    <div style={{ backgroundColor: "var(--color-cream)", minHeight: "100vh" }}>
       <Header onNavigate={scrollToSection} />
       <main>
         <Hero onNavigate={scrollToSection} />

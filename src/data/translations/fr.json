@@ -23,7 +23,45 @@
     "materials": "Matériaux 100% compostables et écoresponsables",
     "madeIn": "Conçu et fabriqué au Québec",
     "rules": "Règles claires et accessibles à tous",
-    "commitment": "Engagement environnemental garanti"
+    "commitment": "Engagement environnemental garanti",
+    "categories": {
+      "tous": "Tous nos jeux",
+      "famille": "Famille",
+      "stratégie": "Stratégie",
+      "party": "Party Game"
+    },
+    "items": {
+      "1": {
+        "title": "Origines Mystérieuses",
+        "shortDesc": "Plongez dans les légendes du Sasquatch et découvrez ses secrets",
+        "fullDesc": "Origines Mystérieuses vous transporte dans l'univers fascinant du Sasquatch. Explorez les forêts, décodez les indices et percez les mystères de cette créature légendaire. Un jeu captivant qui allie stratégie et découverte pour toute la famille."
+      },
+      "2": {
+        "title": "Mission Ninja",
+        "shortDesc": "Infiltration, discrétion et tactiques pour devenir le meilleur ninja",
+        "fullDesc": "Dans Mission Ninja, devenez un maître de la discrétion. Planifiez vos mouvements, déjouez vos adversaires et accomplissez vos objectifs secrets. Chaque décision compte dans ce jeu de stratégie où le mystère règne."
+      },
+      "3": {
+        "title": "Festin Forestier",
+        "shortDesc": "Des rires garantis autour d'un festin sauvage et déjanté",
+        "fullDesc": "Festin Forestier transforme vos soirées en aventures hilarantes. Entre défis loufoques et situations absurdes, ce party game garantit des moments inoubliables et des fous rires incontrôlables."
+      },
+      "4": {
+        "title": "Gardiens de la Forêt",
+        "shortDesc": "Coopérez pour protéger la nature et ses habitants",
+        "fullDesc": "Gardiens de la Forêt célèbre nos valeurs environnementales. Travaillez ensemble pour préserver l'écosystème, sauver les animaux et restaurer l'équilibre naturel. Un jeu coopératif qui sensibilise tout en amusant."
+      },
+      "5": {
+        "title": "Légendes du Québec",
+        "shortDesc": "Explorez les mythes et créatures fantastiques du Québec",
+        "fullDesc": "Légendes du Québec vous invite à découvrir le folklore québécois. Du Sasquatch aux créatures des légendes locales, parcourez le territoire et collectez les récits mythiques dans une aventure stratégique unique."
+      },
+      "6": {
+        "title": "Soirée Mystère",
+        "shortDesc": "Enquêtes et énigmes pour une soirée pleine de suspense",
+        "fullDesc": "Soirée Mystère plonge vos invités dans des enquêtes palpitantes. Indices cachés, suspects intrigants et rebondissements garantis pour une expérience immersive qui marquera les esprits."
+      }
+    }
   },
   "about": {
     "title": "Notre Mission",
@@ -37,6 +75,12 @@
       "quebec": "Fait au Québec",
       "accessible": "Accessible à tous",
       "fun": "Rires garantis"
+    },
+    "statValues": {
+      "compostable": "100%",
+      "quebec": "QUÉBEC",
+      "accessible": "TOUS",
+      "fun": "FUN"
     }
   },
   "contact": {
@@ -48,9 +92,18 @@
     "namePlaceholder": "Votre nom",
     "emailPlaceholder": "votre@email.com",
     "messagePlaceholder": "Votre message...",
-    "send": "Envoyer le message"
+    "send": "Envoyer le message",
+    "subject": "Message du site Ninja Sasquatch Games",
+    "success": "Merci ! Votre logiciel de messagerie va s'ouvrir pour envoyer votre message.",
+    "errors": {
+      "nameRequired": "Veuillez entrer votre nom.",
+      "emailRequired": "Veuillez entrer votre adresse email.",
+      "emailInvalid": "Veuillez entrer une adresse email valide.",
+      "messageRequired": "Veuillez entrer votre message."
+    }
   },
   "footer": {
+    "copyright": "© 2026 Ninja Sasquatch Games.",
     "rights": "Tous droits réservés.",
     "tagline": "Fièrement québécois et 100% compostable"
   }

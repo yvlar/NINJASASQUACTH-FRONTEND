@@ -40,7 +40,7 @@
   margin-bottom: 1.5rem;
   font-family: "Poppins", sans-serif;
   letter-spacing: -0.01em;
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 @media (min-width: 768px) {
@@ -53,14 +53,14 @@
   margin-bottom: 1rem;
   line-height: 1.6;
   font-size: 1.125rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .ecoCard {
   margin-top: 2rem;
   padding: 1.5rem;
   border-radius: 0.5rem;
-  background-color: #077e16;
+  background-color: var(--color-eco-green);
 }
 
 .ecoHeader {
@@ -79,7 +79,7 @@
 
 .ecoDesc {
   line-height: 1.6;
-  color: #ffffe9;
+  color: var(--color-cream);
 }
 
 .statsGrid {
@@ -103,16 +103,26 @@
   font-family: "Poppins", sans-serif;
 }
 
+.statCard:nth-child(1),
+.statCard:nth-child(3) {
+  border-top-color: var(--color-brown);
+}
+
+.statCard:nth-child(2),
+.statCard:nth-child(4) {
+  border-top-color: var(--color-eco-green);
+}
+
 .statCard:nth-child(1) .statNumber,
 .statCard:nth-child(3) .statNumber {
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 .statCard:nth-child(2) .statNumber,
 .statCard:nth-child(4) .statNumber {
-  color: #077e16;
+  color: var(--color-eco-green);
 }
 
 .statLabel {
-  color: #142d17;
+  color: var(--color-dark-green);
 }

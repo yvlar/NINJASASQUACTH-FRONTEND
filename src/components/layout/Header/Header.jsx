@@ -1,14 +1,25 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Header.module.css";
 
 export default function Header({ onNavigate }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { lang, t, toggleLang } = useLanguage();
 
   const handleNavClick = (sectionId) => {
     onNavigate(sectionId);
     setIsMenuOpen(false);
   };
+
+  const navItems = [
+    { id: "accueil", label: t("nav.home") },
+    { id: "jeux", label: t("nav.games") },
+    { id: "univers", label: t("nav.universe") },
+    { id: "contact", label: t("nav.contact") },
+  ];
+
+  const targetLang = lang === "fr" ? "EN" : "FR";
 
   return (
     <nav className={styles.header}>
@@ -19,29 +30,17 @@ export default function Header({ onNavigate }) {
         </div>
 
         <div className={styles.navDesktop}>
-          <button
-            onClick={() => handleNavClick("accueil")}
-            className={styles.navLink}
-          >
-            Accueil
-          </button>
-          <button
-            onClick={() => handleNavClick("jeux")}
-            className={styles.navLink}
-          >
-            Nos Jeux
-          </button>
-          <button
-            onClick={() => handleNavClick("univers")}
-            className={styles.navLink}
-          >
-            Notre Univers
-          </button>
-          <button
-            onClick={() => handleNavClick("contact")}
-            className={styles.navLink}
-          >
-            Contact
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavClick(item.id)}
+              className={styles.navLink}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button onClick={toggleLang} className={styles.langButton}>
+            {targetLang}
           </button>
         </div>
 
@@ -55,29 +54,17 @@ export default function Header({ onNavigate }) {
 
       {isMenuOpen && (
         <div className={styles.mobileMenu}>
-          <button
-            onClick={() => handleNavClick("accueil")}
-            className={styles.mobileNavLink}
-          >
-            Accueil
-          </button>
-          <button
-            onClick={() => handleNavClick("jeux")}
-            className={styles.mobileNavLink}
-          >
-            Nos Jeux
-          </button>
-          <button
-            onClick={() => handleNavClick("univers")}
-            className={styles.mobileNavLink}
-          >
-            Notre Univers
-          </button>
-          <button
-            onClick={() => handleNavClick("contact")}
-            className={styles.mobileNavLink}
-          >
-            Contact
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              onClick={() => handleNavClick(item.id)}
+              className={styles.mobileNavLink}
+            >
+              {item.label}
+            </button>
+          ))}
+          <button onClick={toggleLang} className={styles.langButton}>
+            {targetLang}
           </button>
         </div>
       )}

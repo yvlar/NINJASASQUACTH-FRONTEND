@@ -1,37 +1,43 @@
-import React from "react";
 import { Users, Clock, Star, Leaf } from "lucide-react";
+import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Games.module.css";
 
 export default function GameDetail({ game, onBack }) {
+  const { t } = useLanguage();
+
   return (
     <div className={styles.detailContainer}>
       <div className={styles.detailContent}>
         <button onClick={onBack} className={styles.backButton}>
-          ← Retour aux jeux
+          ← {t("games.backToGames")}
         </button>
 
         <div className={styles.detailGrid}>
           <div>
             <img
               src={game.image}
-              alt={game.title}
+              alt={t(`games.items.${game.id}.title`)}
               className={styles.detailImage}
             />
             {game.eco && (
               <div className={styles.ecoLabel}>
                 <Leaf size={20} />
-                <span>100% compostable et écoresponsable</span>
+                <span>{t("games.eco")}</span>
               </div>
             )}
           </div>
 
           <div>
-            <h1 className={styles.detailTitle}>{game.title}</h1>
+            <h1 className={styles.detailTitle}>
+              {t(`games.items.${game.id}.title`)}
+            </h1>
 
             <div className={styles.detailMeta}>
               <div className={styles.metaItem}>
                 <Users size={20} />
-                <span>{game.players} joueurs</span>
+                <span>
+                  {game.players} {t("games.players")}
+                </span>
               </div>
               <div className={styles.metaItem}>
                 <Clock size={20} />
@@ -43,20 +49,23 @@ export default function GameDetail({ game, onBack }) {
               </div>
             </div>
 
-            <p className={styles.detailDesc}>{game.fullDesc}</p>
+            <p className={styles.detailDesc}>
+              {t(`games.items.${game.id}.fullDesc`)}
+            </p>
 
             <div className={styles.characteristics}>
-              <h3 className={styles.characteristicsTitle}>Caractéristiques</h3>
+              <h3 className={styles.characteristicsTitle}>
+                {t("games.characteristics")}
+              </h3>
               <ul className={styles.characteristicsList}>
                 <li>
-                  • Catégorie:{" "}
-                  {game.category.charAt(0).toUpperCase() +
-                    game.category.slice(1)}
+                  • {t("games.category")}:{" "}
+                  {t(`games.categories.${game.category}`)}
                 </li>
-                <li>• Matériaux 100% compostables et écoresponsables</li>
-                <li>• Conçu et fabriqué au Québec</li>
-                <li>• Règles claires et accessibles à tous</li>
-                <li>• Engagement environnemental garanti</li>
+                <li>• {t("games.materials")}</li>
+                <li>• {t("games.madeIn")}</li>
+                <li>• {t("games.rules")}</li>
+                <li>• {t("games.commitment")}</li>
               </ul>
             </div>
           </div>

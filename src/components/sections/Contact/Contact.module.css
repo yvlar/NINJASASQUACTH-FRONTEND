@@ -1,6 +1,6 @@
 .section {
   padding: 5rem 0;
-  background-color: #ffffe9;
+  background-color: var(--color-cream);
 }
 
 .container {
@@ -28,7 +28,7 @@
   text-align: center;
   font-family: "Poppins", sans-serif;
   letter-spacing: -0.01em;
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 @media (min-width: 768px) {
@@ -41,7 +41,7 @@
   text-align: center;
   margin-bottom: 3rem;
   font-size: 1.125rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .formCard {
@@ -78,7 +78,7 @@
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .input,
@@ -86,8 +86,8 @@
   width: 100%;
   padding: 0.75rem 1rem;
   border-radius: 0.5rem;
-  border: 2px solid #9b5824;
-  background-color: #ffffe9;
+  border: 2px solid var(--color-brown);
+  background-color: var(--color-cream);
   font-family: inherit;
   font-size: 1rem;
   transition: border-color 0.3s ease;
@@ -96,7 +96,7 @@
 .input:focus,
 .textarea:focus {
   outline: none;
-  border-color: #077e16;
+  border-color: var(--color-eco-green);
 }
 
 .textarea {
@@ -106,7 +106,7 @@
 
 .submitButton {
   width: 100%;
-  background-color: #077e16;
+  background-color: var(--color-eco-green);
   color: white;
   padding: 1rem 2rem;
   border-radius: 0.5rem;
@@ -132,10 +132,26 @@
 }
 
 .socialLink {
-  color: #142d17;
+  color: var(--color-dark-green);
   transition: opacity 0.3s ease;
 }
 
 .socialLink:hover {
   opacity: 0.7;
+}
+
+.inputError {
+  border-color: var(--color-error);
+}
+
+.errorText {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--color-error);
+}
+
+.successText {
+  text-align: center;
+  font-weight: 500;
+  color: var(--color-eco-green);
 }

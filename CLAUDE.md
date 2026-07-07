@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Single-page marketing site for **Ninja Sasquatch Games**, a Québec board-game company. Content is French-first (the live UI hardcodes French strings).
+Single-page marketing site for **Ninja Sasquatch Games**, a Québec board-game company. Bilingual FR/EN, French by default.
 
 Stack: **React 19** + **Vite 7**, `lucide-react` for icons. No backend, no router, no state-management library, no CSS framework, no TypeScript.
 
@@ -21,7 +21,7 @@ There is **no test framework** configured — no `npm test`, no test files. Don'
 
 ## Architecture
 
-Entry: `src/main.jsx` mounts `<App>` in `StrictMode`. `src/App.jsx` is the whole page — it composes `Header` + `Footer` (layout) around `Hero`, `GamesSection`, `AboutSection`, `ContactSection`.
+Entry: `src/main.jsx` mounts `<App>` in `StrictMode`, wrapped in `<LanguageProvider>`. `src/App.jsx` is the whole page — it composes `Header` + `Footer` (layout) around `Hero`, `GamesSection`, `AboutSection`, `ContactSection`.
 
 **Navigation is scroll-based, not routed.** `App.jsx` defines `scrollToSection(id)` and passes it as `onNavigate` to `Header` and `Hero`. Buttons call it with section anchor IDs: `accueil`, `jeux`, `univers`, `contact`. These IDs are the contract between nav buttons and the `<section id="...">` targets — keep them in sync.
 
@@ -30,11 +30,15 @@ Entry: `src/main.jsx` mounts `<App>` in `StrictMode`. `src/App.jsx` is the whole
 - `<Name>.module.css` — scoped styles
 - `index.js` — a barrel: `export { default } from "./<Name>";`
 
-Import components by folder (`import Header from "./components/layout/Header"`), which resolves through the barrel. Follow this exact pattern when adding components.
+Import components by folder (`import Header from "./components/layout/Header"`), which resolves through the barrel. Follow this exact pattern when adding components. Don't add `import React from "react"` — the automatic JSX transform makes it unnecessary.
+
+**i18n.** `src/i18n/` holds three files, deliberately split so the `react-refresh/only-export-components` lint rule stays happy: `context.js` (the context object), `LanguageProvider.jsx` (state + `t()` + `toggleLang`, syncs `document.documentElement.lang`), and `useLanguage.js` (the hook). All user-visible strings live in `src/data/translations/{fr,en}.json` (same key structure in both files) and are looked up with `t("dot.path.key")` — `t` returns the key itself when a lookup misses, so a raw key showing in the UI means a missing/typo'd translation. The FR/EN toggle button is in `Header` (desktop nav and mobile menu). Default language is `"fr"`; `index.html` also declares `lang="fr"`.
 
 **Games feature.** `GamesSection` holds `selectedCategory` (defaults to `"tous"`, i.e. all) and `selectedGame` state. It filters `games` by category and renders `GameCard`s; clicking a card sets `selectedGame`, which swaps the entire section view to `GameDetail` (with a back button) — there's no modal or route.
 
-**Data layer.** `src/data/games.js` exports `games` and `categories` arrays — this is the single source of truth for game content. Each `game` object has: `id, title, category, image, shortDesc, players, duration, age, fullDesc, eco` (images are remote Unsplash URLs). The four category IDs are `tous`, `famille`, `stratégie`, `party`. Category IDs include accented values (e.g. `"stratégie"`); filtering matches on these exact strings, so the `categories` IDs and each game's `category` must agree byte-for-byte.
+**Data layer.** `src/data/games.js` exports `games` and `categories`, holding only non-translatable data: each `game` is `{ id, category, image, players, duration, age, eco }` (images are remote Unsplash URLs) and `categories` is `[{ id }]`. Game copy (`title`, `shortDesc`, `fullDesc`) lives in the translation JSONs under `games.items.<id>`, category labels under `games.categories.<id>`. The four category IDs are `tous`, `famille`, `stratégie`, `party` — accented values are significant: filtering and translation lookups match these exact strings, so `categories` IDs, each game's `category`, and the JSON keys must agree byte-for-byte. `src/data/site.js` exports `CONTACT_EMAIL`.
+
+**Contact form.** `ContactSection` is a controlled form with client-side validation; `errors` state stores i18n *keys* (not translated strings) so messages re-render in the current language. Submit builds a `mailto:` URL to `CONTACT_EMAIL`. The `<form>` has `noValidate` on purpose — native `type="email"` validation would short-circuit the custom messages.
 
 **Icons.** Pulled from `lucide-react` as named imports (e.g. `Menu`/`X` in `Header`, `Leaf` in `About`/`Footer`/`GameCard`, `Users`/`Clock`/`Star` in the Games components, `Instagram`/`Facebook`/`Mail` in `Contact`).
 
@@ -42,22 +46,17 @@ Import components by folder (`import Header from "./components/layout/Header"`),
 
 CSS Modules per component, plus one global reset/base in `src/styles/global.css` (imported once in `App.jsx`). No Tailwind, no CSS framework.
 
-Brand palette is hardcoded throughout (both in `.module.css` and inline `style={{}}`):
-- `#ffffe9` cream (background)
-- `#142d17` dark green (body text)
-- `#9b5824` brown (headings)
-- `#077e16` eco green (accents, CTAs, eco badge)
+The brand palette is defined once as custom properties in `global.css` `:root` — always use `var(--...)`, never raw hex:
+- `--color-cream` `#ffffe9` (background)
+- `--color-dark-green` `#142d17` (body text)
+- `--color-brown` `#9b5824` (headings)
+- `--color-eco-green` `#077e16` (accents, CTAs, eco badge, success text)
+- `--color-error` `#b3261e` (form errors)
+
+A few `rgba(...)` tints derived from the palette remain hardcoded in modules (e.g. header backdrop, filter-button background).
 
 Headings use **Poppins** (imported in `global.css`). Responsive breakpoints used in modules: 640px, 768px, 1024px.
 
-## Gotchas
-
-- **`src/claude.jsx` is dead code.** It's the original single-file prototype (one monolithic `NinjaSasquatchGames` component) and is **not imported anywhere**. The live app is the modular version under `components/`. Editing `claude.jsx` has no effect on the site. It also uses Tailwind utility classes (`min-h-screen`, `max-w-7xl`, etc.) — **Tailwind is not installed**, so those classes are inert; they only document the original design.
-
-- **i18n is scaffolded but not wired up.** `src/data/translations/{fr,en}.json` contain a complete FR/EN key structure, but no component imports them — all visible strings are hardcoded French in the JSX. The "FR / EN" toggle button (in the dead `claude.jsx`) is non-functional and absent from the live `Header`. Building real language switching means consuming these JSON files and adding a language state/provider.
-
-- **`CategoryFiltes.jsx` is misspelled** (missing the `r` in "Filters"). `GamesSection` imports it as `./CategoryFiltes`. If you rename the file, update that import too — don't "fix" the import string without renaming the file.
-
 ## Lint convention
 
-ESLint flat config (`eslint.config.js`) with `no-unused-vars` set to error but ignoring names matching `^[A-Z_]` — unused capitalized identifiers (e.g. the `React` import, SCREAMING_CASE constants) won't trip the rule. JS/JSX only; no TypeScript.
+ESLint flat config (`eslint.config.js`) with `no-unused-vars` set to error but ignoring names matching `^[A-Z_]` — unused capitalized identifiers (e.g. SCREAMING_CASE constants) won't trip the rule. `react-refresh/only-export-components` is active: component files must export only components (this is why `src/i18n/` is split into three files). JS/JSX only; no TypeScript.

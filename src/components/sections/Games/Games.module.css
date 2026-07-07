@@ -1,6 +1,6 @@
 .section {
   padding: 5rem 0;
-  background-color: #ffffe9;
+  background-color: var(--color-cream);
 }
 
 .container {
@@ -28,7 +28,7 @@
   text-align: center;
   font-family: "Poppins", sans-serif;
   letter-spacing: -0.01em;
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 @media (min-width: 768px) {
@@ -44,7 +44,7 @@
   margin-left: auto;
   margin-right: auto;
   font-size: 1.125rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .filterContainer {
@@ -63,7 +63,7 @@
   cursor: pointer;
   transition: all 0.3s ease;
   background-color: rgba(155, 88, 36, 0.2);
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .filterButton:hover {
@@ -71,7 +71,7 @@
 }
 
 .filterButtonActive {
-  background-color: #142d17;
+  background-color: var(--color-dark-green);
   color: white;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
@@ -121,7 +121,7 @@
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  background-color: #077e16;
+  background-color: var(--color-eco-green);
   padding: 0.5rem;
   border-radius: 9999px;
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
@@ -132,19 +132,19 @@
   font-weight: 700;
   margin-bottom: 0.5rem;
   font-family: "Poppins", sans-serif;
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 .cardDesc {
   margin-bottom: 0.75rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .cardInfo {
   display: flex;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .infoItem {
@@ -156,7 +156,7 @@
 /* Detail View */
 .detailContainer {
   min-height: 100vh;
-  background-color: #ffffe9;
+  background-color: var(--color-cream);
   padding-top: 4rem;
 }
 
@@ -169,7 +169,7 @@
 .backButton {
   background: none;
   border: none;
-  color: #142d17;
+  color: var(--color-dark-green);
   font-weight: 500;
   margin-bottom: 1.5rem;
   cursor: pointer;
@@ -207,8 +207,8 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  background-color: #077e16;
-  color: #ffffe9;
+  background-color: var(--color-eco-green);
+  color: var(--color-cream);
   font-weight: 500;
 }
 
@@ -218,14 +218,14 @@
   margin-bottom: 1rem;
   font-family: "Poppins", sans-serif;
   letter-spacing: -0.01em;
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 .detailMeta {
   display: flex;
   gap: 1.5rem;
   margin-bottom: 1.5rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .metaItem {
@@ -238,20 +238,20 @@
   font-size: 1.125rem;
   margin-bottom: 1.5rem;
   line-height: 1.6;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .characteristics {
   padding: 1.5rem;
   border-radius: 0.5rem;
   background-color: rgba(7, 126, 22, 0.1);
-  border-left: 4px solid #077e16;
+  border-left: 4px solid var(--color-eco-green);
 }
 
 .characteristicsTitle {
   font-weight: 600;
   margin-bottom: 0.75rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .characteristicsList {
@@ -259,5 +259,5 @@
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-  color: #142d17;
+  color: var(--color-dark-green);
 }

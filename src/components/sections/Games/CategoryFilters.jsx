@@ -1,4 +1,4 @@
-import React from "react";
+import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Games.module.css";
 
 export default function CategoryFilter({
@@ -6,6 +6,8 @@ export default function CategoryFilter({
   selectedCategory,
   onSelectCategory,
 }) {
+  const { t } = useLanguage();
+
   return (
     <div className={styles.filterContainer}>
       {categories.map((cat) => (
@@ -16,7 +18,7 @@ export default function CategoryFilter({
             selectedCategory === cat.id ? styles.filterButtonActive : ""
           }`}
         >
-          {cat.label}
+          {t(`games.categories.${cat.id}`)}
         </button>
       ))}
     </div>
