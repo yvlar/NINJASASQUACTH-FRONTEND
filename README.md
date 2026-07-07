@@ -29,9 +29,13 @@ conventions de code.
 
 ## Déploiement (Vercel)
 
-Le site est un build statique Vite (`npm run build` → `dist/`), prêt à être
-déployé sur Vercel sans configuration particulière (framework détecté
-automatiquement, aucune variable d'environnement requise). Deux voies :
+**Production : <https://ninjasasquacth-frontend.vercel.app>** (intégration
+Git Vercel — chaque push sur `main` déclenche un déploiement de production,
+chaque branche une preview).
+
+Le site est un build statique Vite (`npm run build` → `dist/`), déployé sur
+Vercel sans configuration particulière (framework détecté automatiquement,
+aucune variable d'environnement requise). Pour rejouer l'installation :
 
 - **Intégration Git (recommandé)** : importer le dépôt GitHub dans le
   tableau de bord Vercel (« Add New… → Project »). Chaque push sur `main`

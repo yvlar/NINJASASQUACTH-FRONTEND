@@ -15,7 +15,7 @@
 | **Production**   | 62        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
 - **Dernière mise à jour** : 2026-07-07 — clôture du Sprint 2 : 10 vulnérabilités `npm audit` → 0, URL mailto extraite (`src/utils/mailto.js`) et verrouillée par test, h1 unique garanti dans toutes les vues (hiérarchie des headings testée), procédure de déploiement Vercel documentée. Items 2.4/2.5 reportés (Décisions requises sans réponse). Une découverte nouvelle (D13 : déploiement bloqué sur l'authentification Vercel).
-- **Sprint courant** : **Sprint 3 — Mise en ligne et contenu réel** (items 3.1 → 3.4 ci-dessous ; 3.2 : décision prise — intégration Git Vercel, en attente de l'import du dépôt par l'utilisateur ; 3.3 et 3.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
+- **Sprint courant** : **Sprint 3 — Mise en ligne et contenu réel** (items 3.1 → 3.4 ci-dessous ; 3.2 ✅ fait — **production en ligne : <https://ninjasasquacth-frontend.vercel.app>** ; 3.3 et 3.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
 - **État des tests** : **21/21 verts** (8 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 2 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
 
@@ -159,16 +159,17 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   silencieusement.
   **Acceptation** : la CI échoue sur vulnérabilité `high`, passe aujourd'hui ;
   lint/tests/build inchangés.
-- [ ] **3.2** (D13) **Déployer sur Vercel** — **Décision prise (2026-07-07)** :
-  **intégration Git Vercel** (la voie `VERCEL_TOKEN` est écartée).
-  Reste-à-faire : l'utilisateur importe `yvlar/ninjasasquacth-frontend` dans le
-  tableau de bord Vercel (« Add New… → Project » — procédure dans le README,
-  section « Déploiement »), puis un push/merge sur `main` déclenche le
-  déploiement de production ; enfin, vérifier l'URL (MCP Vercel
-  `list_projects`/`list_deployments`, équipe `yvlars-projects`) et la consigner
-  ici + dans le README.
-  **Acceptation** : URL de production accessible et consignée ici + dans le
-  README ; le build déployé est celui de `main` (ou de la branche décidée).
+- [x] **3.2** (D13) **Déployer sur Vercel** — **FAIT (2026-07-07)** via
+  l'intégration Git Vercel (décision utilisateur ; import du dépôt réalisé par
+  l'utilisateur après autorisation de la GitHub App).
+  **Production : <https://ninjasasquacth-frontend.vercel.app>**
+  **Acceptation SATISFAITE** : URL de production vérifiée (HTTP 200, titre du
+  site correct) et consignée ici + dans le README ; le bundle déployé
+  (`index-CtC0q-o5.js`) est identique octet pour octet au build local de
+  `main` mergé (`19c00b2`, PR #5) — le Sprint 2 complet est en production.
+  Note : le projet n'apparaît pas dans l'équipe `yvlars-projects` visible du
+  MCP (probablement créé sur un autre compte/équipe Vercel) — la vérification
+  s'est faite sur l'URL publique.
 - [ ] **3.3** (D3) **Vraies photos produits** — **Décision requise** (report de
   2.4, périmètre identique) : brancher les vraies photos (`src/data/games.js:10`
   et suiv.) et ajouter `og:image` (`index.html`).
@@ -203,7 +204,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D10 | ✅ | (Sprint 1) La construction de l'URL `mailto:` (`ContactSection.jsx:47-51`) n'est pas interceptable sous jsdom : le verrou 1.2 couvre erreurs/succès mais pas l'URL elle-même | ✅ Sprint 2 (item 2.2 `42cc330`) — `src/utils/mailto.js` + 3 tests |
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
-| D13 | 🟠 | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07) mais bloqué : l'outil MCP Vercel renvoie vers la CLI, et la CLI n'a aucune authentification dans l'environnement (pas de `VERCEL_TOKEN`, login interactif impossible). Le compte est joignable via MCP (équipe `yvlars-projects`, aucun projet pour ce site). Procédure documentée dans le README (`5645547`) | Sprint 3 (item 3.2) — **décision prise (2026-07-07) : intégration Git Vercel** ; en attente de l'import du dépôt par l'utilisateur |
+| D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07) mais bloqué : l'outil MCP Vercel renvoie vers la CLI, et la CLI n'a aucune authentification dans l'environnement (pas de `VERCEL_TOKEN`, login interactif impossible). Procédure documentée dans le README (`5645547`) | ✅ Sprint 3 (item 3.2) — intégration Git Vercel : import fait par l'utilisateur, production en ligne <https://ninjasasquacth-frontend.vercel.app> |
 
 ## Changelog
 
