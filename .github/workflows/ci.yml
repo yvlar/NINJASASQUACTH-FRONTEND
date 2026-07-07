@@ -1,0 +1,31 @@
+# CI — vérifie mécaniquement la Definition of Done du workflow de sprint :
+# lint sans erreur, tests 100 % verts, build de production qui passe.
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  qualite:
+    name: Lint + tests + build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Lint (ESLint)
+        run: npm run lint
+
+      - name: Tests (Vitest)
+        run: npm test
+
+      - name: Build de production (Vite)
+        run: npm run build

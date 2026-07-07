@@ -11,13 +11,15 @@ Stack: **React 19** + **Vite 7**, `lucide-react` for icons. No backend, no route
 ## Commands
 
 ```bash
-npm run dev      # Vite dev server with HMR
-npm run build    # production build to dist/
-npm run preview  # serve the built dist/ locally
-npm run lint     # ESLint over the repo
+npm run dev         # Vite dev server with HMR
+npm run build       # production build to dist/
+npm run preview     # serve the built dist/ locally
+npm run lint        # ESLint over the repo
+npm test            # Vitest, single run
+npm run test:watch  # Vitest in watch mode
 ```
 
-There is **no test framework** configured — no `npm test`, no test files. Don't claim tests pass; verify changes by running `npm run dev` and checking the browser.
+Tests run on **Vitest + Testing Library** (jsdom environment, configured in the `test` block of `vite.config.js`, setup in `src/__tests__/setup.js`). Test files live in `src/__tests__/*.test.{js,jsx}` and import `describe/it/expect` explicitly from `vitest` (no injected globals — keeps ESLint's `no-undef` happy without config changes). The suite locks the repo's byte-exact contracts (i18n key parity, category IDs, nav anchors) — see "Testing conventions". UI changes should still be eyeballed with `npm run dev`.
 
 ## Architecture
 
@@ -60,3 +62,25 @@ Headings use **Poppins** (imported in `global.css`). Responsive breakpoints used
 ## Lint convention
 
 ESLint flat config (`eslint.config.js`) with `no-unused-vars` set to error but ignoring names matching `^[A-Z_]` — unused capitalized identifiers (e.g. SCREAMING_CASE constants) won't trip the rule. `react-refresh/only-export-components` is active: component files must export only components (this is why `src/i18n/` is split into three files). JS/JSX only; no TypeScript.
+
+## Sprint workflow
+
+Development runs as a disciplined sprint loop, in French, driven by two reusable prompts:
+
+- `prompt-executer-sprint.md` — executes the **current sprint** defined in `ROADMAP.md`: verify the green baseline first, then per item: red test → minimal fix → green suite → one atomic commit.
+- `prompt-mise-a-jour-roadmap.md` — closes the sprint: check off items with commit hashes, record discoveries (`D<n>` with 🔴🟠🟡🟢 severity), write the changelog block and the 4-question retrospective, update the dashboard scores, define the next sprint.
+
+`ROADMAP.md` is the **workflow source of truth**: dashboard (scores /100, current sprint, test count), Phase-0 audit, sprint definitions with file:line references and acceptance criteria, discovery register, changelog, retrospectives. The test count lives ONLY in the ROADMAP dashboard ("État des tests", recalibrated from the real `npm test` output every sprint) — other docs reference it, never carry their own number. Items marked « Décision requise » are blocked until the user answers.
+
+## Règles de gouvernance (OVERRIDE everything else)
+
+- **Do not modify `prompt-executer-sprint.md`, `prompt-mise-a-jour-roadmap.md`, or any DoD wording on your own.** Propose the diff and wait for an explicit user decision — the process must not be able to rewrite its own guardrails. An accepted amendment lands in a dedicated commit citing the decision.
+- **Never invent brand content to close an item.** Real product photos (D3), the official contact email (D7), social links, and any brand copy are « Décisions requises » — they stay tracked as discoveries until the user provides or validates the content (decision recorded in the ROADMAP changelog).
+- **Secrets never live in code or commits.**
+
+## Documentation map
+
+- `README.md` — overview + developer quickstart.
+- `ROADMAP.md` — the workflow source of truth: sprints, discoveries (`D<n>`), test-state, changelog, retrospectives.
+- `prompt-executer-sprint.md` / `prompt-mise-a-jour-roadmap.md` — the two workflow prompts (governed, see above).
+- `CLAUDE.md` — this file: code rules and conventions.
