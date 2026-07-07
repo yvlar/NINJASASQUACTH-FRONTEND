@@ -226,10 +226,14 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   byte-for-byte** à `index.html` (SEO de l'item 1.4) → le build servi est bien
   celui de `main`. Consigné ici + dans le README (section « Déploiement »).
   **Note** : la vérification s'est faite par requête HTTP directe sur l'URL
-  publique ; les API de gestion de l'intégration MCP Vercel (token) ne couvrent
-  pas ce projet (`list_projects` ne voit que `grandford`, `get_project`→404,
-  `list_deployments`→403) — d'où l'impossibilité de relever l'ID de déploiement
-  ou le SHA exact via MCP. L'alias équipe
+  publique. Les API de gestion de l'intégration MCP Vercel ne couvrent pas ce
+  projet — **problème d'autorisation, pas de découverte** : même avec l'ID
+  projet fourni (`prj_mQkt78gkQIeDB1ccAHBV8895HAox`, équipe
+  `team_q1UhvyjnHoxIanQhyp9HCdBF`), `get_project`→404 et `list_deployments`→403.
+  Le token de l'intégration est scoppé au seul projet `grandford`. Pour piloter
+  ce projet via MCP (ID de déploiement, SHA, logs), il faut accorder à
+  l'intégration/au token l'accès au projet `ninjasasquacth-frontend` côté
+  tableau de bord Vercel. L'alias équipe
   `ninjasasquacth-frontend-yvlars-projects.vercel.app` est protégé (SSO Vercel) ;
   le domaine de production propre reste public.
   **Acceptation SATISFAITE** : URL de production accessible et consignée ici +
@@ -268,7 +272,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D10 | ✅ | (Sprint 1) La construction de l'URL `mailto:` (`ContactSection.jsx:47-51`) n'est pas interceptable sous jsdom : le verrou 1.2 couvre erreurs/succès mais pas l'URL elle-même | ✅ Sprint 2 (item 2.2 `42cc330`) — `src/utils/mailto.js` + 3 tests |
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
-| D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford` (`list_deployments` sur ce projet → 403, `get_project`→404), donc l'ID de déploiement/SHA n'est pas relevable via MCP — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
+| D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford`. Confirmé comme un refus d'autorisation (et non de découverte) : avec l'ID projet fourni `prj_mQkt78gkQIeDB1ccAHBV8895HAox`, `get_project`→404 et `list_deployments`→403. L'ID de déploiement/SHA n'est donc pas relevable via MCP tant que l'accès n'est pas accordé au projet côté Vercel — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
 
 ## Changelog
 
