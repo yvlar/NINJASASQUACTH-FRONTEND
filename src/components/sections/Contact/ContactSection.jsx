@@ -1,50 +1,138 @@
-import React from "react";
+import { useState } from "react";
 import { Instagram, Facebook, Mail } from "lucide-react";
+import { useLanguage } from "../../../i18n/useLanguage";
+import { CONTACT_EMAIL } from "../../../data/site";
 import styles from "./Contact.module.css";
 
+const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
+
 export default function ContactSection() {
+  const { t } = useLanguage();
+  const [values, setValues] = useState({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState({});
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleChange = (field) => (event) => {
+    setValues((current) => ({ ...current, [field]: event.target.value }));
+    setErrors((current) => ({ ...current, [field]: undefined }));
+    setSubmitted(false);
+  };
+
+  // errors contient des clés i18n, traduites au rendu pour que les
+  // messages suivent la bascule de langue.
+  const validate = () => {
+    const nextErrors = {};
+    if (!values.name.trim()) {
+      nextErrors.name = "contact.errors.nameRequired";
+    }
+    if (!values.email.trim()) {
+      nextErrors.email = "contact.errors.emailRequired";
+    } else if (!EMAIL_PATTERN.test(values.email.trim())) {
+      nextErrors.email = "contact.errors.emailInvalid";
+    }
+    if (!values.message.trim()) {
+      nextErrors.message = "contact.errors.messageRequired";
+    }
+    return nextErrors;
+  };
+
+  const handleSubmit = (event) => {
+    event.preventDefault();
+    const nextErrors = validate();
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    const subject = encodeURIComponent(t("contact.subject"));
+    const body = encodeURIComponent(
+      `${values.name.trim()} <${values.email.trim()}>\n\n${values.message.trim()}`,
+    );
+    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    setSubmitted(true);
+  };
+
   return (
     <section id="contact" className={styles.section}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Contactez-nous</h2>
-        <p className={styles.description}>
-          Une question ? Un projet de collaboration ? Envie de découvrir nos
-          jeux ? Écrivez-nous !
-        </p>
+        <h2 className={styles.title}>{t("contact.title")}</h2>
+        <p className={styles.description}>{t("contact.description")}</p>
 
         <div className={styles.formCard}>
-          <form className={styles.form}>
+          <form className={styles.form} noValidate onSubmit={handleSubmit}>
             <div className={styles.formRow}>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Nom</label>
+                <label htmlFor="contact-name" className={styles.label}>
+                  {t("contact.name")}
+                </label>
                 <input
+                  id="contact-name"
+                  name="name"
                   type="text"
-                  className={styles.input}
-                  placeholder="Votre nom"
+                  className={`${styles.input} ${
+                    errors.name ? styles.inputError : ""
+                  }`}
+                  placeholder={t("contact.namePlaceholder")}
+                  value={values.name}
+                  onChange={handleChange("name")}
+                  aria-invalid={Boolean(errors.name)}
                 />
+                {errors.name && (
+                  <p className={styles.errorText}>{t(errors.name)}</p>
+                )}
               </div>
               <div className={styles.formGroup}>
-                <label className={styles.label}>Email</label>
+                <label htmlFor="contact-email" className={styles.label}>
+                  {t("contact.email")}
+                </label>
                 <input
+                  id="contact-email"
+                  name="email"
                   type="email"
-                  className={styles.input}
-                  placeholder="votre@email.com"
+                  className={`${styles.input} ${
+                    errors.email ? styles.inputError : ""
+                  }`}
+                  placeholder={t("contact.emailPlaceholder")}
+                  value={values.email}
+                  onChange={handleChange("email")}
+                  aria-invalid={Boolean(errors.email)}
                 />
+                {errors.email && (
+                  <p className={styles.errorText}>{t(errors.email)}</p>
+                )}
               </div>
             </div>
 
             <div className={styles.formGroup}>
-              <label className={styles.label}>Message</label>
+              <label htmlFor="contact-message" className={styles.label}>
+                {t("contact.message")}
+              </label>
               <textarea
+                id="contact-message"
+                name="message"
                 rows="5"
-                className={styles.textarea}
-                placeholder="Votre message..."
+                className={`${styles.textarea} ${
+                  errors.message ? styles.inputError : ""
+                }`}
+                placeholder={t("contact.messagePlaceholder")}
+                value={values.message}
+                onChange={handleChange("message")}
+                aria-invalid={Boolean(errors.message)}
               />
+              {errors.message && (
+                <p className={styles.errorText}>{t(errors.message)}</p>
+              )}
             </div>
 
             <button type="submit" className={styles.submitButton}>
-              Envoyer le message
+              {t("contact.send")}
             </button>
+
+            {submitted && (
+              <p className={styles.successText} role="status">
+                {t("contact.success")}
+              </p>
+            )}
           </form>
         </div>
 
@@ -55,7 +143,11 @@ export default function ContactSection() {
           <a href="#" className={styles.socialLink} aria-label="Facebook">
             <Facebook size={28} />
           </a>
-          <a href="#" className={styles.socialLink} aria-label="Email">
+          <a
+            href={`mailto:${CONTACT_EMAIL}`}
+            className={styles.socialLink}
+            aria-label="Email"
+          >
             <Mail size={28} />
           </a>
         </div>

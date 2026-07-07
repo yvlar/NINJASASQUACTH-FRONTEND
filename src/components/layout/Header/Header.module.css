@@ -29,11 +29,11 @@
 }
 
 .logoNinja {
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 .logoSasquatch {
-  color: #142d17;
+  color: var(--color-dark-green);
 }
 
 .navDesktop {
@@ -50,7 +50,7 @@
 .navLink {
   background: none;
   border: none;
-  color: #142d17;
+  color: var(--color-dark-green);
   font-weight: 500;
   cursor: pointer;
   transition: opacity 0.3s;
@@ -60,11 +60,30 @@
   opacity: 0.7;
 }
 
+.langButton {
+  background: none;
+  border: 2px solid var(--color-brown);
+  border-radius: 9999px;
+  padding: 0.25rem 0.75rem;
+  color: var(--color-brown);
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.langButton:hover {
+  opacity: 0.7;
+}
+
+.mobileMenu .langButton {
+  align-self: flex-start;
+}
+
 .menuButton {
   display: flex;
   background: none;
   border: none;
-  color: #142d17;
+  color: var(--color-dark-green);
   cursor: pointer;
 }
 
@@ -79,14 +98,14 @@
   flex-direction: column;
   gap: 0.75rem;
   padding: 1rem;
-  background-color: #ffffe9;
-  border-top: 1px solid #9b5824;
+  background-color: var(--color-cream);
+  border-top: 1px solid var(--color-brown);
 }
 
 .mobileNavLink {
   background: none;
   border: none;
-  color: #142d17;
+  color: var(--color-dark-green);
   font-weight: 500;
   text-align: left;
   padding: 0.75rem 0;

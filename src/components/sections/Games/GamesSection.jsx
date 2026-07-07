@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { games, categories } from "../../../data/games";
+import { useLanguage } from "../../../i18n/useLanguage";
 import GameCard from "./GameCard";
 import GameDetail from "./GameDetail";
-import CategoryFilter from "./CategoryFiltes";
+import CategoryFilter from "./CategoryFilters";
 import styles from "./Games.module.css";
 
 export default function GamesSection() {
   const [selectedCategory, setSelectedCategory] = useState("tous");
   const [selectedGame, setSelectedGame] = useState(null);
+  const { t } = useLanguage();
 
   const filteredGames =
     selectedCategory === "tous"
@@ -23,11 +25,8 @@ export default function GamesSection() {
   return (
     <section id="jeux" className={styles.section}>
       <div className={styles.container}>
-        <h2 className={styles.title}>Nos Créations</h2>
-        <p className={styles.description}>
-          Chaque jeu est pensé avec passion pour offrir une expérience unique,
-          amusante et respectueuse de l'environnement.
-        </p>
+        <h2 className={styles.title}>{t("games.title")}</h2>
+        <p className={styles.description}>{t("games.description")}</p>
 
         <CategoryFilter
           categories={categories}

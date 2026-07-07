@@ -1,5 +1,5 @@
 .footer {
-  background-color: #142d17;
+  background-color: var(--color-dark-green);
   color: white;
   padding: 2rem 0;
   text-align: center;
@@ -20,15 +20,15 @@
 }
 
 .brandNinja {
-  color: #9b5824;
+  color: var(--color-brown);
 }
 
 .brandSasquatch {
-  color: #ffffe9;
+  color: var(--color-cream);
 }
 
 .copyright {
-  color: #ffffe9;
+  color: var(--color-cream);
   opacity: 0.8;
   margin-bottom: 0.5rem;
 }
@@ -38,6 +38,6 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  color: #077e16;
+  color: var(--color-eco-green);
   margin-top: 0.5rem;
 }

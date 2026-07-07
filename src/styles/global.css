@@ -1,4 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap");
+
+:root {
+  --color-cream: #ffffe9;
+  --color-dark-green: #142d17;
+  --color-brown: #9b5824;
+  --color-eco-green: #077e16;
+  --color-error: #b3261e;
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -12,8 +21,8 @@ html {
 body {
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-  background-color: #ffffe9;
-  color: #142d17;
+  background-color: var(--color-cream);
+  color: var(--color-dark-green);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;

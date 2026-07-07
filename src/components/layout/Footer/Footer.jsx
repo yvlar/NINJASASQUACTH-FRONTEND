@@ -1,8 +1,10 @@
-import React from "react";
 import { Leaf } from "lucide-react";
+import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Footer.module.css";
 
 export default function Footer() {
+  const { t } = useLanguage();
+
   return (
     <footer className={styles.footer}>
       <div className={styles.container}>
@@ -11,11 +13,11 @@ export default function Footer() {
           <span className={styles.brandSasquatch}>Sasquatch Games</span>
         </p>
         <p className={styles.copyright}>
-          © 2026 Ninja Sasquatch Games. Tous droits réservés.
+          {t("footer.copyright")} {t("footer.rights")}
         </p>
         <p className={styles.tagline}>
           <Leaf size={16} />
-          <span>Fièrement québécois et 100% compostable</span>
+          <span>{t("footer.tagline")}</span>
         </p>
       </div>
     </footer>

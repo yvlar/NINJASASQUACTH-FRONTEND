@@ -23,7 +23,45 @@
     "materials": "100% compostable and eco-responsible materials",
     "madeIn": "Designed and made in Quebec",
     "rules": "Clear rules accessible to all",
-    "commitment": "Guaranteed environmental commitment"
+    "commitment": "Guaranteed environmental commitment",
+    "categories": {
+      "tous": "All our games",
+      "famille": "Family",
+      "stratégie": "Strategy",
+      "party": "Party Game"
+    },
+    "items": {
+      "1": {
+        "title": "Mysterious Origins",
+        "shortDesc": "Dive into the legends of the Sasquatch and uncover its secrets",
+        "fullDesc": "Mysterious Origins transports you into the fascinating world of the Sasquatch. Explore the forests, decode the clues, and unravel the mysteries of this legendary creature. A captivating game that blends strategy and discovery for the whole family."
+      },
+      "2": {
+        "title": "Ninja Mission",
+        "shortDesc": "Infiltration, stealth, and tactics to become the ultimate ninja",
+        "fullDesc": "In Ninja Mission, become a master of stealth. Plan your moves, outwit your opponents, and complete your secret objectives. Every decision counts in this strategy game where mystery reigns."
+      },
+      "3": {
+        "title": "Forest Feast",
+        "shortDesc": "Guaranteed laughs around a wild and wacky feast",
+        "fullDesc": "Forest Feast turns your evenings into hilarious adventures. Between zany challenges and absurd situations, this party game guarantees unforgettable moments and uncontrollable laughter."
+      },
+      "4": {
+        "title": "Guardians of the Forest",
+        "shortDesc": "Work together to protect nature and its inhabitants",
+        "fullDesc": "Guardians of the Forest celebrates our environmental values. Work together to preserve the ecosystem, save the animals, and restore the natural balance. A cooperative game that raises awareness while entertaining."
+      },
+      "5": {
+        "title": "Legends of Quebec",
+        "shortDesc": "Explore the myths and fantastic creatures of Quebec",
+        "fullDesc": "Legends of Quebec invites you to discover Quebecois folklore. From the Sasquatch to creatures of local legend, travel the land and collect mythical tales in a unique strategic adventure."
+      },
+      "6": {
+        "title": "Mystery Night",
+        "shortDesc": "Investigations and riddles for an evening full of suspense",
+        "fullDesc": "Mystery Night plunges your guests into thrilling investigations. Hidden clues, intriguing suspects, and guaranteed twists for an immersive experience that will leave a lasting impression."
+      }
+    }
   },
   "about": {
     "title": "Our Mission",
@@ -37,6 +75,12 @@
       "quebec": "Made in Quebec",
       "accessible": "Accessible to all",
       "fun": "Laughs guaranteed"
+    },
+    "statValues": {
+      "compostable": "100%",
+      "quebec": "QUEBEC",
+      "accessible": "ALL",
+      "fun": "FUN"
     }
   },
   "contact": {
@@ -48,9 +92,18 @@
     "namePlaceholder": "Your name",
     "emailPlaceholder": "your@email.com",
     "messagePlaceholder": "Your message...",
-    "send": "Send message"
+    "send": "Send message",
+    "subject": "Message from the Ninja Sasquatch Games website",
+    "success": "Thank you! Your email client will open to send your message.",
+    "errors": {
+      "nameRequired": "Please enter your name.",
+      "emailRequired": "Please enter your email address.",
+      "emailInvalid": "Please enter a valid email address.",
+      "messageRequired": "Please enter your message."
+    }
   },
   "footer": {
+    "copyright": "© 2026 Ninja Sasquatch Games.",
     "rights": "All rights reserved.",
     "tagline": "Proudly Quebecois and 100% compostable"
   }
