@@ -12,10 +12,10 @@
 | **Architecture** | 76        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
 | **Qualité**      | 79        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
 | **UX/Contenu**   | 59        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
-| **Production**   | 64        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
+| **Production**   | 70        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-07 — clôture du Sprint 3 : garde-fou `npm audit --audit-level=high` ajouté à la CI (item 3.1). Import Vercel re-vérifié via MCP : toujours pas fait → 3.2 reste bloqué (D13 inchangée) ; aucun contenu fourni pour 3.3/3.4 → reportés. Les trois items bloqués repartent au Sprint 4, complétés d'un item exécutable (garde-fou a11y).
-- **Sprint courant** : **Sprint 4 — Accessibilité, mise en ligne et contenu réel** (items 4.1 → 4.4 ci-dessous ; 4.1 exécutable sans action utilisateur ; 4.2 attend l'import Vercel ; 4.3/4.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
+- **Dernière mise à jour** : 2026-07-07 — Sprint 4 en cours : **déploiement Vercel vérifié et consigné** (item 4.2, D13 résolu) — le site est en ligne et public à `https://ninjasasquacth-frontend.vercel.app` (confirmé live, build identique à `main`). Restent dans le Sprint 4 : garde-fou a11y (4.1, exécutable) et contenu réel (4.3/4.4, Décisions requises).
+- **Sprint courant** : **Sprint 4 — Accessibilité, mise en ligne et contenu réel** (items 4.1 → 4.4 ci-dessous ; **4.2 fait** — site en ligne ; 4.1 exécutable sans action utilisateur ; 4.3/4.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
 - **État des tests** : **21/21 verts** (8 fichiers dans `src/__tests__/`, sortie réelle de `npm test` recalibrée à la clôture du Sprint 3 — inchangée depuis le Sprint 2 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
 
@@ -205,7 +205,9 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > utilisateur — et absorber l'accès Vercel et le contenu réel dès que
 > l'utilisateur les fournit. 4.2/4.3/4.4 reprennent 3.2/3.3/3.4 à périmètre
 > identique. Ordre conseillé : 4.1 → 4.2 dès l'import fait → 4.3/4.4 dès le
-> contenu fourni.
+> contenu fourni. **Avancement** : 4.2 fait dès l'ouverture (site mis en ligne
+> par l'utilisateur, URL vérifiée et consignée) ; reste 4.1 (exécutable) et
+> 4.3/4.4 (Décisions requises).
 
 - [ ] **4.1** **Garde-fou a11y dans le lint** — brancher `eslint-plugin-jsx-a11y`
   (préréglage `recommended`) dans le flat config (`eslint.config.js:1-29`) pour
@@ -217,15 +219,21 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   **Acceptation** : plugin actif dans `eslint.config.js`, `npm run lint` vert
   (zéro erreur, zéro warning) avec le préréglage `recommended`, tests/build
   inchangés et verts.
-- [ ] **4.2** (D13) **Déployer sur Vercel** — **Action requise** (report de 3.2,
-  périmètre identique, décision intégration Git maintenue) :
-  **prérequis d'accès** — l'utilisateur importe `yvlar/ninjasasquacth-frontend`
-  dans le tableau de bord Vercel (procédure README, section « Déploiement »,
-  `README.md:30` et suiv.) ; ensuite vérifier le déploiement de `main` via MCP
-  Vercel (`list_projects`/`list_deployments`, équipe `yvlars-projects`) et
-  consigner l'URL de production ici + dans le README.
-  **Acceptation** : URL de production accessible et consignée ici + dans le
-  README ; le build déployé est celui de `main` (ou de la branche décidée).
+- [x] **4.2** (D13) **Déployer sur Vercel** → **URL de production** :
+  `https://ninjasasquacth-frontend.vercel.app`
+  Intégration Git Vercel en place (décision du 2026-07-07). Site vérifié **en
+  ligne et public** : réponse HTTP 200, titre et meta description **identiques
+  byte-for-byte** à `index.html` (SEO de l'item 1.4) → le build servi est bien
+  celui de `main`. Consigné ici + dans le README (section « Déploiement »).
+  **Note** : la vérification s'est faite par requête HTTP directe sur l'URL
+  publique ; les API de gestion de l'intégration MCP Vercel (token) ne couvrent
+  pas ce projet (`list_projects` ne voit que `grandford`, `get_project`→404,
+  `list_deployments`→403) — d'où l'impossibilité de relever l'ID de déploiement
+  ou le SHA exact via MCP. L'alias équipe
+  `ninjasasquacth-frontend-yvlars-projects.vercel.app` est protégé (SSO Vercel) ;
+  le domaine de production propre reste public.
+  **Acceptation SATISFAITE** : URL de production accessible et consignée ici +
+  dans le README ; contenu servi conforme à `main`.
 - [ ] **4.3** (D3) **Vraies photos produits** — **Décision requise** (report de
   3.3, périmètre identique) : brancher les vraies photos (`src/data/games.js:11`
   et suiv. — 6 URLs Unsplash) et ajouter `og:image` (`index.html`).
@@ -260,7 +268,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D10 | ✅ | (Sprint 1) La construction de l'URL `mailto:` (`ContactSection.jsx:47-51`) n'est pas interceptable sous jsdom : le verrou 1.2 couvre erreurs/succès mais pas l'URL elle-même | ✅ Sprint 2 (item 2.2 `42cc330`) — `src/utils/mailto.js` + 3 tests |
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
-| D13 | 🟠 | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07) mais bloqué : l'outil MCP Vercel renvoie vers la CLI, et la CLI n'a aucune authentification dans l'environnement (pas de `VERCEL_TOKEN`, login interactif impossible). Le compte est joignable via MCP (équipe `yvlars-projects`, aucun projet pour ce site). Procédure documentée dans le README (`5645547`). Import re-vérifié via MCP au Sprint 3 (début et fin) : toujours pas fait | Sprint 4 (item 4.2, report de 3.2) — **décision prise (2026-07-07) : intégration Git Vercel** ; en attente de l'import du dépôt par l'utilisateur |
+| D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford` (`list_deployments` sur ce projet → 403, `get_project`→404), donc l'ID de déploiement/SHA n'est pas relevable via MCP — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
 
 ## Changelog
 
