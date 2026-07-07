@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Instagram, Facebook, Mail } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { CONTACT_EMAIL } from "../../../data/site";
+import { buildMailtoUrl } from "../../../utils/mailto";
 import styles from "./Contact.module.css";
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
@@ -44,11 +45,7 @@ export default function ContactSection() {
       return;
     }
 
-    const subject = encodeURIComponent(t("contact.subject"));
-    const body = encodeURIComponent(
-      `${values.name.trim()} <${values.email.trim()}>\n\n${values.message.trim()}`,
-    );
-    window.location.href = `mailto:${CONTACT_EMAIL}?subject=${subject}&body=${body}`;
+    window.location.href = buildMailtoUrl(values, t("contact.subject"));
     setSubmitted(true);
   };
 
