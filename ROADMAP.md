@@ -10,13 +10,13 @@
 | Dimension        | Note /100 | Baseline (audit 2026-07-07) |
 |------------------|-----------|------------------------------|
 | **Architecture** | 76        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
-| **Qualité**      | 78        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
+| **Qualité**      | 79        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
 | **UX/Contenu**   | 59        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
-| **Production**   | 62        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
+| **Production**   | 64        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-07 — clôture du Sprint 2 : 10 vulnérabilités `npm audit` → 0, URL mailto extraite (`src/utils/mailto.js`) et verrouillée par test, h1 unique garanti dans toutes les vues (hiérarchie des headings testée), procédure de déploiement Vercel documentée. Items 2.4/2.5 reportés (Décisions requises sans réponse). Une découverte nouvelle (D13 : déploiement bloqué sur l'authentification Vercel).
-- **Sprint courant** : **Sprint 3 — Mise en ligne et contenu réel** (items 3.1 → 3.4 ci-dessous ; 3.2 : décision prise — intégration Git Vercel, en attente de l'import du dépôt par l'utilisateur ; 3.3 et 3.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
-- **État des tests** : **21/21 verts** (8 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 2 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **Dernière mise à jour** : 2026-07-07 — clôture du Sprint 3 : garde-fou `npm audit --audit-level=high` ajouté à la CI (item 3.1). Import Vercel re-vérifié via MCP : toujours pas fait → 3.2 reste bloqué (D13 inchangée) ; aucun contenu fourni pour 3.3/3.4 → reportés. Les trois items bloqués repartent au Sprint 4, complétés d'un item exécutable (garde-fou a11y).
+- **Sprint courant** : **Sprint 4 — Accessibilité, mise en ligne et contenu réel** (items 4.1 → 4.4 ci-dessous ; 4.1 exécutable sans action utilisateur ; 4.2 attend l'import Vercel ; 4.3/4.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
+- **État des tests** : **21/21 verts** (8 fichiers dans `src/__tests__/`, sortie réelle de `npm test` recalibrée à la clôture du Sprint 3 — inchangée depuis le Sprint 2 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -143,7 +143,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
-# 🟠 SPRINT 3 — Mise en ligne et contenu réel — **sprint courant**
+# 🟢 SPRINT 3 — Mise en ligne et contenu réel ✅ (clos le 2026-07-07, verdict : DoD satisfaite — 3.2/3.3/3.4 reportés au Sprint 4, accès/contenus utilisateur toujours manquants)
 
 > **Objectif** : mettre le site en production (décision utilisateur du
 > 2026-07-07 : « Déployer l'application ») et absorber le contenu réel dès que
@@ -152,13 +152,15 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > Vercel (décision prise : intégration Git) ; 3.3/3.4 reprennent 2.4/2.5.
 > Ordre conseillé : 3.1 → 3.2 dès l'import fait → 3.3/3.4 dès le contenu fourni.
 
-- [ ] **3.1** **Étape `npm audit` dans la CI** — garde-fou identifié à la rétro
-  du Sprint 1 et rendu viable par l'item 2.1 (reliquat = 0) : ajouter une étape
-  `npm audit --audit-level=high` dans `.github/workflows/ci.yml:22-25` (après
-  `npm ci`, avant le lint) pour que la dette sécurité ne se réinstalle pas
-  silencieusement.
-  **Acceptation** : la CI échoue sur vulnérabilité `high`, passe aujourd'hui ;
-  lint/tests/build inchangés.
+- [x] **3.1** **Étape `npm audit` dans la CI** → `5854503`
+  Garde-fou identifié à la rétro du Sprint 1 et rendu viable par l'item 2.1
+  (reliquat = 0) : étape `npm audit --audit-level=high` ajoutée dans
+  `.github/workflows/ci.yml:27-28` (après `npm ci`, avant le lint) pour que la
+  dette sécurité ne se réinstalle pas silencieusement.
+  **Acceptation SATISFAITE** : `npm audit --audit-level=high` exit 0 en local
+  (0 vulnérabilité — la CI passe aujourd'hui) et exit non nul par construction
+  sur vulnérabilité ≥ high (comportement documenté de npm audit) ; YAML validé
+  par parseur ; lint/tests (21/21)/build inchangés et verts.
 - [ ] **3.2** (D13) **Déployer sur Vercel** — **Décision prise (2026-07-07)** :
   **intégration Git Vercel** (la voie `VERCEL_TOKEN` est écartée).
   Reste-à-faire : l'utilisateur importe `yvlar/ninjasasquacth-frontend` dans le
@@ -169,21 +171,76 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   ici + dans le README.
   **Acceptation** : URL de production accessible et consignée ici + dans le
   README ; le build déployé est celui de `main` (ou de la branche décidée).
+  **Reliquat** : import re-vérifié via MCP Vercel en début ET en fin de sprint
+  (équipe `yvlars-projects`) — toujours aucun projet pour ce dépôt → reporté
+  tel quel au Sprint 4 (item 4.2).
 - [ ] **3.3** (D3) **Vraies photos produits** — **Décision requise** (report de
-  2.4, périmètre identique) : brancher les vraies photos (`src/data/games.js:10`
+  2.4, périmètre identique) : brancher les vraies photos (`src/data/games.js:11`
   et suiv.) et ajouter `og:image` (`index.html`).
   **Acceptation** : plus aucune URL Unsplash dans `src/data/games.js`.
+  **Reliquat** : aucun contenu fourni pendant le sprint → reporté tel quel au
+  Sprint 4 (item 4.3).
 - [ ] **3.4** (D7, D12) **Email officiel + liens sociaux réels** — **Décision
   requise** (report de 2.5, périmètre identique) : confirmer `CONTACT_EMAIL`
   (`src/data/site.js:1`), fournir les URLs Instagram/Facebook
   (`ContactSection.jsx:137-142`, actuellement `href="#"`) ou décider de retirer
   les icônes.
   **Acceptation** : liens réels branchés, ou icônes retirées sur décision.
+  **Reliquat** : aucun contenu fourni pendant le sprint → reporté tel quel au
+  Sprint 4 (item 4.4).
 
 > **Definition of Done du Sprint 3** (en plus de la DoD standard) : la CI
 > échoue sur vulnérabilité `high` ; aucune mise en ligne sans URL vérifiée et
 > consignée ; les items 3.2/3.3/3.4 ne sont cochés que sur accès/contenu fournis
-> par l'utilisateur — jamais inventés.
+> par l'utilisateur — jamais inventés. — **SATISFAITE** (garde-fou audit actif
+> dans la CI ; aucune mise en ligne effectuée donc aucune URL à consigner ;
+> 3.2/3.3/3.4 non cochés, conformément au garde-fou contenu).
+
+---
+
+# 🟠 SPRINT 4 — Accessibilité, mise en ligne et contenu réel — **sprint courant**
+
+> **Objectif** : ajouter le garde-fou d'accessibilité identifié à la rétro du
+> Sprint 2 (« audit a11y plus large ») — seul travail exécutable sans action
+> utilisateur — et absorber l'accès Vercel et le contenu réel dès que
+> l'utilisateur les fournit. 4.2/4.3/4.4 reprennent 3.2/3.3/3.4 à périmètre
+> identique. Ordre conseillé : 4.1 → 4.2 dès l'import fait → 4.3/4.4 dès le
+> contenu fourni.
+
+- [ ] **4.1** **Garde-fou a11y dans le lint** — brancher `eslint-plugin-jsx-a11y`
+  (préréglage `recommended`) dans le flat config (`eslint.config.js:1-29`) pour
+  attraper mécaniquement les régressions d'accessibilité JSX (alt manquant,
+  ancres invalides, aria incohérents) ; corriger toute violation existante
+  révélée par le préréglage, en respectant l'architecture (i18n via `t()`,
+  pattern de composant).
+  **Prérequis d'accès** : aucun (npm registry seulement).
+  **Acceptation** : plugin actif dans `eslint.config.js`, `npm run lint` vert
+  (zéro erreur, zéro warning) avec le préréglage `recommended`, tests/build
+  inchangés et verts.
+- [ ] **4.2** (D13) **Déployer sur Vercel** — **Action requise** (report de 3.2,
+  périmètre identique, décision intégration Git maintenue) :
+  **prérequis d'accès** — l'utilisateur importe `yvlar/ninjasasquacth-frontend`
+  dans le tableau de bord Vercel (procédure README, section « Déploiement »,
+  `README.md:30` et suiv.) ; ensuite vérifier le déploiement de `main` via MCP
+  Vercel (`list_projects`/`list_deployments`, équipe `yvlars-projects`) et
+  consigner l'URL de production ici + dans le README.
+  **Acceptation** : URL de production accessible et consignée ici + dans le
+  README ; le build déployé est celui de `main` (ou de la branche décidée).
+- [ ] **4.3** (D3) **Vraies photos produits** — **Décision requise** (report de
+  3.3, périmètre identique) : brancher les vraies photos (`src/data/games.js:11`
+  et suiv. — 6 URLs Unsplash) et ajouter `og:image` (`index.html`).
+  **Acceptation** : plus aucune URL Unsplash dans `src/data/games.js`.
+- [ ] **4.4** (D7, D12) **Email officiel + liens sociaux réels** — **Décision
+  requise** (report de 3.4, périmètre identique) : confirmer `CONTACT_EMAIL`
+  (`src/data/site.js:1`), fournir les URLs Instagram/Facebook
+  (`src/components/sections/Contact/ContactSection.jsx:137-142`, actuellement
+  `href="#"`) ou décider de retirer les icônes.
+  **Acceptation** : liens réels branchés, ou icônes retirées sur décision.
+
+> **Definition of Done du Sprint 4** (en plus de la DoD standard) : le lint
+> échoue sur violation a11y du préréglage `recommended` ; aucune mise en ligne
+> sans URL vérifiée et consignée ; les items 4.2/4.3/4.4 ne sont cochés que sur
+> accès/contenu fournis par l'utilisateur — jamais inventés.
 
 ---
 
@@ -203,9 +260,41 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D10 | ✅ | (Sprint 1) La construction de l'URL `mailto:` (`ContactSection.jsx:47-51`) n'est pas interceptable sous jsdom : le verrou 1.2 couvre erreurs/succès mais pas l'URL elle-même | ✅ Sprint 2 (item 2.2 `42cc330`) — `src/utils/mailto.js` + 3 tests |
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
-| D13 | 🟠 | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07) mais bloqué : l'outil MCP Vercel renvoie vers la CLI, et la CLI n'a aucune authentification dans l'environnement (pas de `VERCEL_TOKEN`, login interactif impossible). Le compte est joignable via MCP (équipe `yvlars-projects`, aucun projet pour ce site). Procédure documentée dans le README (`5645547`) | Sprint 3 (item 3.2) — **décision prise (2026-07-07) : intégration Git Vercel** ; en attente de l'import du dépôt par l'utilisateur |
+| D13 | 🟠 | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07) mais bloqué : l'outil MCP Vercel renvoie vers la CLI, et la CLI n'a aucune authentification dans l'environnement (pas de `VERCEL_TOKEN`, login interactif impossible). Le compte est joignable via MCP (équipe `yvlars-projects`, aucun projet pour ce site). Procédure documentée dans le README (`5645547`). Import re-vérifié via MCP au Sprint 3 (début et fin) : toujours pas fait | Sprint 4 (item 4.2, report de 3.2) — **décision prise (2026-07-07) : intégration Git Vercel** ; en attente de l'import du dépôt par l'utilisateur |
 
 ## Changelog
+
+### Sprint 3 — Mise en ligne et contenu réel (2026-07-07)
+
+- **Contexte** : sprint courant défini à la clôture du Sprint 2 (garde-fou
+  audit 3.1 + mise en ligne 3.2 + contenus 3.3/3.4). Le canal de question
+  utilisateur (AskUserQuestion) a échoué techniquement pendant tout le sprint
+  (« permission stream closed », plusieurs tentatives) : impossible de
+  débloquer 3.3/3.4 en cours de route → les défauts du workflow s'appliquent
+  (items bloqués consignés, jamais inventés). L'import Vercel (prérequis de
+  3.2) a été vérifié via MCP en début et en fin de sprint : non fait.
+- **Baseline à l'ouverture** : `npm run lint`, `npm test` (21/21, conforme au
+  tableau de bord — aucune dérive, aucun commit hors cycle à absorber : la
+  branche part de `main` à `19c00b2`) et `npm run build` verts ;
+  `npm audit --audit-level=high` exit 0.
+- **Commits** :
+  - `5854503` feat : étape npm audit dans la CI — la dette sécurité ne se
+    réinstalle plus silencieusement (item 3.1)
+  - (clôture) docs : clôture sprint 3 — mise à jour roadmap
+- **Tests** : 21 → **21** (aucun nouveau test Vitest : 3.1 est un garde-fou
+  CI, prouvé par exécution locale de la commande — exit 0 aujourd'hui, exit
+  non nul sur vulnérabilité ≥ high par construction — et par validation du
+  YAML). Décompte relevé sur la sortie réelle de `npm test`.
+- **Sécurité** : reliquat toujours 0 ; la CI échoue désormais mécaniquement
+  sur toute vulnérabilité `high`/`critical` (`.github/workflows/ci.yml:27-28`).
+- **Déploiement** : NON réalisé — le prérequis d'accès (import du dépôt dans
+  le tableau de bord Vercel) n'est toujours pas rempli (D13). Aucune écriture
+  côté Vercel.
+- **Verdict de clôture** : DoD standard et DoD Sprint 3 satisfaites — lint,
+  21 tests et build verts ; garde-fou audit actif ; aucune mise en ligne (donc
+  aucune URL à consigner) ; aucun contenu de marque inventé (3.2/3.3/3.4 non
+  cochés, reportés en 4.2/4.3/4.4) ; fichiers gouvernés intacts. Aucune
+  découverte produit nouvelle.
 
 ### Sprint 2 — Dette sécurité, verrou mailto et contenu réel (2026-07-07)
 
@@ -267,6 +356,39 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `fdca579` (vérifié par diff). Découvertes nouvelles : D9, D10, D11, D12.
 
 ## Rétrospectives
+
+### Sprint 3 — Mise en ligne et contenu réel (2026-07-07)
+
+1. **Découpage** : correct mais déséquilibré : un seul item exécutable (3.1)
+   pour trois items en attente d'accès/contenu. 3.1 était bien dimensionné
+   (un diff de 7 lignes, preuve locale, un commit). La leçon du Sprint 2
+   (« les décisions ne se planifient pas, elles se débloquent ») se confirme :
+   le Sprint 4 est donc construit avec au moins un item exécutable sans
+   utilisateur (4.1, garde-fou a11y issu de la rétro du Sprint 2) pour que
+   chaque sprint produise de la valeur même si les blocages persistent.
+2. **Suffisance des prompts** : suffisants pour 3.1, aucune improvisation.
+   Cas non couvert rencontré : le point 4 du prompt (« poser la question à
+   l'utilisateur ») suppose un canal de question fonctionnel — il a échoué
+   techniquement pendant tout le sprint. Le comportement adopté (items
+   « Décision requise » laissés bloqués et reportés, échec consigné au
+   changelog) découle déjà de la lettre du prompt (« ne se font pas sans
+   réponse ») : aucun diff de prompt nécessaire, donc aucun proposé.
+3. **À détecter plus tôt** : rien de nouveau côté produit. Le contrôle d'accès
+   en début de sprint (garde-fou retenu à la rétro du Sprint 2) a fonctionné :
+   l'import Vercel manquant a été constaté via MCP AVANT tout travail, pas au
+   moment de déployer. À maintenir : chaque item « Action requise » du
+   Sprint 4 liste explicitement son prérequis d'accès.
+4. **Notes /100** (précédent : 76/78/59/62) :
+   - **Architecture 76 (=)** : aucun changement structurel (un fichier YAML
+     touché).
+   - **Qualité 79 (+1)** : la dette sécurité ne peut plus se réinstaller
+     silencieusement (audit bloquant en CI) ; le compte de tests ne bouge pas.
+     Prochain levier : le garde-fou a11y (4.1).
+   - **UX/Contenu 59 (=)** : rien de visible n'a changé ; toujours plafonné
+     par le contenu placeholder (D3, D7, D12, `og:image`).
+   - **Production 64 (+2)** : la CI vérifie désormais les quatre marches
+     (audit, lint, tests, build) ; le site n'est toujours PAS en ligne (D13) —
+     la mise en ligne effective (4.2) reste le prochain vrai saut.
 
 ### Sprint 2 — Dette sécurité, verrou mailto et contenu réel (2026-07-07)
 
