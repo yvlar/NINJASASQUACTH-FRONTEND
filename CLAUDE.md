@@ -60,3 +60,25 @@ Headings use **Poppins** (imported in `global.css`). Responsive breakpoints used
 ## Lint convention
 
 ESLint flat config (`eslint.config.js`) with `no-unused-vars` set to error but ignoring names matching `^[A-Z_]` — unused capitalized identifiers (e.g. SCREAMING_CASE constants) won't trip the rule. `react-refresh/only-export-components` is active: component files must export only components (this is why `src/i18n/` is split into three files). JS/JSX only; no TypeScript.
+
+## Sprint workflow
+
+Development runs as a disciplined sprint loop, in French, driven by two reusable prompts:
+
+- `prompt-executer-sprint.md` — executes the **current sprint** defined in `ROADMAP.md`: verify the green baseline first, then per item: red test → minimal fix → green suite → one atomic commit.
+- `prompt-mise-a-jour-roadmap.md` — closes the sprint: check off items with commit hashes, record discoveries (`D<n>` with 🔴🟠🟡🟢 severity), write the changelog block and the 4-question retrospective, update the dashboard scores, define the next sprint.
+
+`ROADMAP.md` is the **workflow source of truth**: dashboard (scores /100, current sprint, test count), Phase-0 audit, sprint definitions with file:line references and acceptance criteria, discovery register, changelog, retrospectives. The test count lives ONLY in the ROADMAP dashboard ("État des tests", recalibrated from the real `npm test` output every sprint) — other docs reference it, never carry their own number. Items marked « Décision requise » are blocked until the user answers.
+
+## Règles de gouvernance (OVERRIDE everything else)
+
+- **Do not modify `prompt-executer-sprint.md`, `prompt-mise-a-jour-roadmap.md`, or any DoD wording on your own.** Propose the diff and wait for an explicit user decision — the process must not be able to rewrite its own guardrails. An accepted amendment lands in a dedicated commit citing the decision.
+- **Never invent brand content to close an item.** Real product photos (D3), the official contact email (D7), social links, and any brand copy are « Décisions requises » — they stay tracked as discoveries until the user provides or validates the content (decision recorded in the ROADMAP changelog).
+- **Secrets never live in code or commits.**
+
+## Documentation map
+
+- `README.md` — overview + developer quickstart.
+- `ROADMAP.md` — the workflow source of truth: sprints, discoveries (`D<n>`), test-state, changelog, retrospectives.
+- `prompt-executer-sprint.md` / `prompt-mise-a-jour-roadmap.md` — the two workflow prompts (governed, see above).
+- `CLAUDE.md` — this file: code rules and conventions.
