@@ -256,6 +256,44 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
+# 🔵 SPRINT 5 — Backend : authentification (login) et extensions futures — pré-cadrage
+
+> **Objectif décidé par l'utilisateur (2026-07-07)** : doter le site d'un
+> backend pour un login et servir de socle aux extensions futures (D14).
+> Changement structurel majeur : le dépôt est aujourd'hui une SPA statique
+> sans backend, sans routeur et sans gestion d'état (voir `CLAUDE.md`).
+> Ce bloc est un **pré-cadrage** : les items exécutables seront définis à la
+> clôture du Sprint 4, une fois les décisions ci-dessous tranchées.
+
+**Décisions requises avant tout code** :
+
+- [ ] **5.A** **Finalité du login** — **Décision requise** : qui se connecte
+  et pour quoi faire ? (administration du contenu — jeux/photos/textes ;
+  espace client ; précommandes ; infolettre…). Cette réponse dimensionne le
+  modèle de données, les rôles et tout le périmètre.
+- [ ] **5.B** **Choix d'infrastructure** — **Décision requise** : candidat
+  naturel **Supabase** (Auth + Postgres + RLS ; MCP déjà connecté à
+  l'environnement de travail, patron éprouvé sur le projet GRANDFORD du même
+  compte) ; alternatives : Vercel Functions seules, Firebase, backend dédié.
+  Critères : coût, hébergement des données (Québec/Canada si pertinent),
+  intégration avec le déploiement Vercel existant (item 4.2).
+- [ ] **5.C** **Impact sur l'architecture frontend** — **Décision requise** :
+  un login implique probablement un routeur (routes protégées), une gestion
+  de session et des conventions nouvelles — amendements à `CLAUDE.md`
+  (« Règles de gouvernance » : toute modification des conventions passe par
+  une décision utilisateur explicite).
+- [ ] **5.D** (D6) **Synergie formulaire de contact** : le backend rendrait
+  possible un vrai envoi du formulaire (`ContactSection`, aujourd'hui
+  `mailto:` — D6) — à cadrer dans le même mouvement pour éviter deux
+  chantiers d'infra successifs.
+
+> **Garde-fous du Sprint 5** (rappel, non négociables) : aucun secret (clé
+> API, token, service key) dans le code ou les commits — variables
+> d'environnement Vercel/Supabase uniquement ; les conventions de `CLAUDE.md`
+> ne changent que sur décision utilisateur consignée.
+
+---
+
 ## Découvertes
 
 | #   | Gravité | Constat | Affectation |
@@ -273,6 +311,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
 | D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford`. Confirmé comme un refus d'autorisation (et non de découverte) : avec l'ID projet fourni `prj_mQkt78gkQIeDB1ccAHBV8895HAox`, `get_project`→404 et `list_deployments`→403. L'ID de déploiement/SHA n'est donc pas relevable via MCP tant que l'accès n'est pas accordé au projet côté Vercel — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
+| D14 | 🟡 | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Changement structurel majeur vs l'architecture actuelle (SPA statique sans backend ni routeur ; lié à D6, formulaire en `mailto:`). Finalité du login, choix d'infra (candidat : Supabase — MCP déjà connecté) et impacts sur les conventions `CLAUDE.md` à trancher | **Décisions requises** — Sprint 5 (pré-cadrage 5.A→5.D ; items exécutables définis à la clôture du Sprint 4) |
 
 ## Changelog
 
