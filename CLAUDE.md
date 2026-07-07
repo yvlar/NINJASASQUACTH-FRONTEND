@@ -11,13 +11,15 @@ Stack: **React 19** + **Vite 7**, `lucide-react` for icons. No backend, no route
 ## Commands
 
 ```bash
-npm run dev      # Vite dev server with HMR
-npm run build    # production build to dist/
-npm run preview  # serve the built dist/ locally
-npm run lint     # ESLint over the repo
+npm run dev         # Vite dev server with HMR
+npm run build       # production build to dist/
+npm run preview     # serve the built dist/ locally
+npm run lint        # ESLint over the repo
+npm test            # Vitest, single run
+npm run test:watch  # Vitest in watch mode
 ```
 
-There is **no test framework** configured — no `npm test`, no test files. Don't claim tests pass; verify changes by running `npm run dev` and checking the browser.
+Tests run on **Vitest + Testing Library** (jsdom environment, configured in the `test` block of `vite.config.js`, setup in `src/__tests__/setup.js`). Test files live in `src/__tests__/*.test.{js,jsx}` and import `describe/it/expect` explicitly from `vitest` (no injected globals — keeps ESLint's `no-undef` happy without config changes). The suite locks the repo's byte-exact contracts (i18n key parity, category IDs, nav anchors) — see "Testing conventions". UI changes should still be eyeballed with `npm run dev`.
 
 ## Architecture
 
