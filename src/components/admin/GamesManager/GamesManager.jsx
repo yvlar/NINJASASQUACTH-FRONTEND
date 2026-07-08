@@ -11,6 +11,8 @@ export default function GamesManager() {
   const [games, setGames] = useState([]);
   const [status, setStatus] = useState("loading"); // loading | error | ready
   const [creating, setCreating] = useState(false);
+  const [editing, setEditing] = useState(null); // jeu en cours d'édition
+  const [deletingId, setDeletingId] = useState(null); // confirmation en cours
 
   const load = useCallback(async () => {
     setStatus("loading");
@@ -30,14 +32,25 @@ export default function GamesManager() {
     load();
   }, [load]);
 
-  if (creating) {
+  const handleDelete = async (id) => {
+    const { error } = await supabase.from("games").delete().eq("id", id);
+    setDeletingId(null);
+    if (!error) load();
+  };
+
+  if (creating || editing) {
     return (
       <GameForm
+        game={editing}
         onSaved={() => {
           setCreating(false);
+          setEditing(null);
           load();
         }}
-        onCancel={() => setCreating(false)}
+        onCancel={() => {
+          setCreating(false);
+          setEditing(null);
+        }}
       />
     );
   }
@@ -73,6 +86,46 @@ export default function GamesManager() {
               </span>
               {!game.published && (
                 <span className={styles.draft}>{t("admin.manager.draft")}</span>
+              )}
+              {deletingId === game.id ? (
+                <span className={styles.confirmZone}>
+                  <span className={styles.confirmText}>
+                    {t("admin.manager.confirmDelete")}
+                  </span>
+                  <button
+                    className={styles.deleteButton}
+                    type="button"
+                    onClick={() => handleDelete(game.id)}
+                  >
+                    {t("admin.manager.confirm")}
+                  </button>
+                  <button
+                    className={styles.actionButton}
+                    type="button"
+                    onClick={() => setDeletingId(null)}
+                  >
+                    {t("admin.form.cancel")}
+                  </button>
+                </span>
+              ) : (
+                <span className={styles.confirmZone}>
+                  <button
+                    className={styles.actionButton}
+                    type="button"
+                    aria-label={`${t("admin.manager.edit")} : ${game.title_fr}`}
+                    onClick={() => setEditing(game)}
+                  >
+                    {t("admin.manager.edit")}
+                  </button>
+                  <button
+                    className={styles.deleteButton}
+                    type="button"
+                    aria-label={`${t("admin.manager.delete")} : ${game.title_fr}`}
+                    onClick={() => setDeletingId(game.id)}
+                  >
+                    {t("admin.manager.delete")}
+                  </button>
+                </span>
               )}
             </li>
           ))}

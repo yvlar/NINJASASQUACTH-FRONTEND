@@ -15,10 +15,15 @@
       "newGame": "Ajouter un jeu",
       "empty": "Aucun jeu pour l'instant — créez le premier !",
       "loadError": "Impossible de charger les jeux.",
-      "draft": "Brouillon"
+      "draft": "Brouillon",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer ce jeu ?",
+      "confirm": "Confirmer la suppression"
     },
     "form": {
       "createTitle": "Nouveau jeu",
+      "editTitle": "Modifier le jeu",
       "title_fr": "Titre (français)",
       "title_en": "Titre (anglais)",
       "short_desc_fr": "Description courte (français)",
@@ -34,6 +39,7 @@
       "image": "Photo du jeu",
       "imageHelp": "JPEG, PNG ou WebP, 5 Mo maximum.",
       "submitCreate": "Créer le jeu",
+      "submitEdit": "Enregistrer les modifications",
       "saving": "Enregistrement…",
       "cancel": "Annuler",
       "errors": {

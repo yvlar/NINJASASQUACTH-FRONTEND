@@ -25,12 +25,22 @@ const VALEURS_INITIALES = Object.fromEntries(
   CHAMPS_TEXTE.map((champ) => [champ, ""]),
 );
 
-export default function GameForm({ onSaved, onCancel }) {
+// Sans `game` : création ; avec `game` : édition du jeu existant
+// (formulaire pré-rempli, update sur son id, image conservée sauf
+// nouveau fichier téléversé).
+export default function GameForm({ game = null, onSaved, onCancel }) {
   const { t } = useLanguage();
-  const [values, setValues] = useState(VALEURS_INITIALES);
-  const [category, setCategory] = useState("famille");
-  const [eco, setEco] = useState(true);
-  const [published, setPublished] = useState(true);
+  const edition = game !== null;
+  const [values, setValues] = useState(() =>
+    edition
+      ? Object.fromEntries(
+          CHAMPS_TEXTE.map((champ) => [champ, game[champ] ?? ""]),
+        )
+      : VALEURS_INITIALES,
+  );
+  const [category, setCategory] = useState(game?.category ?? "famille");
+  const [eco, setEco] = useState(game?.eco ?? true);
+  const [published, setPublished] = useState(game?.published ?? true);
   const [file, setFile] = useState(null);
   // erreurs = clés i18n (jamais du texte) : re-traduites au changement de langue
   const [errors, setErrors] = useState({});
@@ -63,7 +73,7 @@ export default function GameForm({ onSaved, onCancel }) {
     if (Object.keys(next).length > 0) return;
 
     setStatus("saving");
-    let imageUrl = null;
+    let imageUrl = game?.image_url ?? null;
     if (file) {
       const chemin = `${crypto.randomUUID()}.${EXTENSIONS[file.type]}`;
       const { error: uploadError } = await supabase.storage
@@ -77,16 +87,18 @@ export default function GameForm({ onSaved, onCancel }) {
         .data.publicUrl;
     }
 
-    const payload = Object.fromEntries(
-      CHAMPS_TEXTE.map((champ) => [champ, values[champ].trim()]),
-    );
-    const { error } = await supabase.from("games").insert({
-      ...payload,
+    const payload = {
+      ...Object.fromEntries(
+        CHAMPS_TEXTE.map((champ) => [champ, values[champ].trim()]),
+      ),
       category,
       eco,
       published,
       image_url: imageUrl,
-    });
+    };
+    const { error } = edition
+      ? await supabase.from("games").update(payload).eq("id", game.id)
+      : await supabase.from("games").insert(payload);
     if (error) {
       setStatus("error");
       return;
@@ -131,7 +143,9 @@ export default function GameForm({ onSaved, onCancel }) {
 
   return (
     <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <h2 className={styles.formTitle}>{t("admin.form.createTitle")}</h2>
+      <h2 className={styles.formTitle}>
+        {t(edition ? "admin.form.editTitle" : "admin.form.createTitle")}
+      </h2>
 
       {CHAMPS_COURTS.slice(0, 2).map((champ) => renderChampTexte(champ, false))}
       {CHAMPS_LONGS.map((champ) => renderChampTexte(champ, true))}
@@ -213,7 +227,7 @@ export default function GameForm({ onSaved, onCancel }) {
         >
           {status === "saving"
             ? t("admin.form.saving")
-            : t("admin.form.submitCreate")}
+            : t(edition ? "admin.form.submitEdit" : "admin.form.submitCreate")}
         </button>
         <button className={styles.cancel} type="button" onClick={onCancel}>
           {t("admin.form.cancel")}
