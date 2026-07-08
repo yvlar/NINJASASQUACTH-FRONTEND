@@ -11,11 +11,11 @@
 |------------------|-----------|------------------------------|
 | **Architecture** | 76        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
 | **Qualité**      | 79        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
-| **UX/Contenu**   | 59        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
+| **UX/Contenu**   | 61        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
 | **Production**   | 70        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-07 — Sprint 4 en cours : **déploiement Vercel vérifié et consigné** (item 4.2, D13 résolu) — le site est en ligne et public à `https://ninjasasquacth-frontend.vercel.app` (confirmé live, build identique à `main`). Restent dans le Sprint 4 : garde-fou a11y (4.1, exécutable) et contenu réel (4.3/4.4, Décisions requises).
-- **Sprint courant** : **Sprint 4 — Accessibilité, mise en ligne et contenu réel** (items 4.1 → 4.4 ci-dessous ; **4.2 fait** — site en ligne ; 4.1 exécutable sans action utilisateur ; 4.3/4.4 restent des **Décisions requises** — bloqués sans réponse utilisateur).
+- **Dernière mise à jour** : 2026-07-08 — **Sprint 4 clos** (4.1/4.2 faits ; 4.3/4.4 reportés, décisions restées sans réponse) et **Sprint 5 ouvert** sur décision utilisateur du 2026-07-08 : exécution du sprint backend (items 5.1 → 5.14 définis ci-dessous, décisions de cadrage consignées).
+- **Sprint courant** : **Sprint 5 — Backend Supabase : auth admin, création de jeux, lecture publique** (items 5.1 → 5.14 ci-dessous ; deux prérequis d'accès à la charge de l'utilisateur : mot de passe du compte admin — item 5.4 — et variables Vercel — item 5.13).
 - **État des tests** : **24/24 verts** (9 fichiers dans `src/__tests__/`, sortie réelle de `npm test` après l'item 4.1 — Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
 
@@ -198,7 +198,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
-# 🟠 SPRINT 4 — Accessibilité, mise en ligne et contenu réel — **sprint courant**
+# 🟢 SPRINT 4 — Accessibilité, mise en ligne et contenu réel ✅ (clos le 2026-07-08, verdict : DoD satisfaite — 4.3/4.4 reportés, Décisions requises restées sans réponse)
 
 > **Objectif** : ajouter le garde-fou d'accessibilité identifié à la rétro du
 > Sprint 2 (« audit a11y plus large ») — seul travail exécutable sans action
@@ -243,17 +243,26 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   3.3, périmètre identique) : brancher les vraies photos (`src/data/games.js:11`
   et suiv. — 6 URLs Unsplash) et ajouter `og:image` (`index.html`).
   **Acceptation** : plus aucune URL Unsplash dans `src/data/games.js`.
+  **Reliquat** : aucun contenu fourni pendant le sprint → le Sprint 5 (backend)
+  change la nature du problème : les jeux (et leurs photos, uploadées par
+  l'admin dans Supabase Storage) sortiront du code — l'item 5.12 purge les URLs
+  Unsplash, l'upload des vraies photos devient une action admin (D3).
 - [ ] **4.4** (D7, D12) **Email officiel + liens sociaux réels** — **Décision
   requise** (report de 3.4, périmètre identique) : confirmer `CONTACT_EMAIL`
   (`src/data/site.js:1`), fournir les URLs Instagram/Facebook
   (`src/components/sections/Contact/ContactSection.jsx:137-142`, actuellement
   `href="#"`) ou décider de retirer les icônes.
   **Acceptation** : liens réels branchés, ou icônes retirées sur décision.
+  **Reliquat** : aucun contenu fourni pendant le sprint → D7/D12 restent des
+  Décisions requises au registre (hors périmètre du Sprint 5 backend).
 
 > **Definition of Done du Sprint 4** (en plus de la DoD standard) : le lint
 > échoue sur violation a11y du préréglage `recommended` ; aucune mise en ligne
 > sans URL vérifiée et consignée ; les items 4.2/4.3/4.4 ne sont cochés que sur
-> accès/contenu fournis par l'utilisateur — jamais inventés.
+> accès/contenu fournis par l'utilisateur — jamais inventés. — **SATISFAITE**
+> (lint a11y actif et vert ; URL de production vérifiée et consignée ; 4.3/4.4
+> non cochés, conformément au garde-fou contenu — reportés : D3 trouvera son
+> canal naturel dans l'admin du Sprint 5, D7/D12 restent au registre).
 
 ---
 
@@ -316,6 +325,33 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D14 | 🟡 | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Changement structurel majeur vs l'architecture actuelle (SPA statique sans backend ni routeur ; lié à D6, formulaire en `mailto:`). **Décisions prises (2026-07-07)** : finalité = **admin + espace client** (5.A), infra = **Supabase** (5.B). Restent à cadrer : impact frontend/conventions `CLAUDE.md` (5.C) et synergie formulaire de contact (5.D) | Sprint 5 (pré-cadrage : 5.A/5.B décidés ; items exécutables définis à la clôture du Sprint 4) |
 
 ## Changelog
+
+### Sprint 4 — Accessibilité, mise en ligne et contenu réel (2026-07-08)
+
+- **Contexte** : sprint courant défini à la clôture du Sprint 3 (garde-fou a11y
+  4.1 + mise en ligne 4.2 + contenus 4.3/4.4). En cours de sprint, l'utilisateur
+  a mis le site en ligne via l'intégration Git Vercel (4.2 vérifié et consigné)
+  et pris les décisions de pré-cadrage du Sprint 5 (5.A admin + espace client,
+  5.B Supabase — commits `25ec6fb`, `19aaebf`). Clôture déclenchée le 2026-07-08
+  par la décision utilisateur d'exécuter le sprint backend.
+- **Baseline à l'ouverture** : lint, tests (21/21) et build verts ;
+  audit high = 0.
+- **Commits** :
+  - `6b445c5` feat : garde-fou a11y dans le lint + cartes de jeu accessibles
+    au clavier (item 4.1)
+  - `aa44aef` docs : item 4.1 coché — garde-fou a11y actif, décompte de tests
+    recalibré (24)
+  - (clôture) docs : clôture sprint 4 — mise à jour roadmap
+- **Tests** : 21 → **24** (+3 : `game-card-a11y.test.jsx`, rouges avant le fix
+  clavier des cartes). Décompte relevé sur la sortie réelle de `npm test`.
+- **Déploiement** : site **en ligne et public** à
+  `https://ninjasasquacth-frontend.vercel.app` (D13 résolu — vérification HTTP
+  directe, build identique à `main` ; MCP Vercel toujours scoppé à `grandford`).
+- **Verdict de clôture** : DoD standard et DoD Sprint 4 satisfaites — lint
+  (préréglage jsx-a11y `recommended` actif) 0/0, 24 tests verts, build vert,
+  audit high 0 ; URL de production consignée ; aucun contenu de marque inventé
+  (4.3/4.4 non cochés — D3 bascule vers le canal admin du Sprint 5, D7/D12
+  restent au registre). Fichiers gouvernés intacts.
 
 ### Sprint 3 — Mise en ligne et contenu réel (2026-07-07)
 
@@ -409,6 +445,33 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `fdca579` (vérifié par diff). Découvertes nouvelles : D9, D10, D11, D12.
 
 ## Rétrospectives
+
+### Sprint 4 — Accessibilité, mise en ligne et contenu réel (2026-07-08)
+
+1. **Découpage** : bon. La leçon des Sprints 2/3 (« au moins un item exécutable
+   sans utilisateur ») a payé : 4.1 a produit de la valeur (garde-fou lint +
+   3 tests) pendant que 4.2 se débloquait côté utilisateur. 4.3/4.4 confirment
+   qu'un item « Décision requise » ne coûte rien mais ne produit rien tant que
+   le contenu n'arrive pas.
+2. **Suffisance des prompts** : suffisants. Le préréglage jsx-a11y a révélé un
+   vrai défaut (cartes inaccessibles au clavier) traité en test rouge → fix —
+   la procédure standard a couvert le cas sans improvisation.
+3. **À détecter plus tôt** : le scope du token MCP Vercel (limité à `grandford`)
+   a été correctement diagnostiqué comme problème d'autorisation, pas contourné.
+   À retenir pour le Sprint 5 : toute action dashboard (variables d'env,
+   création d'utilisateur) est un **prérequis d'accès utilisateur** à lister
+   dans l'item dès sa définition — c'est fait pour 5.4 et 5.13.
+4. **Notes /100** (précédent : 76/79/59/64 ; le tableau de bord avait été
+   partiellement mis à jour en cours de sprint) :
+   - **Architecture 76 (=)** : aucun changement structurel.
+   - **Qualité 79 (=, consolidé)** : garde-fou a11y mécanique dans le lint,
+     24 tests ; prochain levier : découpler les tests des données statiques
+     (arrive mécaniquement au Sprint 5).
+   - **UX/Contenu 61 (+2)** : cartes de jeu utilisables au clavier ; toujours
+     plafonné par le contenu placeholder (D3, D7, D12, `og:image`).
+   - **Production 70 (consolidé)** : site en ligne, CI complète (audit, lint,
+     tests, build) ; prochain saut : le backend (données réelles gérées hors
+     du code).
 
 ### Sprint 3 — Mise en ligne et contenu réel (2026-07-07)
 
