@@ -1,0 +1,18 @@
+.page {
+  min-height: 100vh;
+  padding: 2rem 1rem;
+  background-color: var(--color-cream);
+  color: var(--color-dark-green);
+}
+
+.title {
+  margin: 0 auto 1.5rem;
+  max-width: 60rem;
+  color: var(--color-brown);
+}
+
+@media (min-width: 768px) {
+  .page {
+    padding: 3rem 2rem;
+  }
+}
