@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { supabase } from "../../../lib/supabase";
 import GameForm from "../GameForm";
@@ -13,29 +13,48 @@ export default function GamesManager() {
   const [creating, setCreating] = useState(false);
   const [editing, setEditing] = useState(null); // jeu en cours d'édition
   const [deletingId, setDeletingId] = useState(null); // confirmation en cours
-
-  const load = useCallback(async () => {
-    setStatus("loading");
-    const { data, error } = await supabase
-      .from("games")
-      .select("*")
-      .order("created_at", { ascending: true });
-    if (error) {
-      setStatus("error");
-      return;
-    }
-    setGames(data ?? []);
-    setStatus("ready");
-  }, []);
+  // Incrémentée pour relancer la lecture (après création/édition/suppression) :
+  // le fetch vit dans l'effet, les setState n'y sont qu'en callbacks
+  // asynchrones (règle react-hooks set-state-in-effect).
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
-    load();
-  }, [load]);
+    let active = true;
+
+    supabase
+      .from("games")
+      .select("*")
+      .order("created_at", { ascending: true })
+      .then(
+        ({ data, error }) => {
+          if (!active) return;
+          if (error) {
+            setStatus("error");
+            return;
+          }
+          setGames(data ?? []);
+          setStatus("ready");
+        },
+        // panne réseau avant toute réponse (même filet que useGames — D16)
+        () => {
+          if (active) setStatus("error");
+        },
+      );
+
+    return () => {
+      active = false;
+    };
+  }, [reloadKey]);
+
+  const reload = () => {
+    setStatus("loading");
+    setReloadKey((key) => key + 1);
+  };
 
   const handleDelete = async (id) => {
     const { error } = await supabase.from("games").delete().eq("id", id);
     setDeletingId(null);
-    if (!error) load();
+    if (!error) reload();
   };
 
   if (creating || editing) {
@@ -45,7 +64,7 @@ export default function GamesManager() {
         onSaved={() => {
           setCreating(false);
           setEditing(null);
-          load();
+          reload();
         }}
         onCancel={() => {
           setCreating(false);

@@ -9,8 +9,11 @@ import { AuthContext } from "./context";
 export default function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
-  // null = rôle pas encore connu (session absente ou lecture en cours)
-  const [role, setRole] = useState(null);
+  // Rôle mémorisé AVEC la session qui l'a produit : le rôle exposé est dérivé
+  // au rendu (null tant que la session courante n'a pas son rôle), ce qui
+  // évite un setState synchrone dans l'effet (règle react-hooks).
+  const [roleInfo, setRoleInfo] = useState({ session: null, role: null });
+  const role = roleInfo.session === session ? roleInfo.role : null;
 
   useEffect(() => {
     let active = true;
@@ -36,7 +39,6 @@ export default function AuthProvider({ children }) {
 
   useEffect(() => {
     if (!session) {
-      setRole(null);
       return undefined;
     }
     let active = true;
@@ -48,7 +50,7 @@ export default function AuthProvider({ children }) {
       .single()
       .then(({ data }) => {
         // profil absent ou illisible → « client » (jamais de promotion par défaut)
-        if (active) setRole(data?.role ?? "client");
+        if (active) setRoleInfo({ session, role: data?.role ?? "client" });
       });
 
     return () => {
