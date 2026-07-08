@@ -9,14 +9,14 @@
 
 | Dimension        | Note /100 | Baseline (audit 2026-07-07) |
 |------------------|-----------|------------------------------|
-| **Architecture** | 76        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
-| **Qualité**      | 79        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
-| **UX/Contenu**   | 61        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
-| **Production**   | 70        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
+| **Architecture** | 82        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
+| **Qualité**      | 83        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
+| **UX/Contenu**   | 60        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
+| **Production**   | 73        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-08 — **Sprint 4 clos** (4.1/4.2 faits ; 4.3/4.4 reportés, décisions restées sans réponse) et **Sprint 5 ouvert** sur décision utilisateur du 2026-07-08 : exécution du sprint backend (items 5.1 → 5.14 définis ci-dessous, décisions de cadrage consignées).
-- **Sprint courant** : **Sprint 5 — Backend Supabase : auth admin, création de jeux, lecture publique** (items 5.1 → 5.14 ci-dessous ; deux prérequis d'accès à la charge de l'utilisateur : mot de passe du compte admin — item 5.4 — et variables Vercel — item 5.13).
-- **État des tests** : **24/24 verts** (9 fichiers dans `src/__tests__/`, sortie réelle de `npm test` après l'item 4.1 — Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **Dernière mise à jour** : 2026-07-08 — **Sprint 5 clos** : backend Supabase livré (projet dédié, schéma + RLS, Storage, login admin, CRUD de jeux bilingue avec upload de photos, site public branché sur la base — vide par décision 5.F). Restent deux actions utilisateur (compte admin 5.4, variables Vercel — reprises au Sprint 6).
+- **Sprint courant** : **Sprint 6 — Mise en service du backend et contenu réel** (items 6.1 → 6.5 ci-dessous ; 6.1/6.2/6.3/6.4 dépendent d'actions/contenus utilisateur, 6.5 est exécutable sans lui).
+- **État des tests** : **62/62 verts** (18 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 5 — Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -266,7 +266,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
-# 🟠 SPRINT 5 — Backend Supabase : auth admin, création de jeux, lecture publique — **sprint courant**
+# 🟢 SPRINT 5 — Backend Supabase : auth admin, création de jeux, lecture publique ✅ (clos le 2026-07-08, verdict : DoD satisfaite — 5.4 reporté, action utilisateur restée en attente)
 
 > **Objectif** (décisions utilisateur 2026-07-07 et 2026-07-08) : doter le site
 > d'un backend Supabase — authentification avec rôle admin, interface admin de
@@ -313,73 +313,88 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   (`.env.local`, variables Vercel) — jamais dans le dépôt.
   **Acceptation SATISFAITE** : `get_project` → `ACTIVE_HEALTHY`, ref/URL
   consignés, aucun secret committé.
-- [ ] **5.2** **Migration schéma + RLS** : tables `profiles` (rôles
-  admin/client, trigger signup) et `games` (catégorie CHECK accentuée,
-  colonnes bilingues NOT NULL `*_fr`/`*_en`, `image_url`, `published`,
-  timestamps), fonction `is_admin()` security definer, RLS (lecture anon
-  filtrée `published`, écritures admin). SQL committé sous
-  `supabase/migrations/`.
-  **Acceptation** : `execute_sql` sous rôle `anon` — lecture filtrée, insert
-  rejeté ; `get_advisors(security)` sans erreur.
-- [ ] **5.3** **Bucket Storage `game-images`** : public en lecture, 5 Mio,
-  jpeg/png/webp, écritures réservées `is_admin()`. SQL committé.
-  **Acceptation** : upload anon rejeté par policy, lecture publique OK.
+- [x] **5.2** **Migration schéma + RLS** → `a216f6f`
+  Tables `profiles` (rôles admin/client, trigger signup) et `games`
+  (catégorie CHECK accentuée, colonnes bilingues NOT NULL `*_fr`/`*_en`,
+  `image_url`, `published`, timestamps), fonction `is_admin()` security
+  definer, RLS. SQL tracé sous `supabase/migrations/20260708032500_*.sql`.
+  **Acceptation SATISFAITE** : `execute_sql` sous rôle `anon` — 1 seul jeu
+  visible sur 2 (le publié), insert rejeté (42501) ; advisors sécurité : les
+  2 WARN restants sur `is_admin()` sont intentionnels et documentés
+  (`handle_new_user` dé-exposée du RPC en correctif).
+- [x] **5.3** **Bucket Storage `game-images`** → `65f58cf`
+  Public en lecture, 5 Mio, jpeg/png/webp, écritures `is_admin()`. SQL tracé.
+  **Acceptation SATISFAITE** : insert anon dans `storage.objects` rejeté
+  (42501), config du bucket vérifiée en base.
 - [ ] **5.4** **Compte admin** — **Prérequis d'accès utilisateur** : créer
   l'utilisateur `ivess49@gmail.com` dans le dashboard Supabase
   (Authentication → Add user, auto-confirm, mot de passe choisi par lui).
   Ensuite : promotion `role='admin'` en SQL via MCP.
   **Acceptation** : `execute_sql` prouve le rôle admin ; aucun identifiant
   dans le dépôt.
-- [ ] **5.5** **Dépendances + client Supabase + env** :
+  **Reliquat** : action utilisateur non réalisée pendant le sprint → reporté
+  tel quel au Sprint 6 (item 6.1). Sans elle, personne ne peut se connecter
+  à `/admin` (le reste du livré n'en dépend pas).
+- [x] **5.5** **Dépendances + client Supabase + env** → `148c512`
   `@supabase/supabase-js` + `react-router-dom`, `src/lib/supabase.js`
   (singleton, erreur explicite si env manquante), `.env.example`.
-  **Acceptation** : test client vert, audit high = 0, build vert sans
-  variables (la CI n'a pas de secrets).
-- [ ] **5.6** **Routage `/` et `/admin` + rewrite Vercel** : `BrowserRouter`
-  dans `main.jsx`, `/` → `App` intact, `/admin` → `AdminPage` lazy,
-  `vercel.json` (rewrite SPA pour l'accès direct à `/admin`).
-  **Acceptation** : `routing.test.jsx` vert, les 24 tests existants intacts.
-- [ ] **5.7** **Session + login admin** : `src/auth/` (calqué sur `src/i18n/`),
-  `LoginForm` accessible, clés `admin.login.*` fr+en.
-  **Acceptation** : `auth-login.test.jsx` vert (signIn, erreur i18n, succès).
-- [ ] **5.8** **Garde `RequireAdmin`** : rôle lu dans `profiles` ; anonyme →
-  login, non-admin → accès refusé, admin → contenu (la barrière réelle reste
-  la RLS).
-  **Acceptation** : `require-admin.test.jsx` vert (3 cas).
-- [ ] **5.9** **Création de jeux dans l'admin** : `GamesManager` (liste) +
-  `GameForm` (FR+EN obligatoires, catégorie parmi les 3, validation
-  type/taille d'image AVANT upload, upload → `getPublicUrl` → insert).
-  **Acceptation** : `admin-game-create.test.jsx` vert (payload exact, fichier
-  invalide bloqué sans upload, EN vide bloqué) ; jsx-a11y vert.
-- [ ] **5.10** **Édition + suppression** : `GameForm` pré-rempli (update),
-  remplacement d'image optionnel, suppression avec confirmation.
-  **Acceptation** : `admin-game-edit.test.jsx` vert.
-- [ ] **5.11** **`localizeGame` + `useGames` + mocks/fixtures** (non branchés —
-  commit sûr intermédiaire).
-  **Acceptation** : tests dédiés verts, suite existante intacte.
-- [ ] **5.12** **Bascule lecture publique + purge statique** : `GamesSection`
-  → `useGames` (loading/error/**empty**), `GameCard`/`GameDetail` →
-  `localizeGame`, suppression de l'export `games` (`categories` conservé) et
-  de `games.items.*` des deux JSON, adaptation de `games-contract.test.js` et
-  des tests UI sur mocks+fixtures.
-  **Acceptation** : test rouge « base vide → `games.empty` » vert après
-  bascule ; plus aucune URL Unsplash dans `src/data/games.js` (périmètre code
-  de D3 résolu) ; parité i18n verte ; suite complète verte.
-- [ ] **5.13** **Build/preview + déploiement** — **Prérequis d'accès
-  utilisateur** : poser `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` dans
-  le dashboard Vercel (MCP Vercel scoppé à `grandford` — D13) puis redéployer.
-  Localement : build sans env vert, parcours preview `/` et `/admin` ; README
-  section « Déploiement » enrichie.
-  **Acceptation** : procédure documentée ; prod vérifiée par HTTP si l'action
-  utilisateur est faite dans le sprint (sinon reliquat consigné).
-- [ ] **5.14** **Clôture documentaire** : amendement `CLAUDE.md` (router,
-  Supabase, `src/lib`/`src/auth`/`src/hooks`/`src/components/admin`,
-  convention env `VITE_*`, convention de mock) en **commit dédié citant la
-  décision du 2026-07-08** (règle de gouvernance), puis
-  `prompt-mise-a-jour-roadmap.md` (cocher, découvertes, changelog, rétro,
-  dashboard, décompte de tests recalibré).
-  **Acceptation** : DoD complète (lint 0/0, tests 100 %, build, audit high 0,
-  parité i18n, aucun secret).
+  **Acceptation SATISFAITE** : `supabase-client.test.js` vert (rouge avant),
+  audit high = 0, build vert sans variables (prouvé en déplaçant `.env.local`).
+- [x] **5.6** **Routage `/` et `/admin` + rewrite Vercel** → `a8690df`
+  `BrowserRouter` dans `main.jsx`, `AppRoutes` (`/` → `App` intact, `/admin`
+  → `AdminPage` lazy, `*` → `/`), `vercel.json`.
+  **Acceptation SATISFAITE** : `routing.test.jsx` vert (rouge avant), les
+  24 tests existants inchangés, code-splitting visible au build.
+- [x] **5.7** **Session + login admin** → `b343e63`
+  `src/auth/` (calqué sur `src/i18n/`), `LoginForm` accessible, clés
+  `admin.login.*` fr+en, helper `supabaseMock.js` (avancé depuis 5.11 : les
+  tests d'auth en dépendent).
+  **Acceptation SATISFAITE** : `auth-login.test.jsx` vert — identifiants
+  transmis, erreur i18n, zone protégée après succès, signOut.
+- [x] **5.8** **Garde `RequireAdmin`** → `04b1c08`
+  Rôle lu dans `profiles` ; anonyme → login, non-admin → accès refusé
+  (bouton déconnexion), admin → contenu. La barrière réelle reste la RLS.
+  **Acceptation SATISFAITE** : `require-admin.test.jsx` vert (3 cas).
+- [x] **5.9** **Création de jeux dans l'admin** → `f82a9d2`
+  `GamesManager` (liste, brouillons signalés) + `GameForm` (FR+EN
+  obligatoires, catégorie parmi les 3, validation type/taille AVANT upload,
+  upload → `getPublicUrl` → insert).
+  **Acceptation SATISFAITE** : `admin-game-create.test.jsx` vert (7 tests :
+  payload exact avec catégorie accentuée, fichier invalide/trop gros bloqué
+  sans upload, EN vide bloqué, upload → URL publique insérée) ; jsx-a11y vert.
+- [x] **5.10** **Édition + suppression** → `7d7a06d`
+  `GameForm` pré-rempli (update sur le bon id, image conservée sans nouveau
+  fichier), suppression avec confirmation inline.
+  **Acceptation SATISFAITE** : `admin-game-edit.test.jsx` vert (4 tests,
+  delete jamais appelé avant confirmation).
+- [x] **5.11** **`localizeGame` + `useGames` + fixtures** → `b1fc36a`
+  Util pur + hook + `fixtures/games.js` (copy des anciens jeux 1-3, format
+  table). Le helper de mock était déjà livré en 5.7.
+  **Acceptation SATISFAITE** : tests dédiés verts, suite existante intacte.
+- [x] **5.12** **Bascule lecture publique + purge statique** → `53547e9`
+  `GamesSection` → `useGames` (loading/error/**empty**), `GameCard`/
+  `GameDetail` → `localizeGame` (+ `image_url` nullable), suppression de
+  l'export `games` (`categories` conservé) et de `games.items.*` des deux
+  JSON, `games-contract.test.js` réécrit (verrous catégories + fixtures au
+  format table), tests UI adaptés sur mocks+fixtures.
+  **Acceptation SATISFAITE** : test « base vide → `games.empty` » rouge
+  avant / vert après ; grep : zéro URL Unsplash, zéro `games.items` dans le
+  code (périmètre code de D3 résolu) ; parité i18n verte ; suite complète
+  verte (62 tests).
+- [x] **5.13** **Build/preview + déploiement** → `78546ce` (+ fix `18525a9`)
+  Localement : build sans env vert, preview parcourue (`/` et `/admin`),
+  README « Déploiement » réécrit (variables Vercel, rewrite SPA). Preuves
+  réseau réelles : lecture anonyme REST → 200 `[]` (RLS, base vide), insert
+  anonyme → 401. La vérification navigateur a révélé et corrigé un bug
+  (D16 : rejet réseau non géré dans `useGames` → UI bloquée en chargement) ;
+  état d'erreur validé en navigateur réel après le fix.
+  **Reliquat** : pose des variables `VITE_*` au dashboard Vercel +
+  vérification HTTP de `/admin` en production = action utilisateur → Sprint 6
+  (item 6.2). Le MCP Vercel reste scoppé à `grandford` (D13).
+- [x] **5.14** **Clôture documentaire** → `433a2f5` (amendement CLAUDE.md en
+  commit dédié citant la décision du 2026-07-08) + le commit de clôture.
+  **Acceptation SATISFAITE** : DoD complète — lint 0/0, 62/62 tests, build
+  vert, audit high 0, parité i18n verte, aucun secret committé.
 
 > **Definition of Done du Sprint 5** (en plus de la DoD standard) : aucun
 > secret (clé API, token, service key) dans le code ou les commits —
@@ -388,7 +403,66 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > par `execute_sql` sous rôle anon), jamais sur la seule garde frontend ;
 > les items 5.4 et 5.13 ne sont cochés que sur action utilisateur effectuée —
 > jamais à sa place ; les conventions de `CLAUDE.md` ne changent que par le
-> commit dédié de l'item 5.14 citant la décision du 2026-07-08.
+> commit dédié de l'item 5.14 citant la décision du 2026-07-08. —
+> **SATISFAITE** (zéro secret — `.env.local` gitignoré, clé publiable en env
+> seulement ; 62 tests mockés sans réseau ; RLS prouvée par SQL sous rôle
+> anon ET par requêtes REST réelles — lecture 200 `[]`, insert 401 ; 5.4 non
+> coché, action utilisateur en attente ; le volet local de 5.13 est livré,
+> son volet production reste tracé en reliquat vers 6.2 ; CLAUDE.md amendé
+> par le seul commit dédié `433a2f5`).
+
+---
+
+# 🟠 SPRINT 6 — Mise en service du backend et contenu réel — **sprint courant**
+
+> **Objectif** : mettre le backend livré au Sprint 5 en service réel — compte
+> admin actif, variables Vercel posées, premiers vrais jeux créés (avec
+> photos → résout D3 côté contenu) — et absorber les décisions de contenu
+> restantes (D7/D12). Leçon des rétros : au moins un item exécutable sans
+> utilisateur → 6.5 (garde-fou anti-pause Supabase, D15). Ordre conseillé :
+> 6.1 → 6.2 → 6.3 (dépendances strictes), 6.4/6.5 indépendants.
+
+- [ ] **6.1** **Compte admin actif** (report de 5.4) — **Prérequis d'accès
+  utilisateur** : créer l'utilisateur `ivess49@gmail.com` dans le dashboard
+  Supabase du projet `ninja-sasquatch-games` (Authentication → Add user,
+  auto-confirm). Ensuite (exécutable via MCP) : promotion `role='admin'`
+  en SQL, preuve par `execute_sql`.
+  **Acceptation** : rôle admin prouvé en base ; aucun identifiant committé.
+- [ ] **6.2** **Variables Vercel + vérification prod** (reliquat de 5.13) —
+  **Prérequis d'accès utilisateur** : poser `VITE_SUPABASE_URL` et
+  `VITE_SUPABASE_ANON_KEY` dans le dashboard Vercel (Settings → Environment
+  Variables, procédure au README) puis redéployer.
+  **Acceptation** : `https://ninjasasquacth-frontend.vercel.app/` affiche
+  l'état du catalogue servi par Supabase (vide ou jeux réels) et `/admin`
+  répond en accès direct (rewrite `vercel.json` vérifié en production) —
+  vérification HTTP directe, consignée ici.
+- [ ] **6.3** (D3) **Premiers vrais jeux + photos via l'admin** — **Décision/
+  action utilisateur** : créer les jeux réels (textes FR/EN, photos produits
+  uploadées dans `game-images`) via `/admin`. Dépend de 6.1 + 6.2.
+  **Acceptation** : au moins un jeu réel publié visible sur le site public ;
+  D3 clôturée (plus aucun placeholder nulle part). Ajouter `og:image`
+  (`index.html`) dès qu'une vraie photo existe.
+- [ ] **6.4** (D7, D12) **Email officiel + liens sociaux réels** — **Décision
+  requise** (report de 4.4, périmètre identique) : confirmer `CONTACT_EMAIL`
+  (`src/data/site.js:1`), fournir les URLs Instagram/Facebook
+  (`src/components/sections/Contact/ContactSection.jsx:137-142`, `href="#"`)
+  ou décider de retirer les icônes (retire aussi la suspension locale
+  d'`anchor-is-valid` posée en 4.1).
+  **Acceptation** : liens réels branchés, ou icônes retirées sur décision.
+- [ ] **6.5** (D15) **Garde-fou anti-pause Supabase** — exécutable sans
+  utilisateur : le palier gratuit met le projet en pause après ~1 semaine
+  d'inactivité → le catalogue afficherait l'état d'erreur. Ajouter un ping
+  hebdomadaire planifié dans la CI (`.github/workflows/`, cron + `curl` de
+  l'endpoint REST public avec la clé publiable en secret GitHub Actions —
+  clé publique par conception, mais hors dépôt par convention).
+  **Acceptation** : workflow planifié vert ; la requête maintient le projet
+  actif ; documentation d'une ligne au README.
+
+> **Definition of Done du Sprint 6** (en plus de la DoD standard) : les items
+> 6.1 → 6.4 ne sont cochés que sur action/contenu utilisateur effectifs —
+> jamais à sa place ; aucune URL/statut de production consigné sans
+> vérification HTTP directe ; aucun secret committé (la clé publiable vit en
+> secret CI/variable d'env, jamais dans le YAML en clair).
 
 ---
 
@@ -398,7 +472,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 |-----|---------|---------|-------------|
 | D1  | ✅ | Aucun framework de test : aucun script `test`, aucun fichier de test — les contrats byte-for-byte (parité i18n, catégories accentuées, ancres de nav) n'étaient protégés par rien, et `t()` masque les clés manquantes en retournant la clé | ✅ Sprint 1 (items 1.1 `0d6d903`, 1.2 `ee5cf70`) — 16 tests verrous |
 | D2  | ✅ | Aucune CI : pas de répertoire `.github/`, lint/build jamais vérifiés sur push/PR | ✅ Sprint 1 (item 1.3 `db8f3bd`) |
-| D3  | 🟠 | Images des 6 jeux = URLs Unsplash distantes (`src/data/games.js:10` et suiv.) — pas de vraies photos produits, dépendance à un CDN tiers | **Décision requise** — Sprint 3 (item 3.3, report de 2.4) |
+| D3  | 🟡 | Images des 6 jeux = URLs Unsplash distantes — pas de vraies photos produits, dépendance à un CDN tiers. **Périmètre code résolu au Sprint 5** (item 5.12 `53547e9`) : plus aucune URL Unsplash dans le dépôt, les jeux statiques sont purgés (base vide, décision 5.F). Reste le volet contenu : créer les vrais jeux avec photos via `/admin` (upload Storage) + `og:image` | Sprint 6 (item 6.3 — action utilisateur via l'admin) |
 | D4  | ✅ | Aucune balise SEO : pas de meta description ni OpenGraph, titre brut `ninja-sasquatch-games` | ✅ Sprint 1 (item 1.4 `4df9994`) — `og:image` reste lié à D3 |
 | D5  | ✅ | Favicon = `vite.svg` par défaut | ✅ Sprint 1 (item 1.4 `4df9994`) — monogramme NS |
 | D6  | 🟡 | Formulaire de contact en `mailto:` sans backend (`ContactSection.jsx:51`) — dépend du client mail de l'utilisateur ; un vrai envoi demanderait un service (API, Formspree…) | Backlog (choix d'infra à discuter) |
@@ -409,9 +483,68 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
 | D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford`. Confirmé comme un refus d'autorisation (et non de découverte) : avec l'ID projet fourni `prj_mQkt78gkQIeDB1ccAHBV8895HAox`, `get_project`→404 et `list_deployments`→403. L'ID de déploiement/SHA n'est donc pas relevable via MCP tant que l'accès n'est pas accordé au projet côté Vercel — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
-| D14 | 🟡 | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Changement structurel majeur vs l'architecture actuelle (SPA statique sans backend ni routeur ; lié à D6, formulaire en `mailto:`). **Toutes les décisions de cadrage prises** (5.A → 5.G, 2026-07-07 et 2026-07-08) : admin + espace client, Supabase projet dédié, react-router, formulaire reporté, admin `ivess49@gmail.com`, base vide, catégories fixes | **Sprint 5 en cours** (items 5.1 → 5.14 définis, 5.1 fait) |
+| D14 | ✅ | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Toutes les décisions de cadrage prises (5.A → 5.G, 2026-07-07/08) | ✅ Sprint 5 — backend Supabase livré (projet dédié, schéma+RLS, Storage, login/rôles, CRUD jeux, site branché). Mise en service = Sprint 6 ; espace client = sprint ultérieur (le modèle de rôles est prêt) |
+| D15 | 🟡 | (Sprint 5) Le palier gratuit Supabase met le projet en **pause après ~1 semaine d'inactivité** → le catalogue public afficherait l'état d'erreur (message i18n en place comme filet). Constaté à la conception, garde-fou peu coûteux identifié : ping hebdomadaire en CI | Sprint 6 (item 6.5 — exécutable sans utilisateur) |
+| D16 | ✅ | (Sprint 5) `useGames` ne gérait pas le **rejet** de la promesse (panne réseau avant réponse) : UI bloquée sur « Chargement… » au lieu de l'état d'erreur. Découvert en vérifiant l'app dans un vrai navigateur (item 5.13) — les tests unitaires ne simulaient que l'erreur applicative, pas le rejet | ✅ Sprint 5 (`18525a9`) — fix + cas de rejet ajouté au mock et aux tests |
 
 ## Changelog
+
+### Sprint 5 — Backend Supabase : auth admin, création de jeux, lecture publique (2026-07-08)
+
+- **Contexte** : décision utilisateur du 2026-07-08 — exécuter le sprint
+  backend (D14, pré-cadré en 5.A/5.B). Cadrage complété le jour même via
+  AskUserQuestion (7 décisions 5.A → 5.G consignées en tête de sprint :
+  projet Supabase dédié, périmètre admin+site branché, react-router,
+  formulaire reporté, admin `ivess49@gmail.com`, **base vide**, catégories
+  fixes). La clôture du Sprint 4 (restée en attente) a été régularisée à
+  l'ouverture (`247f4c7`).
+- **Baseline à l'ouverture** : lint, tests (24/24, conforme au tableau de
+  bord — aucune dérive, branche partie de `main` à `d1ff2c6`) et build
+  verts ; audit high = 0.
+- **Infrastructure créée (via MCP Supabase)** : projet `ninja-sasquatch-games`
+  (ref `vgmqmifgdolccquyjcoc`, ca-central-1, 0 $/mois confirmé avant
+  création) ; tables `profiles`/`games` + `is_admin()` + RLS ; bucket
+  `game-images`. Preuves : lecture anon filtrée `published`, écritures anon
+  rejetées (SQL 42501 et REST 401), advisors sécurité propres (2 WARN
+  intentionnels documentés).
+- **Commits** :
+  - `247f4c7` docs : clôture sprint 4 — mise à jour roadmap
+  - `cbb9fc3` docs : sprint 5 défini et ouvert + projet Supabase créé (5.1)
+  - `a216f6f` feat : schéma games/profiles + RLS par rôle (5.2)
+  - `65f58cf` feat : bucket Storage game-images (5.3)
+  - `148c512` feat : client Supabase injectable + env Vite (5.5)
+  - `a8690df` feat : react-router-dom — route /admin (5.6)
+  - `b343e63` feat : session Supabase et écran de login admin (5.7)
+  - `04b1c08` feat : garde d'accès admin par rôle profiles (5.8)
+  - `f82a9d2` feat : création de jeux dans l'admin (5.9)
+  - `7d7a06d` feat : édition et suppression de jeux (5.10)
+  - `b1fc36a` feat : hook useGames et localisation des jeux (5.11)
+  - `53547e9` feat : site public sur Supabase, purge du statique (5.12)
+  - `18525a9` fix : useGames signale la panne réseau (D16, vérification 5.13)
+  - `78546ce` docs : procédure de déploiement Supabase/Vercel (5.13)
+  - `433a2f5` docs : amendement CLAUDE.md (décision 2026-07-08, 5.14)
+  - (clôture) docs : clôture sprint 5 — mise à jour roadmap
+- **Tests** : 24 → **62** (+38 ; 9 fichiers nouveaux : client env, routage,
+  login, garde admin, création/édition admin, localizeGame, useGames,
+  GamesSection-Supabase ; 5 fichiers adaptés à la purge du statique).
+  Chaque item de code a eu son test rouge avant le vert. Décompte relevé sur
+  la sortie réelle de `npm test`. Zéro réseau : client mocké partout
+  (`helpers/supabaseMock.js`), prouvé mécaniquement (module réel jamais
+  exécuté sous test).
+- **Vérifications de bout en bout** : build sans env vert (CI sans secrets) ;
+  preview parcourue ; REST réel — lecture anonyme 200 `[]`, insert anonyme
+  401 ; parcours navigateur (Playwright) sur `/` et `/admin` — a révélé D16
+  (corrigé) ; état d'erreur validé en navigateur réel après le fix.
+- **Sécurité** : audit high = 0 après ajout des dépendances ; aucun secret
+  committé (`.env.local` gitignoré, `.env.example` en placeholders, clé
+  publiable en env seulement) ; RLS = barrière d'écriture réelle.
+- **Contenu** : conformément à la décision 5.F, la base part **vide** — le
+  site public affiche un état vide propre. Les anciens jeux statiques
+  (placeholder Unsplash) sont purgés : le périmètre code de D3 est résolu,
+  le contenu réel passe désormais par `/admin` (Sprint 6).
+- **Verdict de clôture** : DoD standard et DoD Sprint 5 satisfaites — voir
+  le bloc DoD du sprint. 5.4 non coché (action utilisateur), reliquat prod
+  de 5.13 tracé vers 6.2. Découvertes nouvelles : D15, D16 (résolue).
 
 ### Sprint 4 — Accessibilité, mise en ligne et contenu réel (2026-07-08)
 
@@ -532,6 +665,59 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `fdca579` (vérifié par diff). Découvertes nouvelles : D9, D10, D11, D12.
 
 ## Rétrospectives
+
+### Sprint 5 — Backend Supabase (2026-07-08)
+
+1. **Découpage** : bon dans l'ensemble pour un sprint structurel de 14 items.
+   L'ordre backend-d'abord (5.1-5.3 via MCP avant tout code front) s'est
+   vérifié : aucun aller-retour de schéma. Deux ajustements en cours de
+   route, tous deux sains : le helper de mock (prévu en 5.11) a été avancé
+   à 5.7 car les tests d'auth en dépendaient — à retenir : les outils de
+   test se planifient AVANT le premier item qui teste ; et 5.11 (livrer
+   util/hook/fixtures non branchés) a tenu sa promesse d'amortisseur : 5.12,
+   l'item le plus risqué (bascule + purge + 5 fichiers de tests), est passé
+   en un seul commit sans casse.
+2. **Suffisance des prompts** : suffisants — la procédure standard (baseline,
+   rouge → vert, commits atomiques, question utilisateur) a couvert un sprint
+   pourtant hors de son gabarit d'origine (infra via MCP, décisions produit
+   en rafale). Le canal AskUserQuestion a fonctionné (7 décisions consignées),
+   contrairement au Sprint 3. Cas non couvert par la lettre du prompt : les
+   « tests rouges d'infrastructure » (preuves `execute_sql`/advisors au lieu
+   de Vitest) — traités dans l'esprit de la procédure, consignés comme
+   preuves dans les items. Aucun diff de prompt proposé.
+3. **À détecter plus tôt** : D16 (rejet réseau non géré → UI bloquée en
+   chargement) n'a été vu qu'en pilotant l'app dans un vrai navigateur à
+   5.13 — les tests unitaires ne simulaient que l'erreur applicative
+   `{ data, error }`, pas le rejet de la promesse. Garde-fou peu coûteux
+   appliqué immédiatement : le mock supporte `{ reject }` et le cas est
+   verrouillé dans `use-games.test.jsx`. Leçon générale : pour tout code
+   réseau, écrire systématiquement les DEUX cas d'échec (erreur retournée ET
+   promesse rejetée). D15 (pause auto du free tier) a été identifiée à la
+   conception plutôt qu'en production — le garde-fou (ping CI) est planifié
+   en 6.5 avant que la pause ne morde.
+4. **Notes /100** (précédent : 76/79/61/70) :
+   - **Architecture 82 (+6)** : changement structurel majeur absorbé sans
+     casser les patterns existants — router à deux routes (App intact),
+     `src/auth/` calqué sur `src/i18n/`, client Supabase en point unique
+     mockable, contenu bilingue porté par le schéma (NOT NULL par langue,
+     CHECK partagé avec le front), conventions consignées dans CLAUDE.md
+     par commit dédié. Réserve : l'admin est un rendu conditionnel à états
+     dans GamesManager — acceptable aujourd'hui, à surveiller si l'espace
+     client arrive.
+   - **Qualité 83 (+4)** : 62 tests (24 → 62), chaque item prouvé rouge →
+     vert, mocks sans réseau garantis mécaniquement, RLS prouvée par SQL et
+     REST réels, bug D16 attrapé par une vérification navigateur puis
+     verrouillé. Manque : un vrai parcours E2E automatisé (le parcours
+     Playwright de 5.13 était manuel/jetable).
+   - **UX/Contenu 60 (-1)** : le socle UX progresse (admin complet,
+     formulaires accessibles, états loading/vide/erreur propres) mais le
+     site public affiche désormais un catalogue **vide** (décision 5.F
+     assumée : plus de placeholder) tant que 6.1 → 6.3 ne sont pas faits —
+     la note remontera avec le premier jeu réel publié.
+   - **Production 73 (+3)** : backend réel en place et prouvé, procédure de
+     déploiement documentée, CI toujours sans secrets ; retenue par les deux
+     actions utilisateur bloquantes (compte admin, variables Vercel) et par
+     D15 (pause free tier) — les trois sont le cœur du Sprint 6.
 
 ### Sprint 4 — Accessibilité, mise en ligne et contenu réel (2026-07-08)
 
