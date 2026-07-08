@@ -3,16 +3,21 @@ import { useLanguage } from "../../../i18n/useLanguage";
 import { supabase } from "../../../lib/supabase";
 import GameForm from "../GameForm";
 import styles from "./GamesManager.module.css";
+import type { GameRow } from "../../../types/database";
+
+type ManagerStatus = "loading" | "error" | "ready";
 
 // Gestion des jeux côté admin : la RLS laisse l'admin voir aussi les
 // brouillons (published = false), invisibles du site public.
 export default function GamesManager() {
   const { t } = useLanguage();
-  const [games, setGames] = useState([]);
-  const [status, setStatus] = useState("loading"); // loading | error | ready
+  const [games, setGames] = useState<GameRow[]>([]);
+  const [status, setStatus] = useState<ManagerStatus>("loading");
   const [creating, setCreating] = useState(false);
-  const [editing, setEditing] = useState(null); // jeu en cours d'édition
-  const [deletingId, setDeletingId] = useState(null); // confirmation en cours
+  // jeu en cours d'édition
+  const [editing, setEditing] = useState<GameRow | null>(null);
+  // confirmation de suppression en cours
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   // Incrémentée pour relancer la lecture (après création/édition/suppression) :
   // le fetch vit dans l'effet, les setState n'y sont qu'en callbacks
   // asynchrones (règle react-hooks set-state-in-effect).
@@ -51,7 +56,7 @@ export default function GamesManager() {
     setReloadKey((key) => key + 1);
   };
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (id: string) => {
     const { error } = await supabase.from("games").delete().eq("id", id);
     setDeletingId(null);
     if (!error) reload();

@@ -2,8 +2,15 @@ import { Users, Clock, Star, Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { localizeGame } from "../../../utils/localizeGame";
 import styles from "./Games.module.css";
+import type { GameRow } from "../../../types/database";
 
-export default function GameDetail({ game, onBack }) {
+export default function GameDetail({
+  game,
+  onBack,
+}: {
+  game: GameRow;
+  onBack: () => void;
+}) {
   const { t, lang } = useLanguage();
   const { title, fullDesc } = localizeGame(game, lang);
 

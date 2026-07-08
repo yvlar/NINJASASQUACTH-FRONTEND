@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import { useAuth } from "../../../auth/useAuth";
 import { useLanguage } from "../../../i18n/useLanguage";
 import LoginForm from "../LoginForm";
@@ -6,7 +7,7 @@ import styles from "./RequireAdmin.module.css";
 // Garde d'accès UX : anonyme → login, non-admin → refus, admin → contenu.
 // La sécurité réelle est portée par la RLS Supabase (écritures refusées
 // sans rôle admin), jamais par cette garde.
-export default function RequireAdmin({ children }) {
+export default function RequireAdmin({ children }: { children: ReactNode }) {
   const { t } = useLanguage();
   const { session, role, loading, signOut } = useAuth();
 

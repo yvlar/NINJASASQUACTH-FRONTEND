@@ -2,7 +2,7 @@ import { Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./About.module.css";
 
-const STAT_KEYS = ["compostable", "quebec", "accessible", "fun"];
+const STAT_KEYS = ["compostable", "quebec", "accessible", "fun"] as const;
 
 export default function AboutSection() {
   const { t } = useLanguage();

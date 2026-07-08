@@ -1,7 +1,11 @@
 import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Hero.module.css";
 
-export default function Hero({ onNavigate }) {
+export default function Hero({
+  onNavigate,
+}: {
+  onNavigate: (id: string) => void;
+}) {
   const { t } = useLanguage();
 
   return (

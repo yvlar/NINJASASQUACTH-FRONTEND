@@ -1,9 +1,17 @@
+import type { KeyboardEvent } from "react";
 import { Users, Clock, Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { localizeGame } from "../../../utils/localizeGame";
 import styles from "./Games.module.css";
+import type { GameRow } from "../../../types/database";
 
-export default function GameCard({ game, onClick }) {
+export default function GameCard({
+  game,
+  onClick,
+}: {
+  game: GameRow;
+  onClick: () => void;
+}) {
   const { lang } = useLanguage();
   // Contenu bilingue porté par le jeu lui-même (colonnes *_fr/*_en de la
   // base), résolu selon la langue courante — plus de clés games.items.*
@@ -12,7 +20,7 @@ export default function GameCard({ game, onClick }) {
   // Bouton non natif (la carte contient un h3, interdit dans un <button>) :
   // activation clavier Entrée/Espace pour rendre la vue détail atteignable
   // sans souris.
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       onClick();

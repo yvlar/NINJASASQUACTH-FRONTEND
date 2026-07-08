@@ -7,7 +7,7 @@ import ContactSection from "./components/sections/Contact";
 import "./styles/global.css";
 
 function App() {
-  const scrollToSection = (id) => {
+  const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       element.scrollIntoView({ behavior: "smooth", block: "start" });

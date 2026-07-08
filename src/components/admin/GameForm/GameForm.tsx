@@ -1,58 +1,91 @@
 import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { categories } from "../../../data/games";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { supabase } from "../../../lib/supabase";
 import styles from "./GameForm.module.css";
+import type {
+  GameCategory,
+  GameInsert,
+  GameRow,
+} from "../../../types/database";
 
 // Le bucket est l'autorité sur ces limites (voir la migration Storage) ;
 // on les vérifie aussi ici pour une erreur immédiate, avant tout upload.
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 const IMAGE_MAX_OCTETS = 5 * 1024 * 1024;
-const EXTENSIONS = { "image/jpeg": "jpg", "image/png": "png", "image/webp": "webp" };
+const EXTENSIONS: Record<string, string> = {
+  "image/jpeg": "jpg",
+  "image/png": "png",
+  "image/webp": "webp",
+};
 
 // Champs texte de la table games : la parité FR/EN est obligatoire à la
 // saisie (miroir des contraintes NOT NULL de la base).
-const CHAMPS_COURTS = ["title_fr", "title_en", "players", "duration", "age"];
+const CHAMPS_COURTS = [
+  "title_fr",
+  "title_en",
+  "players",
+  "duration",
+  "age",
+] as const;
 const CHAMPS_LONGS = [
   "short_desc_fr",
   "short_desc_en",
   "full_desc_fr",
   "full_desc_en",
-];
-const CHAMPS_TEXTE = [...CHAMPS_COURTS, ...CHAMPS_LONGS];
+] as const;
+const CHAMPS_TEXTE = [...CHAMPS_COURTS, ...CHAMPS_LONGS] as const;
+
+type ChampTexte = (typeof CHAMPS_TEXTE)[number];
+type FormValues = Record<ChampTexte, string>;
+type FormErrors = Partial<Record<ChampTexte | "image", string>>;
+type FormStatus = "idle" | "saving" | "error";
 
 const VALEURS_INITIALES = Object.fromEntries(
   CHAMPS_TEXTE.map((champ) => [champ, ""]),
-);
+) as FormValues;
 
 // Sans `game` : création ; avec `game` : édition du jeu existant
 // (formulaire pré-rempli, update sur son id, image conservée sauf
 // nouveau fichier téléversé).
-export default function GameForm({ game = null, onSaved, onCancel }) {
+export default function GameForm({
+  game = null,
+  onSaved,
+  onCancel,
+}: {
+  game?: GameRow | null;
+  onSaved: () => void;
+  onCancel: () => void;
+}) {
   const { t } = useLanguage();
   const edition = game !== null;
-  const [values, setValues] = useState(() =>
-    edition
-      ? Object.fromEntries(
+  const [values, setValues] = useState<FormValues>(() =>
+    game
+      ? (Object.fromEntries(
           CHAMPS_TEXTE.map((champ) => [champ, game[champ] ?? ""]),
-        )
+        ) as FormValues)
       : VALEURS_INITIALES,
   );
-  const [category, setCategory] = useState(game?.category ?? "famille");
+  const [category, setCategory] = useState<GameCategory>(
+    game?.category ?? "famille",
+  );
   const [eco, setEco] = useState(game?.eco ?? true);
   const [published, setPublished] = useState(game?.published ?? true);
-  const [file, setFile] = useState(null);
+  const [file, setFile] = useState<File | null>(null);
   // erreurs = clés i18n (jamais du texte) : re-traduites au changement de langue
-  const [errors, setErrors] = useState({});
-  const [status, setStatus] = useState("idle"); // idle | saving | error
+  const [errors, setErrors] = useState<FormErrors>({});
+  const [status, setStatus] = useState<FormStatus>("idle");
 
-  const handleChange = (event) => {
+  const handleChange = (
+    event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) => {
     const { name, value } = event.target;
     setValues((previous) => ({ ...previous, [name]: value }));
   };
 
-  const validate = () => {
-    const next = {};
+  const validate = (): FormErrors => {
+    const next: FormErrors = {};
     for (const champ of CHAMPS_TEXTE) {
       if (!values[champ].trim()) next[champ] = "admin.form.errors.required";
     }
@@ -66,7 +99,7 @@ export default function GameForm({ game = null, onSaved, onCancel }) {
     return next;
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const next = validate();
     setErrors(next);
@@ -75,7 +108,13 @@ export default function GameForm({ game = null, onSaved, onCancel }) {
     setStatus("saving");
     let imageUrl = game?.image_url ?? null;
     if (file) {
-      const chemin = `${crypto.randomUUID()}.${EXTENSIONS[file.type]}`;
+      // validate() garantit file.type ∈ IMAGE_TYPES avant tout upload
+      const extension = EXTENSIONS[file.type];
+      if (!extension) {
+        setStatus("error");
+        return;
+      }
+      const chemin = `${crypto.randomUUID()}.${extension}`;
       const { error: uploadError } = await supabase.storage
         .from("game-images")
         .upload(chemin, file);
@@ -87,16 +126,16 @@ export default function GameForm({ game = null, onSaved, onCancel }) {
         .data.publicUrl;
     }
 
-    const payload = {
-      ...Object.fromEntries(
+    const payload: GameInsert = {
+      ...(Object.fromEntries(
         CHAMPS_TEXTE.map((champ) => [champ, values[champ].trim()]),
-      ),
+      ) as FormValues),
       category,
       eco,
       published,
       image_url: imageUrl,
     };
-    const { error } = edition
+    const { error } = game
       ? await supabase.from("games").update(payload).eq("id", game.id)
       : await supabase.from("games").insert(payload);
     if (error) {
@@ -107,14 +146,14 @@ export default function GameForm({ game = null, onSaved, onCancel }) {
     onSaved();
   };
 
-  const renderErreur = (champ, id) =>
+  const renderErreur = (champ: ChampTexte | "image", id: string) =>
     errors[champ] ? (
       <p className={styles.fieldError} id={id}>
         {t(errors[champ])}
       </p>
     ) : null;
 
-  const renderChampTexte = (champ, multiline) => {
+  const renderChampTexte = (champ: ChampTexte, multiline: boolean) => {
     const id = `game-form-${champ}`;
     const idErreur = `${id}-erreur`;
     const props = {
@@ -160,7 +199,9 @@ export default function GameForm({ game = null, onSaved, onCancel }) {
           id="game-form-category"
           name="category"
           value={category}
-          onChange={(event) => setCategory(event.target.value)}
+          onChange={(event) =>
+            setCategory(event.target.value as GameCategory)
+          }
         >
           {categories
             .filter((cat) => cat.id !== "tous")
@@ -182,7 +223,7 @@ export default function GameForm({ game = null, onSaved, onCancel }) {
           name="image"
           type="file"
           accept={IMAGE_TYPES.join(",")}
-          onChange={(event) => setFile(event.target.files[0] ?? null)}
+          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           aria-invalid={Boolean(errors.image)}
           aria-describedby="game-form-image-aide"
         />

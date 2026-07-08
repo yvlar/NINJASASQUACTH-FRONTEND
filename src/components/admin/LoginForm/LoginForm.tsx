@@ -1,20 +1,23 @@
 import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { useAuth } from "../../../auth/useAuth";
 import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./LoginForm.module.css";
+
+type LoginStatus = "idle" | "loading" | "error";
 
 export default function LoginForm() {
   const { t } = useLanguage();
   const { signIn } = useAuth();
   const [values, setValues] = useState({ email: "", password: "" });
-  const [status, setStatus] = useState("idle"); // idle | loading | error
+  const [status, setStatus] = useState<LoginStatus>("idle");
 
-  const handleChange = (event) => {
+  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = event.target;
     setValues((previous) => ({ ...previous, [name]: value }));
   };
 
-  const handleSubmit = async (event) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setStatus("loading");
     const { error } = await signIn(values.email.trim(), values.password);

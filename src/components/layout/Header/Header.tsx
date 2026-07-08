@@ -3,11 +3,15 @@ import { Menu, X } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Header.module.css";
 
-export default function Header({ onNavigate }) {
+export default function Header({
+  onNavigate,
+}: {
+  onNavigate: (id: string) => void;
+}) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { lang, t, toggleLang } = useLanguage();
 
-  const handleNavClick = (sectionId) => {
+  const handleNavClick = (sectionId: string) => {
     onNavigate(sectionId);
     setIsMenuOpen(false);
   };

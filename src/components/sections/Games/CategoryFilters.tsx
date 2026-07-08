@@ -1,10 +1,15 @@
 import { useLanguage } from "../../../i18n/useLanguage";
 import styles from "./Games.module.css";
+import type { CatalogCategoryId } from "../../../types/database";
 
 export default function CategoryFilter({
   categories,
   selectedCategory,
   onSelectCategory,
+}: {
+  categories: ReadonlyArray<{ id: CatalogCategoryId }>;
+  selectedCategory: CatalogCategoryId;
+  onSelectCategory: (id: CatalogCategoryId) => void;
 }) {
   const { t } = useLanguage();
 

@@ -1,28 +1,38 @@
 import { useState } from "react";
+import type { ChangeEvent, FormEvent } from "react";
 import { Instagram, Facebook, Mail } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { CONTACT_EMAIL } from "../../../data/site";
 import { buildMailtoUrl } from "../../../utils/mailto";
+import type { ContactFormValues } from "../../../utils/mailto";
 import styles from "./Contact.module.css";
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 
+// errors contient des clés i18n (jamais du texte), traduites au rendu pour
+// que les messages suivent la bascule de langue.
+type ContactErrors = Partial<Record<keyof ContactFormValues, string>>;
+
 export default function ContactSection() {
   const { t } = useLanguage();
-  const [values, setValues] = useState({ name: "", email: "", message: "" });
-  const [errors, setErrors] = useState({});
+  const [values, setValues] = useState<ContactFormValues>({
+    name: "",
+    email: "",
+    message: "",
+  });
+  const [errors, setErrors] = useState<ContactErrors>({});
   const [submitted, setSubmitted] = useState(false);
 
-  const handleChange = (field) => (event) => {
-    setValues((current) => ({ ...current, [field]: event.target.value }));
-    setErrors((current) => ({ ...current, [field]: undefined }));
-    setSubmitted(false);
-  };
+  const handleChange =
+    (field: keyof ContactFormValues) =>
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      setValues((current) => ({ ...current, [field]: event.target.value }));
+      setErrors((current) => ({ ...current, [field]: undefined }));
+      setSubmitted(false);
+    };
 
-  // errors contient des clés i18n, traduites au rendu pour que les
-  // messages suivent la bascule de langue.
-  const validate = () => {
-    const nextErrors = {};
+  const validate = (): ContactErrors => {
+    const nextErrors: ContactErrors = {};
     if (!values.name.trim()) {
       nextErrors.name = "contact.errors.nameRequired";
     }
@@ -37,7 +47,7 @@ export default function ContactSection() {
     return nextErrors;
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const nextErrors = validate();
     setErrors(nextErrors);
@@ -107,7 +117,7 @@ export default function ContactSection() {
               <textarea
                 id="contact-message"
                 name="message"
-                rows="5"
+                rows={5}
                 className={`${styles.textarea} ${
                   errors.message ? styles.inputError : ""
                 }`}
