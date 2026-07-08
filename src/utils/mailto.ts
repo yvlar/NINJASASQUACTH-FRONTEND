@@ -3,9 +3,18 @@
 // mailto: du formulaire de contact, verrouillée par src/__tests__/mailto.test.js.
 import { CONTACT_EMAIL } from "../data/site";
 
-// values : { name, email, message } (valeurs brutes du formulaire, trimées ici) ;
+export interface ContactFormValues {
+  name: string;
+  email: string;
+  message: string;
+}
+
+// values : valeurs brutes du formulaire (trimées ici) ;
 // subject : sujet déjà traduit (t("contact.subject")).
-export function buildMailtoUrl(values, subject) {
+export function buildMailtoUrl(
+  values: ContactFormValues,
+  subject: string,
+): string {
   const encodedSubject = encodeURIComponent(subject);
   const body = encodeURIComponent(
     `${values.name.trim()} <${values.email.trim()}>\n\n${values.message.trim()}`,

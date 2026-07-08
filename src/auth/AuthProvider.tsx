@@ -3,16 +3,27 @@
 // aucun appel d'authentification. La garde par rôle côté front n'est que de
 // l'UX — la barrière réelle est la RLS côté Supabase.
 import { useCallback, useEffect, useMemo, useState } from "react";
+import type { ReactNode } from "react";
+import type { Session } from "@supabase/supabase-js";
 import { supabase } from "../lib/supabase";
 import { AuthContext } from "./context";
+import type { ProfileRole } from "../types/database";
 
-export default function AuthProvider({ children }) {
-  const [session, setSession] = useState(null);
+interface RoleInfo {
+  session: Session | null;
+  role: ProfileRole | null;
+}
+
+export default function AuthProvider({ children }: { children: ReactNode }) {
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   // Rôle mémorisé AVEC la session qui l'a produit : le rôle exposé est dérivé
   // au rendu (null tant que la session courante n'a pas son rôle), ce qui
   // évite un setState synchrone dans l'effet (règle react-hooks).
-  const [roleInfo, setRoleInfo] = useState({ session: null, role: null });
+  const [roleInfo, setRoleInfo] = useState<RoleInfo>({
+    session: null,
+    role: null,
+  });
   const role = roleInfo.session === session ? roleInfo.role : null;
 
   useEffect(() => {
@@ -58,7 +69,7 @@ export default function AuthProvider({ children }) {
     };
   }, [session]);
 
-  const signIn = useCallback(async (email, password) => {
+  const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

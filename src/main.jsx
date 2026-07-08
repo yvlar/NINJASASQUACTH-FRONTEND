@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 
 import AppRoutes from "./AppRoutes.jsx";
-import LanguageProvider from "./i18n/LanguageProvider.jsx";
+import LanguageProvider from "./i18n/LanguageProvider";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
