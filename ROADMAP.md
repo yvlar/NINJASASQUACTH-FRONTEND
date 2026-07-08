@@ -266,42 +266,129 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
-# 🔵 SPRINT 5 — Backend : authentification (login) et extensions futures — pré-cadrage
+# 🟠 SPRINT 5 — Backend Supabase : auth admin, création de jeux, lecture publique — **sprint courant**
 
-> **Objectif décidé par l'utilisateur (2026-07-07)** : doter le site d'un
-> backend pour un login et servir de socle aux extensions futures (D14).
-> Changement structurel majeur : le dépôt est aujourd'hui une SPA statique
-> sans backend, sans routeur et sans gestion d'état (voir `CLAUDE.md`).
-> Ce bloc est un **pré-cadrage** : les items exécutables seront définis à la
-> clôture du Sprint 4, une fois les décisions ci-dessous tranchées.
+> **Objectif** (décisions utilisateur 2026-07-07 et 2026-07-08) : doter le site
+> d'un backend Supabase — authentification avec rôle admin, interface admin de
+> **création de jeux (photos, descriptions)**, et site public lisant les jeux
+> depuis Supabase. But ultime exprimé par l'utilisateur : la création de jeux.
+> Espace client = sprint ultérieur (le modèle de rôles le prépare, 5.A).
+> Prérequis d'accès utilisateur : mot de passe admin (5.4), variables Vercel
+> (5.13). Ordre : 5.1 → 5.14 (backend MCP d'abord, le front a besoin du schéma).
 
-**Décisions requises avant tout code** :
+**Décisions de cadrage** (toutes prises) :
 
 - [x] **5.A** **Finalité du login** — **Décision prise (2026-07-07)** :
-  **administration ET espace client** — deux rôles distincts (admin : gestion
-  du contenu ; client : espace personnel). Implique un modèle de rôles dès la
-  conception (RLS par rôle) ; le périmètre exact de chaque espace (quelles
-  actions admin ? que voit le client ?) sera détaillé à la définition des
-  items du Sprint 5.
+  administration ET espace client — deux rôles distincts. Modèle de rôles dès
+  la conception (RLS par rôle). **Périmètre 2026-07-08** : ce sprint livre le
+  rôle admin (gestion des jeux) ; l'espace client attend un sprint ultérieur.
 - [x] **5.B** **Choix d'infrastructure** — **Décision prise (2026-07-07)** :
-  **Supabase** (Auth + Postgres + RLS ; MCP déjà connecté à l'environnement
-  de travail, patron éprouvé sur le projet GRANDFORD du même compte).
-  Intégration avec le déploiement Vercel existant (item 4.2) ; clés côté
-  variables d'environnement Vercel/Supabase uniquement.
-- [ ] **5.C** **Impact sur l'architecture frontend** — **Décision requise** :
-  un login implique probablement un routeur (routes protégées), une gestion
-  de session et des conventions nouvelles — amendements à `CLAUDE.md`
-  (« Règles de gouvernance » : toute modification des conventions passe par
-  une décision utilisateur explicite).
-- [ ] **5.D** (D6) **Synergie formulaire de contact** : le backend rendrait
-  possible un vrai envoi du formulaire (`ContactSection`, aujourd'hui
-  `mailto:` — D6) — à cadrer dans le même mouvement pour éviter deux
-  chantiers d'infra successifs.
+  Supabase (Auth + Postgres + RLS). **2026-07-08** : nouveau projet dédié
+  (0 $/mois vérifié) — le projet existant du compte appartient à GRANDFORD,
+  on n'y touche pas. Clés côté variables d'environnement uniquement.
+- [x] **5.C** **Impact sur l'architecture frontend** — **Décision prise
+  (2026-07-08)** : `react-router-dom` — `/` = site vitrine inchangé,
+  `/admin` = espace protégé par login. Amendement `CLAUDE.md` autorisé,
+  consigné à l'item 5.14 (commit dédié citant cette décision).
+- [x] **5.D** (D6) **Synergie formulaire de contact** — **Décision prise
+  (2026-07-08)** : **reporté** — le formulaire reste en `mailto:` ce sprint
+  (D6 au backlog, à recadrer une fois le socle Supabase en place).
+- [x] **5.E** **Compte admin** — **Décision prise (2026-07-08)** :
+  `ivess49@gmail.com` (créé côté Supabase, jamais en dur dans le code).
+- [x] **5.F** **Données initiales** — **Décision prise (2026-07-08)** :
+  **base vide** — pas de seed des 6 jeux statiques ; le site public affiche un
+  état vide propre (message i18n) jusqu'à création des jeux par l'admin. Les
+  données statiques `games` et les clés `games.items.*` sont purgées (5.12).
+- [x] **5.G** **Catégories** — **Décision prise (2026-07-08)** : fixes ce
+  sprint (`famille`/`stratégie`/`party` dans le code/i18n, `tous` =
+  pseudo-filtre) ; l'admin choisit parmi les trois.
 
-> **Garde-fous du Sprint 5** (rappel, non négociables) : aucun secret (clé
-> API, token, service key) dans le code ou les commits — variables
-> d'environnement Vercel/Supabase uniquement ; les conventions de `CLAUDE.md`
-> ne changent que sur décision utilisateur consignée.
+**Items** :
+
+- [x] **5.1** **Projet Supabase dédié** → créé le 2026-07-08 :
+  **`ninja-sasquatch-games`** (ref `vgmqmifgdolccquyjcoc`, org
+  `mfaahgznohhnqguffoah`, région `ca-central-1`, statut `ACTIVE_HEALTHY`),
+  URL d'API : `https://vgmqmifgdolccquyjcoc.supabase.co`. Coût confirmé
+  0 $/mois avant création (`confirm_cost`). La clé publiable vit dans l'env
+  (`.env.local`, variables Vercel) — jamais dans le dépôt.
+  **Acceptation SATISFAITE** : `get_project` → `ACTIVE_HEALTHY`, ref/URL
+  consignés, aucun secret committé.
+- [ ] **5.2** **Migration schéma + RLS** : tables `profiles` (rôles
+  admin/client, trigger signup) et `games` (catégorie CHECK accentuée,
+  colonnes bilingues NOT NULL `*_fr`/`*_en`, `image_url`, `published`,
+  timestamps), fonction `is_admin()` security definer, RLS (lecture anon
+  filtrée `published`, écritures admin). SQL committé sous
+  `supabase/migrations/`.
+  **Acceptation** : `execute_sql` sous rôle `anon` — lecture filtrée, insert
+  rejeté ; `get_advisors(security)` sans erreur.
+- [ ] **5.3** **Bucket Storage `game-images`** : public en lecture, 5 Mio,
+  jpeg/png/webp, écritures réservées `is_admin()`. SQL committé.
+  **Acceptation** : upload anon rejeté par policy, lecture publique OK.
+- [ ] **5.4** **Compte admin** — **Prérequis d'accès utilisateur** : créer
+  l'utilisateur `ivess49@gmail.com` dans le dashboard Supabase
+  (Authentication → Add user, auto-confirm, mot de passe choisi par lui).
+  Ensuite : promotion `role='admin'` en SQL via MCP.
+  **Acceptation** : `execute_sql` prouve le rôle admin ; aucun identifiant
+  dans le dépôt.
+- [ ] **5.5** **Dépendances + client Supabase + env** :
+  `@supabase/supabase-js` + `react-router-dom`, `src/lib/supabase.js`
+  (singleton, erreur explicite si env manquante), `.env.example`.
+  **Acceptation** : test client vert, audit high = 0, build vert sans
+  variables (la CI n'a pas de secrets).
+- [ ] **5.6** **Routage `/` et `/admin` + rewrite Vercel** : `BrowserRouter`
+  dans `main.jsx`, `/` → `App` intact, `/admin` → `AdminPage` lazy,
+  `vercel.json` (rewrite SPA pour l'accès direct à `/admin`).
+  **Acceptation** : `routing.test.jsx` vert, les 24 tests existants intacts.
+- [ ] **5.7** **Session + login admin** : `src/auth/` (calqué sur `src/i18n/`),
+  `LoginForm` accessible, clés `admin.login.*` fr+en.
+  **Acceptation** : `auth-login.test.jsx` vert (signIn, erreur i18n, succès).
+- [ ] **5.8** **Garde `RequireAdmin`** : rôle lu dans `profiles` ; anonyme →
+  login, non-admin → accès refusé, admin → contenu (la barrière réelle reste
+  la RLS).
+  **Acceptation** : `require-admin.test.jsx` vert (3 cas).
+- [ ] **5.9** **Création de jeux dans l'admin** : `GamesManager` (liste) +
+  `GameForm` (FR+EN obligatoires, catégorie parmi les 3, validation
+  type/taille d'image AVANT upload, upload → `getPublicUrl` → insert).
+  **Acceptation** : `admin-game-create.test.jsx` vert (payload exact, fichier
+  invalide bloqué sans upload, EN vide bloqué) ; jsx-a11y vert.
+- [ ] **5.10** **Édition + suppression** : `GameForm` pré-rempli (update),
+  remplacement d'image optionnel, suppression avec confirmation.
+  **Acceptation** : `admin-game-edit.test.jsx` vert.
+- [ ] **5.11** **`localizeGame` + `useGames` + mocks/fixtures** (non branchés —
+  commit sûr intermédiaire).
+  **Acceptation** : tests dédiés verts, suite existante intacte.
+- [ ] **5.12** **Bascule lecture publique + purge statique** : `GamesSection`
+  → `useGames` (loading/error/**empty**), `GameCard`/`GameDetail` →
+  `localizeGame`, suppression de l'export `games` (`categories` conservé) et
+  de `games.items.*` des deux JSON, adaptation de `games-contract.test.js` et
+  des tests UI sur mocks+fixtures.
+  **Acceptation** : test rouge « base vide → `games.empty` » vert après
+  bascule ; plus aucune URL Unsplash dans `src/data/games.js` (périmètre code
+  de D3 résolu) ; parité i18n verte ; suite complète verte.
+- [ ] **5.13** **Build/preview + déploiement** — **Prérequis d'accès
+  utilisateur** : poser `VITE_SUPABASE_URL` et `VITE_SUPABASE_ANON_KEY` dans
+  le dashboard Vercel (MCP Vercel scoppé à `grandford` — D13) puis redéployer.
+  Localement : build sans env vert, parcours preview `/` et `/admin` ; README
+  section « Déploiement » enrichie.
+  **Acceptation** : procédure documentée ; prod vérifiée par HTTP si l'action
+  utilisateur est faite dans le sprint (sinon reliquat consigné).
+- [ ] **5.14** **Clôture documentaire** : amendement `CLAUDE.md` (router,
+  Supabase, `src/lib`/`src/auth`/`src/hooks`/`src/components/admin`,
+  convention env `VITE_*`, convention de mock) en **commit dédié citant la
+  décision du 2026-07-08** (règle de gouvernance), puis
+  `prompt-mise-a-jour-roadmap.md` (cocher, découvertes, changelog, rétro,
+  dashboard, décompte de tests recalibré).
+  **Acceptation** : DoD complète (lint 0/0, tests 100 %, build, audit high 0,
+  parité i18n, aucun secret).
+
+> **Definition of Done du Sprint 5** (en plus de la DoD standard) : aucun
+> secret (clé API, token, service key) dans le code ou les commits —
+> variables d'environnement uniquement ; les tests restent 100 % sans réseau
+> (client Supabase mocké) ; la sécurité d'écriture repose sur la RLS (prouvée
+> par `execute_sql` sous rôle anon), jamais sur la seule garde frontend ;
+> les items 5.4 et 5.13 ne sont cochés que sur action utilisateur effectuée —
+> jamais à sa place ; les conventions de `CLAUDE.md` ne changent que par le
+> commit dédié de l'item 5.14 citant la décision du 2026-07-08.
 
 ---
 
@@ -322,7 +409,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
 | D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
 | D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford`. Confirmé comme un refus d'autorisation (et non de découverte) : avec l'ID projet fourni `prj_mQkt78gkQIeDB1ccAHBV8895HAox`, `get_project`→404 et `list_deployments`→403. L'ID de déploiement/SHA n'est donc pas relevable via MCP tant que l'accès n'est pas accordé au projet côté Vercel — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
-| D14 | 🟡 | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Changement structurel majeur vs l'architecture actuelle (SPA statique sans backend ni routeur ; lié à D6, formulaire en `mailto:`). **Décisions prises (2026-07-07)** : finalité = **admin + espace client** (5.A), infra = **Supabase** (5.B). Restent à cadrer : impact frontend/conventions `CLAUDE.md` (5.C) et synergie formulaire de contact (5.D) | Sprint 5 (pré-cadrage : 5.A/5.B décidés ; items exécutables définis à la clôture du Sprint 4) |
+| D14 | 🟡 | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Changement structurel majeur vs l'architecture actuelle (SPA statique sans backend ni routeur ; lié à D6, formulaire en `mailto:`). **Toutes les décisions de cadrage prises** (5.A → 5.G, 2026-07-07 et 2026-07-08) : admin + espace client, Supabase projet dédié, react-router, formulaire reporté, admin `ivess49@gmail.com`, base vide, catégories fixes | **Sprint 5 en cours** (items 5.1 → 5.14 définis, 5.1 fait) |
 
 ## Changelog
 
