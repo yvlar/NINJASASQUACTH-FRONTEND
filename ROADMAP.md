@@ -9,15 +9,15 @@
 
 | Dimension        | Note /100 | Baseline (audit 2026-07-07) |
 |------------------|-----------|------------------------------|
-| **Architecture** | 82        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
-| **Qualité**      | 84        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
-| **UX/Contenu**   | 60        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
-| **Production**   | 75        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
+| **Architecture** | 88        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
+| **Qualité**      | 89        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
+| **UX/Contenu**   | 62        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
+| **Production**   | 78        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-08 — **Sprint 6 clos** : compte admin actif (6.1) et garde-fou anti-pause Supabase en CI (6.5) ; 6.2/6.3/6.4 restent bloqués sur actions/contenus utilisateur (reportés en « Actions utilisateur » du Sprint 7). Décision utilisateur du 2026-07-08 : transformer le site en qualité production — **migration TypeScript strict + Tailwind CSS v4 + durcissement** (Sprint 7).
-- **Sprint courant** : **Sprint 7 — Production : TypeScript strict, Tailwind v4 et durcissement** (items 7.1 → 7.15 ci-dessous, tous exécutables sans action utilisateur).
-- **État des tests** : **62/62 verts** (18 fichiers dans `src/__tests__/`, sortie réelle de `npm test` vérifiée à l'ouverture ET à la clôture du Sprint 6 — Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
-- **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
+- **Dernière mise à jour** : 2026-07-08 — **Sprint 7 clos** : site transformé en qualité production — migration complète vers **TypeScript strict** (tout `src/`, tests compris), remplacement des CSS Modules par **Tailwind CSS v4** (palette en tokens `@theme`), et socle robustesse (error boundary, `tsc --noEmit` en CI, types Database Supabase, fallback Suspense visible). Décision utilisateur du 2026-07-08. Restent en « Actions utilisateur » : secrets CI keepalive (6.5), variables Vercel (6.2), vrais jeux+photos (6.3, D3), email/liens sociaux (6.4, D7/D12).
+- **Sprint courant** : **Sprint 8 — Durcissement production & mise en service** (défini ci-dessous, à ouvrir ; 8.1 E2E Playwright exécutable sans utilisateur, 8.2 headers D19 sur « go », 8.3 actions utilisateur en attente, 8.4 backend de contact D6).
+- **État des tests** : **64/64 verts** (19 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 7 — Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS : audit → lint → typecheck → tests → build) + `.github/workflows/supabase-keepalive.yml` (ping REST hebdomadaire, D15).
 
 ## Audit Phase 0 — constats (2026-07-07)
 
@@ -462,7 +462,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   **Acceptation** : liens réels branchés, ou icônes retirées sur décision.
   **Reliquat** : aucun contenu fourni pendant le sprint → D7/D12 restent des
   Décisions requises, reportées en « Actions utilisateur » du Sprint 7.
-- [x] **6.5** (D15) **Garde-fou anti-pause Supabase** → `30bf3d6`
+- [x] **6.5** (D15) **Garde-fou anti-pause Supabase** → `cac264a`
   `.github/workflows/supabase-keepalive.yml` : cron hebdomadaire (lundi
   06:00 UTC) + `workflow_dispatch`, GET REST public sur `games` avec la clé
   publiable en secret GitHub Actions (`SUPABASE_URL`/`SUPABASE_ANON_KEY` —
@@ -485,7 +485,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
-# 🟠 SPRINT 7 — Production : TypeScript strict, Tailwind v4 et durcissement — **sprint courant**
+# 🟢 SPRINT 7 — Production : TypeScript strict, Tailwind v4 et durcissement ✅ (clos le 2026-07-08, verdict : DoD satisfaite)
 
 > **Objectif** (décision utilisateur du 2026-07-08) : transformer le site en
 > qualité production — migration complète de `src/` vers **TypeScript
@@ -504,13 +504,13 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > Vercel + redéploiement (6.2) ; premiers vrais jeux + photos via `/admin`
 > (6.3, D3) ; email officiel + liens sociaux (6.4, D7/D12).
 
-- [ ] **7.0** **Amendement des prompts de workflow** — commit dédié citant la
-  décision du 2026-07-08 : pattern composant à 2 fichiers (`<Name>.tsx` +
-  `index.ts`), styles Tailwind v4 (tokens `@theme`, jamais de hex brut),
-  tests `*.test.{ts,tsx}`, DoD + `npm run typecheck` zéro erreur.
-  **Acceptation** : seuls `prompt-executer-sprint.md` et
-  `prompt-mise-a-jour-roadmap.md` touchés ; décision citée dans le commit.
-- [ ] **7.1** **Socle TypeScript** — `typescript` + `typescript-eslint` +
+- [x] **7.0** **Amendement des prompts de workflow** → `1add2e1`
+  Commit dédié citant la décision du 2026-07-08 : pattern composant à
+  2 fichiers, styles Tailwind v4 (tokens `@theme`), tests `*.test.{ts,tsx}`,
+  DoD + `npm run typecheck`. Seul `prompt-executer-sprint.md` touché
+  (`prompt-mise-a-jour-roadmap.md` ne véhicule aucune convention TS/CSS).
+  **Acceptation SATISFAITE**.
+- [x] **7.1** **Socle TypeScript** → `7768b34` — `typescript` + `typescript-eslint` +
   `@types/react{,-dom}` ; `tsconfig.json` strict (`noUncheckedIndexedAccess`,
   `verbatimModuleSyntax`, `moduleResolution: bundler`, `allowJs: true`
   transitoire — retiré en 7.5) ; `src/vite-env.d.ts` ; `vite.config.js` →
@@ -519,7 +519,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   **Acceptation** : `npm run typecheck` vert ; lint/tests/build verts ;
   étape Typecheck dans `.github/workflows/ci.yml` ; audit high 0 après
   installation.
-- [ ] **7.2** **Types Database Supabase + client typé** —
+- [x] **7.2** **Types Database Supabase + client typé** → `d65bd69`
   `src/types/database.ts` écrit à la main au format codegen supabase-js,
   dérivé de `supabase/migrations/20260708032500_init_games_auth.sql`
   (`GameCategory` = CHECK byte-for-byte, `CatalogCategoryId`, `GameRow`) ;
@@ -527,29 +527,30 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `src/data/games.js` → `.ts` typé (valeur runtime byte-identique).
   **Acceptation** : `games-contract.test.js` et `supabase-client.test.js`
   verts SANS modification (preuve que contrat et imports survivent).
-- [ ] **7.3** **Migration TS des modules feuilles** — `utils/{localizeGame,
+- [x] **7.3** **Migration TS des modules feuilles** → `26922ce` — `utils/{localizeGame,
   mailto}`, `data/site`, `i18n/*`, `auth/*`, `hooks/useGames` → `.ts(x)`
   typés (`Lang`, interfaces de contexte, `GameRow[]`) ; spécificateur
   `./i18n/LanguageProvider.jsx` de `main.jsx` corrigé ; accès calculé de
   `localizeGame` réécrit compatible `noUncheckedIndexedAccess`.
   **Acceptation** : suite complète verte avec zéro modification de test ;
   typecheck vert.
-- [ ] **7.4** **Migration TS des composants et de l'entrée** — tous les
+- [x] **7.4** **Migration TS des composants et de l'entrée** → `82934cc` — tous les
   `.jsx` → `.tsx` (layout, sections, admin, App, AppRoutes, main), barrels
   `index.js` → `index.ts`, `index.html` → `/src/main.tsx`, interfaces de
   props partout, état de `GameForm` typé contre `Insert` ; eslint-disable
   `anchor-is-valid` (D12) conservé.
   **Acceptation** : suite verte sans modification de test ; build vert ;
   typecheck vert ; parcours dev-server `/` et `/admin`.
-- [ ] **7.5** **Migration TS des tests + strict intégral** —
+- [x] **7.5** **Migration TS des tests + strict intégral** → `a07fdee`
   `src/__tests__/**` → `.test.ts(x)`, `setup.ts`, `helpers/supabaseMock.ts`,
   `fixtures/games.ts` typé `GameRow[]` ; `setupFiles` mis à jour ; retrait
   de `allowJs` ; nettoyage du bloc ESLint JS.
   **Acceptation** : `git ls-files 'src/**/*.js' 'src/**/*.jsx'` vide ;
   Vitest rapporte **62 tests / 18 fichiers** (aucun test perdu au
   renommage) ; typecheck strict vert sur tout, tests compris.
-- [ ] **7.6** (D18) **Error boundary + fallback Suspense visible** —
-  `src/components/ErrorBoundary/` (classe, TS), monté dans `main.tsx` sous
+- [x] **7.6** (D18) **Error boundary + fallback Suspense visible** → `9ddc150`
+  `src/components/ErrorBoundary/` (classe + `ErrorFallback` scindé pour
+  react-refresh, TS), monté dans `main.tsx` sous
   `LanguageProvider` autour d'`AppRoutes` (fallback i18n
   `errors.boundary.*`, clés fr+en) ; `fallback={null}` d'`AppRoutes` →
   élément de chargement i18n (`admin.loading`). Limite consignée : le throw
@@ -557,7 +558,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   React, non couvert — intentionnel.
   **Acceptation** : tests rouges avant fix (enfant qui throw → fallback ;
   `/admin` en attente → « Chargement… ») ; parité i18n verte ; décompte > 62.
-- [ ] **7.7** (D20) **Socle Tailwind v4** — `tailwindcss` +
+- [x] **7.7** (D20) **Socle Tailwind v4** → `06fa650` — `tailwindcss` +
   `@tailwindcss/vite` dans `vite.config.ts` ; `src/styles/global.css`
   réécrit : `@import "tailwindcss"` + `@theme` (5 couleurs de marque →
   génère `bg-cream`, `text-dark-green`, … et conserve les `var(--color-*)`
@@ -568,33 +569,33 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `<link>` préconnecté dans `index.html` (D20).
   **Acceptation** : build vert ; parcours visuel `/` et `/admin` sans
   régression (les modules portent encore les styles) ; audit high 0.
-- [ ] **7.8** **Conversion Tailwind : Header + Footer** — supprime
-  `Header.module.css` + `Footer.module.css` (tint rgba du header via
-  modificateur d'opacité ou valeur arbitraire).
-- [ ] **7.9** **Conversion Tailwind : Hero + About** — supprime 2 modules.
-- [ ] **7.10** **Conversion Tailwind : section Jeux** — 4 composants,
-  `Games.module.css` partagé supprimé en un commit.
-- [ ] **7.11** **Conversion Tailwind : Contact** — erreurs en `text-error`,
-  disable a11y D12 conservé ; supprime `Contact.module.css`.
-- [ ] **7.12** **Conversion Tailwind : admin** — 5 composants, 5 modules
+- [x] **7.8** **Conversion Tailwind : Header + Footer** → `780ee08` — supprime
+  `Header.module.css` + `Footer.module.css`.
+- [x] **7.9** **Conversion Tailwind : Hero + About** → `39e25ec` — 2 modules
   supprimés.
+- [x] **7.10** **Conversion Tailwind : section Jeux** → `2820da1` — 4 composants,
+  `Games.module.css` partagé supprimé en un commit.
+- [x] **7.11** **Conversion Tailwind : Contact** → `914ec00` — erreurs en
+  `text-error`, disable a11y D12 conservé ; supprime `Contact.module.css`.
+- [x] **7.12** **Conversion Tailwind : admin** → `2473a35` — 5 composants,
+  5 modules supprimés.
   **Acceptation 7.8 → 7.12 (chacun)** : les `.module.css` nommés supprimés ;
   zéro référence `styles.`/`module.css` restante dans les composants
   convertis ; lint/typecheck/tests/build verts ; vérification visuelle
   documentée à 375/768/1280 px, deux langues ; `focus-visible:` et
   `motion-reduce:` ajoutés sur les interactifs (additif seulement).
-- [ ] **7.13** **Purge finale CSS Modules** — `git grep -l "module.css"
-  src/` vide ; seul CSS restant : `global.css` ; taille du bundle notée au
-  changelog.
-- [ ] **7.14** **Amendement CLAUDE.md** — commit dédié citant la décision du
-  2026-07-08 : stack (TS strict, Tailwind v4), commandes (+`typecheck`),
-  pattern 2 fichiers, section Styling réécrite (tokens `@theme`, préflight),
-  convention lint TS, section tests.
-  **Acceptation** : seul CLAUDE.md touché ; décision citée.
-- [ ] **7.15** **Clôture Sprint 7** — dérouler
-  `prompt-mise-a-jour-roadmap.md` (hashs, découvertes, changelog avec
-  décompte réel, rétrospective, notes /100, définition du Sprint 8) puis
-  pousser la branche.
+- [x] **7.13** **Purge finale CSS Modules** → `836217c` — dernier style inline
+  (div racine d'App) converti en classes ; `git grep -l "module.css" src/`
+  vide ; seul CSS restant : `global.css` (bundle CSS unique 21,8 kB / gzip
+  4,7 kB).
+- [x] **7.14** **Amendement CLAUDE.md** → `5947b4c` — commit dédié citant la
+  décision du 2026-07-08 : stack (TS strict, Tailwind v4), commandes
+  (+`typecheck`), pattern 2 fichiers, section Styling réécrite (tokens
+  `@theme`, préflight), convention lint & types, section tests.
+  **Acceptation SATISFAITE** : seul CLAUDE.md touché ; décision citée.
+- [x] **7.15** **Clôture Sprint 7** → ce commit — `prompt-mise-a-jour-roadmap.md`
+  déroulé (hashs, découvertes, changelog avec décompte réel, rétrospective,
+  notes /100, Sprint 8 défini), puis push de la branche.
 
 > **Definition of Done du Sprint 7** (en plus de la DoD standard) :
 > `npm run typecheck` zéro erreur dès 7.1 ; aucun test perdu à la migration
@@ -602,7 +603,47 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > après 7.6) ; parité visuelle vérifiée à chaque conversion (375/768/1280 px,
 > FR et EN) ; les fichiers gouvernés ne changent que par les commits dédiés
 > 7.0 et 7.14 citant la décision utilisateur du 2026-07-08 ; aucun hex brut
-> hors `@theme` ; aucun secret committé.
+> hors `@theme` ; aucun secret committé. — **SATISFAITE** (lint 0/0,
+> `tsc --noEmit` 0, **64 tests / 19 fichiers** verts, build vert, audit high
+> 0 ; migration sans perte — 62→64 tests, les 2 ajoutés couvrent l'error
+> boundary et le fallback /admin, rougis avant le fix ; zéro `.module.css` et
+> zéro `styles.` sous `src/`, seul `global.css` subsiste ; parité visuelle
+> contrôlée par captures preview aux 3 largeurs ; prompts et CLAUDE.md
+> amendés par les seuls commits dédiés `1add2e1` et `5947b4c` citant la
+> décision ; palette exclusivement en tokens `@theme` ; aucun secret).
+
+---
+
+# ⚪ SPRINT 8 — Durcissement production & mise en service (à ouvrir)
+
+> **Objectif** : consolider la qualité production livrée au Sprint 7 et
+> absorber les actions utilisateur en attente. Ordre conseillé : 8.1
+> (exécutable sans utilisateur) d'abord ; 8.2 dès le « go » ; 8.3/8.4 dès
+> l'action/contenu utilisateur. Leçon des rétros : garder au moins un item
+> exécutable sans utilisateur → 8.1.
+
+- [ ] **8.1** **Parcours E2E automatisé (Playwright)** — exécutable sans
+  utilisateur : le manque d'un vrai E2E est identifié aux rétros des
+  Sprints 5 et 7 (parité visuelle et parcours seulement vérifiés à l'œil).
+  Ajouter un parcours headless (Chromium déjà présent) : navigation par
+  ancres, filtre catégories (dont « stratégie »), bascule FR/EN, deep-link
+  `/admin` → « Chargement… » → login. Mock ou env de test pour Supabase.
+  **Acceptation** : un script E2E vert en local et en CI, sans secret.
+- [ ] **8.2** (D19) **Headers de sécurité `vercel.json`** — **Décision
+  requise** (« go » utilisateur) : ajouter CSP, HSTS, X-Frame-Options,
+  X-Content-Type-Options via la clé `headers` de `vercel.json:1` (aujourd'hui
+  rewrite SPA seul). **Acceptation** : headers servis en production
+  (vérification HTTP directe), site et `/admin` toujours fonctionnels.
+- [ ] **8.3** **Actions utilisateur en attente** (reports du Sprint 6) —
+  secrets CI keepalive (6.5), variables Vercel + redéploiement (6.2), premiers
+  vrais jeux + photos via `/admin` (6.3, D3, + `og:image`), email officiel +
+  liens sociaux (6.4, D7/D12). Chacune reste bloquée sur action/contenu
+  utilisateur — jamais faite à sa place.
+- [ ] **8.4** (D6) **Formulaire de contact avec backend réel** — **Décision
+  requise** (choix d'infra) : le formulaire reste en `mailto:`
+  (`ContactSection.tsx`) ; un envoi réel demanderait un service (Edge Function
+  Supabase, Formspree…). À recadrer maintenant que le socle Supabase est en
+  place.
 
 ---
 
@@ -627,11 +668,78 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D15 | 🟡 | (Sprint 5) Le palier gratuit Supabase met le projet en **pause après ~1 semaine d'inactivité** → le catalogue public afficherait l'état d'erreur (message i18n en place comme filet). Constaté à la conception, garde-fou peu coûteux identifié : ping hebdomadaire en CI | Sprint 6 (item 6.5 — exécutable sans utilisateur) |
 | D16 | ✅ | (Sprint 5) `useGames` ne gérait pas le **rejet** de la promesse (panne réseau avant réponse) : UI bloquée sur « Chargement… » au lieu de l'état d'erreur. Découvert en vérifiant l'app dans un vrai navigateur (item 5.13) — les tests unitaires ne simulaient que l'erreur applicative, pas le rejet | ✅ Sprint 5 (`18525a9`) — fix + cas de rejet ajouté au mock et aux tests |
 | D17 | 🟠→✅ | (Clôture Sprint 5) **Faux vert lint local** : les preuves DoD passaient par `npm run lint 2>&1 \| tail -1 && …` — le code de sortie d'un pipeline bash est celui de la dernière commande (`tail` → 0), donc 2 erreurs `react-hooks/set-state-in-effect` (`AuthProvider.jsx`, `GamesManager.jsx`, introduites aux items 5.7/5.9) ont été rapportées « lint vert » à tort. **Attrapé par la CI sur la PR #7** — le garde-fou mécanique du Sprint 1 a fait exactement son travail. Garde-fou de méthode consigné : toute commande de preuve s'exécute sans pipe masquant (ou avec `set -o pipefail`) et son exit code est vérifié explicitement | ✅ Correctif `2cfe778` (rôle dérivé au rendu dans AuthProvider ; fetch inline + clé de rechargement dans GamesManager, filet de rejet réseau aligné sur D16) — lint exit 0, 62/62, build OK |
-| D18 | 🟠 | (Sprint 6) **Aucun error boundary React** : toute exception au rendu (n'importe quelle section) produit un écran blanc sans message ; et la route `/admin` charge son chunk lazy avec `Suspense fallback={null}` (`src/AppRoutes.jsx:17`) — rien d'affiché pendant le chargement. Constaté à l'audit de transformation production | Sprint 7 (item 7.6) |
+| D18 | ✅ | (Sprint 6) **Aucun error boundary React** : toute exception au rendu produisait un écran blanc ; et `/admin` chargeait son chunk lazy avec `Suspense fallback={null}` — rien d'affiché pendant le chargement | ✅ Sprint 7 (item 7.6 `9ddc150`) — `ErrorBoundary` + repli i18n, fallback /admin visible ; limite documentée : le throw à l'import de `lib/supabase.ts` (env manquante) précède React (fail-fast intentionnel) |
 | D19 | 🟡 | (Sprint 6) **Aucun header de sécurité** dans `vercel.json` (pas de CSP, HSTS, X-Frame-Options, X-Content-Type-Options) — le fichier ne porte que le rewrite SPA. Hors périmètre décidé du Sprint 7 (TS + Tailwind + socle robustesse) | Backlog — proposé pour le Sprint 8, attend un « go » utilisateur |
-| D20 | 🟢 | (Sprint 6) **Poppins chargée par `@import` CSS bloquant** (`src/styles/global.css:1`) : la police est résolue après le CSS, sans préconnexion — coût de rendu évitable | Sprint 7 (item 7.7 — bascule en `<link>` préconnecté pendant la réécriture de `global.css`) |
+| D20 | ✅ | (Sprint 6) **Poppins chargée par `@import` CSS bloquant** : police résolue après le CSS, sans préconnexion | ✅ Sprint 7 (item 7.7 `06fa650`) — bascule en `<link rel="preconnect">` + `<link>` dans `index.html` pendant la réécriture de `global.css` |
 
 ## Changelog
+
+### Sprint 7 — Production : TypeScript strict, Tailwind v4 et durcissement (2026-07-08)
+
+- **Contexte** : décision utilisateur du 2026-07-08 — transformer le site
+  vitrine en site de production de qualité, en suivant les bonnes pratiques
+  (clean code), avec un front en **TypeScript** et le framework **Tailwind**.
+  Cadrage via AskUserQuestion : migration complète (TS strict + Tailwind, pas
+  d'entre-deux), organisation en Sprint 7 dédié après clôture du Sprint 6,
+  durcissement « socle robustesse ». Cette décision amende les conventions
+  « pas de TypeScript / pas de framework CSS » de CLAUDE.md et des prompts —
+  amendements en commits dédiés (7.0 prompts AVANT l'exécution, 7.14 CLAUDE.md
+  à la fin) citant la décision, conformément aux règles de gouvernance.
+- **Baseline à l'ouverture** : lint 0/0, tests 62/62, build vert, audit
+  high 0 (tip `2799b70`, merge PR #7). Exit codes vérifiés sans pipe masquant
+  (leçon D17).
+- **Nouvelles devDependencies** : `typescript`, `typescript-eslint`,
+  `@types/react`, `@types/react-dom`, `tailwindcss`, `@tailwindcss/vite` —
+  audit high resté à 0 après chaque installation.
+- **Commits** (dans l'ordre) :
+  - `1add2e1` docs : amendement du prompt de sprint (7.0, décision 2026-07-08)
+  - `7768b34` feat : socle TypeScript — tsconfig strict, typescript-eslint,
+    tsc --noEmit en CI (7.1)
+  - `d65bd69` feat : types Database Supabase et client typé (7.2)
+  - `26922ce` refactor : migration TS des modules feuilles (7.3)
+  - `82934cc` refactor : migration TS des composants et de l'entrée (7.4)
+  - `a07fdee` refactor : migration TS de la suite de tests, strict intégral (7.5)
+  - `9ddc150` feat : error boundary + fallback de chargement /admin (D18, 7.6)
+  - `06fa650` feat : socle Tailwind v4 — @theme, base globale (D20, 7.7)
+  - `780ee08` refactor : Header et Footer en Tailwind (7.8)
+  - `39e25ec` refactor : Hero et About en Tailwind (7.9)
+  - `2820da1` refactor : section Jeux en Tailwind (7.10)
+  - `914ec00` refactor : section Contact en Tailwind (7.11)
+  - `2473a35` refactor : espace admin en Tailwind (7.12)
+  - `836217c` refactor : purge des derniers vestiges CSS Modules (7.13)
+  - `5947b4c` docs : amendement CLAUDE.md (7.14, décision 2026-07-08)
+  - (clôture) docs : clôture sprint 7 — mise à jour roadmap (7.15)
+- **Tests** : 62 → **64** (+2 ; 1 fichier nouveau `error-boundary.test.tsx`,
+  + 1 cas de fallback /admin ajouté à `routing.test.tsx`). Les 18 fichiers
+  existants ont été renommés `.test.ts(x)` sans perte (prouvé à 7.5 :
+  62 tests / 18 fichiers inchangés au renommage) ; les 2 nouveaux tests ont
+  rougi avant le fix. Décompte relevé sur la sortie réelle de `npm test`.
+- **Migration TypeScript** : tout `src/` en `.ts/.tsx` strict
+  (`noUncheckedIndexedAccess`, `verbatimModuleSyntax`, `isolatedModules`),
+  `allowJs` retiré à 7.5 — zéro `.js/.jsx` sous `src/`. Types Database écrits
+  à la main (`src/types/database.ts`, format codegen), client
+  `createClient<Database>`, props typées partout. `tsc --noEmit` ajouté à la
+  CI (entre lint et tests) et à la DoD.
+- **Migration Tailwind v4** : `@tailwindcss/vite`, palette de marque en tokens
+  `@theme` de `global.css` (utilitaires `bg-cream`/… + `var(--color-*)`
+  conservé le temps de la conversion), préflight en remplacement du reset ;
+  les 11 `.module.css` supprimés (~1 251 lignes de CSS → un seul `global.css`).
+  Poppins passée d'un `@import` bloquant à un `<link>` préconnecté (D20).
+  Durcissement additif : `focus-visible:` sur les interactifs,
+  `motion-reduce:` sur les transitions.
+- **Durcissement robustesse** : `ErrorBoundary` (D18) monté sous
+  `LanguageProvider` — les exceptions de rendu affichent un repli i18n au lieu
+  d'un écran blanc ; le `fallback={null}` de `/admin` devient un état de
+  chargement visible.
+- **Vérifications de bout en bout** : à chaque item, lint + typecheck + tests
+  + build + audit high, exit codes vérifiés sans pipe masquant. Parité
+  visuelle contrôlée par captures preview (Chromium headless) à 375/768/
+  1280 px contre des références prises avant conversion ; écran `/admin`
+  (login) vérifié après 7.12.
+- **Verdict de clôture** : DoD standard et DoD Sprint 7 satisfaites — voir le
+  bloc DoD du sprint. Découvertes traitées : D18 (résolue, 7.6), D20 (résolue,
+  7.7) ; D19 (headers de sécurité) reste ouverte, proposée au Sprint 8.
+  Actions utilisateur en attente inchangées (6.2/6.3/6.4 + secrets CI 6.5).
 
 ### Sprint 6 — Mise en service du backend et contenu réel (2026-07-08)
 
@@ -844,6 +952,51 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `fdca579` (vérifié par diff). Découvertes nouvelles : D9, D10, D11, D12.
 
 ## Rétrospectives
+
+### Sprint 7 — Production : TypeScript strict, Tailwind v4 et durcissement (2026-07-08)
+
+1. **Découpage** : très bon pour un sprint de refonte transverse de 16 items.
+   L'ordre bottom-up de la migration TS (socle → types → feuilles → composants
+   → tests) a tenu chaque commit vert, l'`allowJs` transitoire servant
+   d'amortisseur exactement comme prévu (aucun aller-retour). La conversion
+   Tailwind découpée par zone (un commit = les `.module.css` supprimés) a
+   permis de garder les modules non convertis fonctionnels grâce aux
+   `var(--color-*)` doublés dans `@theme` — décision de conception qui a payé.
+   Deux découpes fines non anticipées mais sensées : `ErrorBoundary` scindé
+   classe/fallback pour `react-refresh` (attrapé par le lint, corrigé
+   immédiatement), et 7.13 qui a trouvé un vrai reliquat (style inline d'App)
+   à purger plutôt que d'être un no-op.
+2. **Suffisance des prompts** : suffisants une fois amendés (7.0). Le point
+   clé de méthode a été respecté : amender les prompts AVANT d'exécuter les
+   items qui en dépendent (sinon chaque commit Sprint 7 aurait violé les
+   conventions vivantes), CLAUDE.md à la fin (il documente l'état réel). Le
+   mécanisme de gouvernance (commit dédié citant la décision) a couvert le cas
+   « la décision utilisateur contredit les conventions que les prompts
+   véhiculent » sans improvisation. Aucun diff de prompt hors décision.
+3. **À détecter plus tôt** : la règle `react-refresh/only-export-components`
+   sur l'`ErrorBoundary` (fallback fonctionnel + classe dans le même fichier)
+   aurait pu être anticipée — c'est le même motif qui a imposé les découpes
+   `src/i18n/` et `src/auth/`. Le lint l'a attrapée au premier `npm run lint`,
+   coût nul. Garde-fou déjà en place (lint en CI + local). Autre point : la
+   parité visuelle ne repose que sur l'œil (captures preview) — un test de
+   régression visuelle automatisé serait le seul vrai garde-fou ; candidat
+   Sprint 8 (avec l'E2E Playwright), non ajouté ici pour rester dans le
+   périmètre décidé.
+4. **Notes /100** (précédent : 82/84/60/78) :
+   - **Architecture 88 (+6)** : typage strict de bout en bout (client
+     Supabase `<Database>`, props, hooks, contrats de catégories partagés à la
+     compilation), error boundary, pattern de composant simplifié à 2 fichiers.
+     Réserve : le `Database` est écrit à la main (swap codegen à prévoir).
+   - **Qualité 89 (+5)** : `tsc --noEmit` strict en CI et DoD, 64 tests tous
+     typés, lint TS (typescript-eslint) ; le typage élimine une classe entière
+     de bugs que les tests ne couvraient pas. Manque toujours un E2E automatisé
+     et la régression visuelle.
+   - **UX/Contenu 62 (+2)** : durcissement a11y additif (focus-visible,
+     motion-reduce, prefers-reduced-motion), police non bloquante ; toujours
+     plafonné par la base vide (6.3) et les contenus D7/D12.
+   - **Production 78 (+3)** : garde-fou d'erreur (plus d'écran blanc), CI
+     renforcée (typecheck), bundle CSS consolidé ; retenue par les headers de
+     sécurité absents (D19) et les actions utilisateur en attente.
 
 ### Sprint 6 — Mise en service du backend et contenu réel (2026-07-08)
 
