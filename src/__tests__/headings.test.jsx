@@ -1,13 +1,21 @@
 // Test verrou : hiérarchie des headings (D9). « Origines Mystérieuses »
-// existe en h1 du hero ET en titre du jeu 1 : la page doit garder un h1
-// unique dans toutes les vues (y compris la vue détail d'un jeu, qui
+// existe en h1 du hero ET en titre du jeu 1 (fixture) : la page doit garder
+// un h1 unique dans toutes les vues (y compris la vue détail d'un jeu, qui
 // rendait un second h1) et une hiérarchie sans saut de niveau :
 // h1 (hero) → h2 (sous-titre du hero, sections, titre du détail)
 // → h3 (cartes de jeux, blocs éco/caractéristiques).
-import { describe, it, expect } from "vitest";
+// Les jeux viennent de Supabase (mocké, fixtures au format table).
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
+import { JEUX_FIXTURES } from "./fixtures/games";
+import { supabase } from "../lib/supabase";
+
+vi.mock("../lib/supabase", async () => {
+  const { makeSupabaseMock } = await import("./helpers/supabaseMock");
+  return { supabase: makeSupabaseMock() };
+});
 
 const renderApp = () =>
   render(
@@ -32,20 +40,33 @@ const expectSingleH1AndNoSkip = () => {
   });
 };
 
+beforeEach(() => {
+  supabase.__reset();
+  supabase.__setTable("games", { data: JEUX_FIXTURES, error: null });
+});
+
 describe("Hiérarchie des headings", () => {
-  it("vue par défaut : un seul h1 (le hero), aucun saut de niveau", () => {
+  it("vue par défaut : un seul h1 (le hero), aucun saut de niveau", async () => {
     renderApp();
+    // attendre le rendu asynchrone des cartes (h3) avant d'auditer
+    await screen.findByRole("heading", {
+      level: 3,
+      name: "Origines Mystérieuses",
+    });
     expectSingleH1AndNoSkip();
     expect(
       screen.getByRole("heading", { level: 1, name: "Origines Mystérieuses" }),
     ).toBeInTheDocument();
   });
 
-  it("vue détail d'un jeu : toujours un seul h1, le titre du jeu est un h2", () => {
+  it("vue détail d'un jeu : toujours un seul h1, le titre du jeu est un h2", async () => {
     renderApp();
     // Ouvre la vue détail du jeu 1 (clic sur sa carte, homonyme du hero).
     fireEvent.click(
-      screen.getByRole("heading", { level: 3, name: "Origines Mystérieuses" }),
+      await screen.findByRole("heading", {
+        level: 3,
+        name: "Origines Mystérieuses",
+      }),
     );
     expect(screen.getByText("← Retour aux jeux")).toBeInTheDocument();
     expectSingleH1AndNoSkip();

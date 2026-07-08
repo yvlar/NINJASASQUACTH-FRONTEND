@@ -31,6 +31,19 @@
   color: var(--color-brown);
 }
 
+/* États de la lecture Supabase : chargement, base vide, erreur */
+.state {
+  margin: 2rem 0;
+  text-align: center;
+}
+
+.stateError {
+  margin: 2rem 0;
+  text-align: center;
+  color: var(--color-error);
+  font-weight: 600;
+}
+
 @media (min-width: 768px) {
   .title {
     font-size: 3rem;
