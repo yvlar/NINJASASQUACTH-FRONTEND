@@ -14,7 +14,7 @@
 | **UX/Contenu**   | 60        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
 | **Production**   | 73        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-08 — **Sprint 5 clos** : backend Supabase livré (projet dédié, schéma + RLS, Storage, login admin, CRUD de jeux bilingue avec upload de photos, site public branché sur la base — vide par décision 5.F). Restent deux actions utilisateur (compte admin 5.4, variables Vercel — reprises au Sprint 6).
+- **Dernière mise à jour** : 2026-07-08 — **Sprint 5 mergé et en production** (PR #7 → `main`, merge `2799b70`, CI verte). Backend Supabase **en service** : compte admin actif (6.1), variables Vercel posées et build de production câblé à Supabase, vérifié par HTTP (6.2). Le site public sert le catalogue depuis la base (vide pour l'instant, décision 5.F). Reste au Sprint 6 : créer les vrais jeux via `/admin` (6.3), contenu D7/D12 (6.4), garde-fou anti-pause Supabase (6.5).
 - **Sprint courant** : **Sprint 6 — Mise en service du backend et contenu réel** (items 6.1 → 6.5 ci-dessous ; 6.1/6.2/6.3/6.4 dépendent d'actions/contenus utilisateur, 6.5 est exécutable sans lui).
 - **État des tests** : **62/62 verts** (18 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 5 — Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS, mêmes trois étapes).
@@ -435,14 +435,18 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   'admin'`), connexion par mot de passe vérifiée (HTTP 200, jeton émis),
   écriture RLS prouvée sous le vrai JWT (insert 201 / delete 204 d'un
   brouillon de test, base revenue à 0) ; aucun identifiant committé.
-- [ ] **6.2** **Variables Vercel + vérification prod** (reliquat de 5.13) —
-  **Prérequis d'accès utilisateur** : poser `VITE_SUPABASE_URL` et
-  `VITE_SUPABASE_ANON_KEY` dans le dashboard Vercel (Settings → Environment
-  Variables, procédure au README) puis redéployer.
-  **Acceptation** : `https://ninjasasquacth-frontend.vercel.app/` affiche
-  l'état du catalogue servi par Supabase (vide ou jeux réels) et `/admin`
-  répond en accès direct (rewrite `vercel.json` vérifié en production) —
-  vérification HTTP directe, consignée ici.
+- [x] **6.2** **Variables Vercel + vérification prod** (reliquat de 5.13) —
+  **fait le 2026-07-08** : variables `VITE_SUPABASE_URL` /
+  `VITE_SUPABASE_ANON_KEY` posées par l'utilisateur au dashboard Vercel ;
+  Sprint 5 mergé dans `main` (PR #7, CI verte, merge `2799b70`) → déploiement
+  de production déclenché.
+  **Acceptation SATISFAITE** (vérifications HTTP directes, le navigateur du
+  bac à sable n'ayant pas d'egress direct — mêmes limites qu'aux items
+  4.2/5.13) : `https://ninjasasquacth-frontend.vercel.app/` → HTTP 200,
+  `/admin` → HTTP 200 (rewrite SPA vérifié en accès direct) ; le bundle de
+  production embarque bien l'URL et la clé Supabase (env vars intégrées au
+  build) ; le backend ciblé répond conformément à la RLS — lecture anonyme
+  `[]` (base vide, HTTP 200), écriture anonyme refusée (HTTP 401).
 - [ ] **6.3** (D3) **Premiers vrais jeux + photos via l'admin** — **Décision/
   action utilisateur** : créer les jeux réels (textes FR/EN, photos produits
   uploadées dans `game-images`) via `/admin`. Dépend de 6.1 + 6.2.
