@@ -3,6 +3,7 @@
     "title": "Administration",
     "loading": "Loading…",
     "signOut": "Sign out",
+    "denied": "Access denied: this account does not have the administrator role.",
     "login": {
       "email": "Email",
       "password": "Password",

@@ -3,6 +3,7 @@
     "title": "Administration",
     "loading": "Chargement…",
     "signOut": "Se déconnecter",
+    "denied": "Accès refusé : ce compte n'a pas le rôle administrateur.",
     "login": {
       "email": "Courriel",
       "password": "Mot de passe",

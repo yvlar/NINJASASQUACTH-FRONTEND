@@ -1,12 +1,12 @@
 import AuthProvider from "../../../auth/AuthProvider";
 import { useAuth } from "../../../auth/useAuth";
 import { useLanguage } from "../../../i18n/useLanguage";
-import LoginForm from "../LoginForm";
+import RequireAdmin from "../RequireAdmin";
 import styles from "./AdminPage.module.css";
 
 function AdminContent() {
   const { t } = useLanguage();
-  const { session, loading, signOut } = useAuth();
+  const { session, signOut } = useAuth();
 
   return (
     <main className={styles.page}>
@@ -18,15 +18,10 @@ function AdminContent() {
           </button>
         )}
       </div>
-      {loading ? (
-        <p className={styles.status}>{t("admin.loading")}</p>
-      ) : session ? (
-        // La garde par rôle (RequireAdmin) et la gestion des jeux
-        // arrivent aux items 5.8/5.9.
-        null
-      ) : (
-        <LoginForm />
-      )}
+      <RequireAdmin>
+        {/* Gestion des jeux (GamesManager) : item 5.9 */}
+        <></>
+      </RequireAdmin>
     </main>
   );
 }
