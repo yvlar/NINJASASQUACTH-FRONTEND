@@ -15,35 +15,56 @@ Prérequis : Node ≥ 20 et npm.
 
 ```bash
 npm install         # installer les dépendances
+cp .env.example .env.local   # puis renseigner les valeurs Supabase du projet
 npm run dev         # serveur de développement Vite (HMR)
 npm run lint        # ESLint
-npm test            # suite Vitest (run unique)
+npm test            # suite Vitest (run unique, sans réseau ni .env)
 npm run test:watch  # Vitest en boucle
 npm run build       # build de production dans dist/
 npm run preview     # servir le build localement
 ```
 
-Stack : React 19 + Vite 7, CSS Modules, `lucide-react`. Pas de backend, pas de
-routeur, pas de TypeScript — voir `CLAUDE.md` pour l'architecture et les
-conventions de code.
+Les valeurs de `.env.local` (URL du projet Supabase et clé publiable) se
+trouvent dans le tableau de bord Supabase du projet `ninja-sasquatch-games`
+(Settings → API). `.env.local` est ignoré par git — aucune clé ne se committe.
+Sans ces variables, le build passe (la CI n'a pas de secrets) mais le
+catalogue et l'admin afficheront une erreur à l'exécution.
+
+Stack : React 19 + Vite 7, `react-router-dom` (`/` site vitrine, `/admin`
+espace d'administration), Supabase (`@supabase/supabase-js` — Auth, Postgres
+avec RLS, Storage), CSS Modules, `lucide-react`. Pas de TypeScript — voir
+`CLAUDE.md` pour l'architecture et les conventions de code, et
+`supabase/migrations/` pour le schéma de la base (copie tracée des migrations
+appliquées).
 
 ## Déploiement (Vercel)
 
 **En production** : https://ninjasasquacth-frontend.vercel.app
 (intégration Git Vercel — chaque push sur `main` redéploie la production).
 
-Le site est un build statique Vite (`npm run build` → `dist/`), prêt à être
-déployé sur Vercel sans configuration particulière (framework détecté
-automatiquement, aucune variable d'environnement requise). Deux voies :
+Le site est un build statique Vite (`npm run build` → `dist/`) déployé par
+l'intégration Git Vercel : chaque push sur `main` déclenche un déploiement de
+production, chaque branche une preview.
 
-- **Intégration Git (recommandé)** : importer le dépôt GitHub dans le
-  tableau de bord Vercel (« Add New… → Project »). Chaque push sur `main`
-  déclenche alors un déploiement de production, et chaque branche une preview.
-- **CLI** : `npx vercel deploy --prod` depuis la racine du projet
-  (authentification `vercel login` ou variable `VERCEL_TOKEN` requise).
+**Variables d'environnement requises** (dashboard Vercel → Settings →
+Environment Variables, pour Production et Preview) :
+
+| Variable | Valeur |
+|---|---|
+| `VITE_SUPABASE_URL` | l'URL d'API du projet Supabase `ninja-sasquatch-games` |
+| `VITE_SUPABASE_ANON_KEY` | la clé publiable (« publishable ») du même projet |
+
+Après avoir posé (ou changé) ces variables, relancer un déploiement — Vite
+les fige dans le bundle au moment du build. Sans elles, le site se déploie
+mais le catalogue et `/admin` affichent une erreur.
+
+`vercel.json` contient le rewrite SPA (`/(.*) → /index.html`) qui rend
+`/admin` accessible en accès direct (sans lui, Vercel répondrait 404 sur
+toute URL profonde).
 
 La CI GitHub Actions (`.github/workflows/ci.yml`) reste la garde qualité
-(lint + tests + build) en amont de tout déploiement.
+(audit + lint + tests + build) en amont de tout déploiement ; elle n'a besoin
+d'aucun secret (tests 100 % mockés, build tolérant l'absence d'env).
 
 ## Documentation
 
