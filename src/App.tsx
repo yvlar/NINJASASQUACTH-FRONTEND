@@ -4,7 +4,6 @@ import Hero from "./components/sections/Hero";
 import GamesSection from "./components/sections/Games";
 import AboutSection from "./components/sections/About";
 import ContactSection from "./components/sections/Contact";
-import "./styles/global.css";
 
 function App() {
   const scrollToSection = (id: string) => {
