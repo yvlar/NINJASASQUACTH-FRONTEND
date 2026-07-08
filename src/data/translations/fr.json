@@ -10,6 +10,38 @@
       "submit": "Se connecter",
       "loading": "Connexion…",
       "error": "Échec de la connexion : vérifiez le courriel et le mot de passe."
+    },
+    "manager": {
+      "newGame": "Ajouter un jeu",
+      "empty": "Aucun jeu pour l'instant — créez le premier !",
+      "loadError": "Impossible de charger les jeux.",
+      "draft": "Brouillon"
+    },
+    "form": {
+      "createTitle": "Nouveau jeu",
+      "title_fr": "Titre (français)",
+      "title_en": "Titre (anglais)",
+      "short_desc_fr": "Description courte (français)",
+      "short_desc_en": "Description courte (anglais)",
+      "full_desc_fr": "Description complète (français)",
+      "full_desc_en": "Description complète (anglais)",
+      "category": "Catégorie",
+      "players": "Nombre de joueurs",
+      "duration": "Durée",
+      "age": "Âge",
+      "eco": "Jeu écoresponsable",
+      "published": "Publié sur le site",
+      "image": "Photo du jeu",
+      "imageHelp": "JPEG, PNG ou WebP, 5 Mo maximum.",
+      "submitCreate": "Créer le jeu",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "errors": {
+        "required": "Ce champ est requis.",
+        "imageType": "Format d'image non pris en charge (JPEG, PNG ou WebP).",
+        "imageSize": "L'image dépasse 5 Mo.",
+        "save": "L'enregistrement a échoué. Réessayez."
+      }
     }
   },
   "nav": {

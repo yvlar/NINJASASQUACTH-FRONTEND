@@ -1,6 +1,7 @@
 import AuthProvider from "../../../auth/AuthProvider";
 import { useAuth } from "../../../auth/useAuth";
 import { useLanguage } from "../../../i18n/useLanguage";
+import GamesManager from "../GamesManager";
 import RequireAdmin from "../RequireAdmin";
 import styles from "./AdminPage.module.css";
 
@@ -19,8 +20,7 @@ function AdminContent() {
         )}
       </div>
       <RequireAdmin>
-        {/* Gestion des jeux (GamesManager) : item 5.9 */}
-        <></>
+        <GamesManager />
       </RequireAdmin>
     </main>
   );

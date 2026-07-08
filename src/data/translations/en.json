@@ -10,6 +10,38 @@
       "submit": "Sign in",
       "loading": "Signing in…",
       "error": "Sign-in failed: check your email and password."
+    },
+    "manager": {
+      "newGame": "Add a game",
+      "empty": "No games yet — create the first one!",
+      "loadError": "Unable to load the games.",
+      "draft": "Draft"
+    },
+    "form": {
+      "createTitle": "New game",
+      "title_fr": "Title (French)",
+      "title_en": "Title (English)",
+      "short_desc_fr": "Short description (French)",
+      "short_desc_en": "Short description (English)",
+      "full_desc_fr": "Full description (French)",
+      "full_desc_en": "Full description (English)",
+      "category": "Category",
+      "players": "Number of players",
+      "duration": "Duration",
+      "age": "Age",
+      "eco": "Eco-friendly game",
+      "published": "Published on the site",
+      "image": "Game photo",
+      "imageHelp": "JPEG, PNG or WebP, 5 MB maximum.",
+      "submitCreate": "Create the game",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "errors": {
+        "required": "This field is required.",
+        "imageType": "Unsupported image format (JPEG, PNG or WebP).",
+        "imageSize": "The image exceeds 5 MB.",
+        "save": "Saving failed. Try again."
+      }
     }
   },
   "nav": {
