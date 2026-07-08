@@ -5,8 +5,24 @@ import styles from "./Games.module.css";
 export default function GameCard({ game, onClick }) {
   const { t } = useLanguage();
 
+  // Bouton non natif (la carte contient un h3, interdit dans un <button>) :
+  // activation clavier Entrée/Espace pour rendre la vue détail atteignable
+  // sans souris.
+  const handleKeyDown = (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      onClick();
+    }
+  };
+
   return (
-    <div className={styles.card} onClick={onClick}>
+    <div
+      className={styles.card}
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      role="button"
+      tabIndex={0}
+    >
       <div className={styles.imageContainer}>
         <img
           src={game.image}

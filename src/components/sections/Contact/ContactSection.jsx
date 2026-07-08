@@ -134,9 +134,15 @@ export default function ContactSection() {
         </div>
 
         <div className={styles.socialLinks}>
+          {/* href="#" = placeholders D12 (ROADMAP item 4.4, Décision requise :
+              URLs réelles à fournir ou icônes à retirer). Le verrou
+              anchor-is-valid est suspendu localement en attendant la décision —
+              retirer ces disables en résolvant 4.4. */}
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a href="#" className={styles.socialLink} aria-label="Instagram">
             <Instagram size={28} />
           </a>
+          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
           <a href="#" className={styles.socialLink} aria-label="Facebook">
             <Facebook size={28} />
           </a>
