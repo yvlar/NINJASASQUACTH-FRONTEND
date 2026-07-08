@@ -66,6 +66,11 @@ La CI GitHub Actions (`.github/workflows/ci.yml`) reste la garde qualité
 (audit + lint + tests + build) en amont de tout déploiement ; elle n'a besoin
 d'aucun secret (tests 100 % mockés, build tolérant l'absence d'env).
 
+Un workflow planifié (`.github/workflows/supabase-keepalive.yml`) pingue
+l'API REST Supabase chaque lundi pour éviter la pause automatique du palier
+gratuit (~1 semaine d'inactivité) ; il requiert les secrets GitHub Actions
+`SUPABASE_URL` et `SUPABASE_ANON_KEY` (mêmes valeurs que `.env.local`).
+
 ## Documentation
 
 - `ROADMAP.md` — source de vérité du workflow : sprints, découvertes, changelog,

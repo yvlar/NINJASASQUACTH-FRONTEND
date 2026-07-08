@@ -1,59 +1,62 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@600;700;800&display=swap");
+/* Base globale du site — Tailwind CSS v4.
+   La palette de marque vit ici, en tokens @theme : chaque --color-* génère
+   les utilitaires (bg-cream, text-dark-green, …) ET reste disponible en
+   var(--color-*) pour les CSS Modules restants pendant la conversion
+   (items 7.8 → 7.13). Jamais de hex brut ailleurs que dans ce bloc.
+   Poppins est chargée par <link> dans index.html (D20). */
+@import "tailwindcss";
 
-:root {
+@theme {
   --color-cream: #ffffe9;
   --color-dark-green: #142d17;
   --color-brown: #9b5824;
   --color-eco-green: #077e16;
   --color-error: #b3261e;
+
+  --font-heading: "Poppins", ui-sans-serif, system-ui, sans-serif;
 }
 
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+/* Le reset universel historique est remplacé par le preflight Tailwind.
+   Ne restent ici que les règles de base qu'il ne couvre pas. */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
 
-html {
-  scroll-behavior: smooth;
-}
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+  }
 
-body {
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
-  background-color: var(--color-cream);
-  color: var(--color-dark-green);
-  line-height: 1.6;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  body {
+    font-family:
+      -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", sans-serif;
+    background-color: var(--color-cream);
+    color: var(--color-dark-green);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
 
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
-  font-family: "Poppins", sans-serif;
-  font-weight: 700;
-}
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-heading);
+    font-weight: 700;
+  }
 
-button {
-  font-family: inherit;
-}
+  a {
+    text-decoration: none;
+    color: inherit;
+  }
 
-a {
-  text-decoration: none;
-  color: inherit;
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-input,
-textarea {
-  font-family: inherit;
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
 }

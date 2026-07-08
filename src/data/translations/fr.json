@@ -124,6 +124,12 @@
       "messageRequired": "Veuillez entrer votre message."
     }
   },
+  "errors": {
+    "boundary": {
+      "title": "Une erreur inattendue est survenue.",
+      "reload": "Recharger la page"
+    }
+  },
   "footer": {
     "copyright": "© 2026 Ninja Sasquatch Games.",
     "rights": "Tous droits réservés.",
