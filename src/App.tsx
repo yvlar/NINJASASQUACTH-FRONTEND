@@ -14,7 +14,7 @@ function App() {
   };
 
   return (
-    <div style={{ backgroundColor: "var(--color-cream)", minHeight: "100vh" }}>
+    <div className="min-h-screen bg-cream">
       <Header onNavigate={scrollToSection} />
       <main>
         <Hero onNavigate={scrollToSection} />
