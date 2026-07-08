@@ -2,7 +2,6 @@ import type { KeyboardEvent } from "react";
 import { Users, Clock, Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { localizeGame } from "../../../utils/localizeGame";
-import styles from "./Games.module.css";
 import type { GameRow } from "../../../types/database";
 
 export default function GameCard({
@@ -28,31 +27,36 @@ export default function GameCard({
   };
 
   return (
+    // La carte est focalisable au clavier (role="button") : focus visible requis.
     <div
-      className={styles.card}
+      className="cursor-pointer transition-transform duration-300 hover:scale-[1.02] motion-reduce:transition-none focus-visible:rounded-lg focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-eco-green"
       onClick={onClick}
       onKeyDown={handleKeyDown}
       role="button"
       tabIndex={0}
     >
-      <div className={styles.imageContainer}>
+      <div className="relative mb-4 overflow-hidden rounded-lg shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]">
         {game.image_url && (
-          <img src={game.image_url} alt={title} className={styles.image} />
+          <img
+            src={game.image_url}
+            alt={title}
+            className="h-64 w-full object-cover"
+          />
         )}
         {game.eco && (
-          <div className={styles.ecoBadge}>
+          <div className="absolute top-2 right-2 rounded-full bg-eco-green p-2 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
             <Leaf size={20} color="var(--color-cream)" />
           </div>
         )}
       </div>
-      <h3 className={styles.cardTitle}>{title}</h3>
-      <p className={styles.cardDesc}>{shortDesc}</p>
-      <div className={styles.cardInfo}>
-        <span className={styles.infoItem}>
+      <h3 className="mb-2 text-xl/[1.6] font-bold text-brown">{title}</h3>
+      <p className="mb-3 text-dark-green">{shortDesc}</p>
+      <div className="flex gap-4 text-sm/[1.6] text-dark-green">
+        <span className="flex items-center gap-1">
           <Users size={16} />
           {game.players}
         </span>
-        <span className={styles.infoItem}>
+        <span className="flex items-center gap-1">
           <Clock size={16} />
           {game.duration}
         </span>

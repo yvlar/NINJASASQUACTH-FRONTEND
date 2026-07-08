@@ -5,7 +5,6 @@ import { useLanguage } from "../../../i18n/useLanguage";
 import GameCard from "./GameCard";
 import GameDetail from "./GameDetail";
 import CategoryFilter from "./CategoryFilters";
-import styles from "./Games.module.css";
 import type { CatalogCategoryId, GameRow } from "../../../types/database";
 
 export default function GamesSection() {
@@ -29,10 +28,14 @@ export default function GamesSection() {
   }
 
   return (
-    <section id="jeux" className={styles.section}>
-      <div className={styles.container}>
-        <h2 className={styles.title}>{t("games.title")}</h2>
-        <p className={styles.description}>{t("games.description")}</p>
+    <section id="jeux" className="bg-cream py-20">
+      <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
+        <h2 className="mb-4 text-center text-[2.5rem] font-extrabold tracking-[-0.01em] text-brown md:text-[3rem]">
+          {t("games.title")}
+        </h2>
+        <p className="mx-auto mb-12 max-w-2xl text-center text-lg/[1.6] text-dark-green">
+          {t("games.description")}
+        </p>
 
         <CategoryFilter
           categories={categories}
@@ -40,17 +43,18 @@ export default function GamesSection() {
           onSelectCategory={setSelectedCategory}
         />
 
-        {loading && <p className={styles.state}>{t("games.loading")}</p>}
+        {/* États de la lecture Supabase : chargement, base vide, erreur */}
+        {loading && <p className="my-8 text-center">{t("games.loading")}</p>}
         {!loading && error != null && (
-          <p className={styles.stateError} role="alert">
+          <p className="my-8 text-center font-semibold text-error" role="alert">
             {t("games.error")}
           </p>
         )}
         {!loading && error == null && filteredGames.length === 0 && (
-          <p className={styles.state}>{t("games.empty")}</p>
+          <p className="my-8 text-center">{t("games.empty")}</p>
         )}
         {!loading && error == null && filteredGames.length > 0 && (
-          <div className={styles.grid}>
+          <div className="grid grid-cols-[1fr] gap-8 sm:grid-cols-[repeat(2,1fr)] lg:grid-cols-[repeat(3,1fr)]">
             {filteredGames.map((game) => (
               <GameCard
                 key={game.id}
