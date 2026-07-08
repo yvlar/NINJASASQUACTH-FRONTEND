@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+
+    /* Strict intégral — décision utilisateur 2026-07-08 (Sprint 7) */
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "forceConsistentCasingInFileNames": true,
+
+    "noEmit": true,
+    "skipLibCheck": true,
+
+    /* Interop transitoire pendant la migration (item 7.1 → 7.5) :
+       les .js/.jsx pas encore migrés restent importables sans être
+       vérifiés. Retiré à l'item 7.5 (migration des tests). */
+    "allowJs": true,
+
+    "types": ["vite/client"]
+  },
+  "include": ["src", "vite.config.ts"]
+}
