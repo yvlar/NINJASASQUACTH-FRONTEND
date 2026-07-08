@@ -15,15 +15,24 @@ export function useGames() {
       .from("games")
       .select("*")
       .order("created_at", { ascending: true })
-      .then(({ data, error: fetchError }) => {
-        if (!active) return;
-        if (fetchError) {
-          setError(fetchError);
-        } else {
-          setGames(data ?? []);
-        }
-        setLoading(false);
-      });
+      .then(
+        ({ data, error: fetchError }) => {
+          if (!active) return;
+          if (fetchError) {
+            setError(fetchError);
+          } else {
+            setGames(data ?? []);
+          }
+          setLoading(false);
+        },
+        // panne réseau AVANT toute réponse (fetch rejeté) : sans ce bras,
+        // l'UI resterait bloquée sur « Chargement… »
+        (thrown) => {
+          if (!active) return;
+          setError(thrown);
+          setLoading(false);
+        },
+      );
 
     return () => {
       active = false;

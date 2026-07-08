@@ -44,6 +44,13 @@ describe("useGames", () => {
     expect(await screen.findByText("état erreur")).toBeInTheDocument();
   });
 
+  it("expose l'état d'erreur sur panne réseau (promesse rejetée)", async () => {
+    supabase.__setTable("games", { reject: new Error("Failed to fetch") });
+    render(<Sonde />);
+
+    expect(await screen.findByText("état erreur")).toBeInTheDocument();
+  });
+
   it("expose une liste vide sur base vide (aucune erreur)", async () => {
     supabase.__setTable("games", { data: [], error: null });
     render(<Sonde />);

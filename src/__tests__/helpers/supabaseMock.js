@@ -23,13 +23,21 @@ const CHAIN_METHODS = [
 
 // Builder chaîné « thenable » : chaque méthode retourne le builder,
 // `await builder` résout le résultat configuré pour la table.
+// Un résultat `{ reject: <erreur> }` fait REJETER la promesse (panne réseau
+// avant toute réponse PostgREST), contrairement à `{ data, error }` qui
+// résout avec une erreur applicative.
 function makeBuilder(getResult) {
   const builder = {};
   for (const method of CHAIN_METHODS) {
     builder[method] = vi.fn(() => builder);
   }
-  builder.then = (resolve, reject) =>
-    Promise.resolve(getResult()).then(resolve, reject);
+  builder.then = (resolve, reject) => {
+    const result = getResult();
+    if (result && result.reject) {
+      return Promise.reject(result.reject).then(resolve, reject);
+    }
+    return Promise.resolve(result).then(resolve, reject);
+  };
   return builder;
 }
 
