@@ -395,6 +395,10 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   commit dédié citant la décision du 2026-07-08) + le commit de clôture.
   **Acceptation SATISFAITE** : DoD complète — lint 0/0, 62/62 tests, build
   vert, audit high 0, parité i18n verte, aucun secret committé.
+  **Rectification post-clôture (D17)** : le « lint 0/0 » de ce verdict était
+  un faux vert (exit code masqué par un pipe dans les commandes de preuve) —
+  2 erreurs react-hooks corrigées en `2cfe778` après que la CI de la PR #7
+  les a attrapées ; lint réellement 0/0 depuis.
 
 > **Definition of Done du Sprint 5** (en plus de la DoD standard) : aucun
 > secret (clé API, token, service key) dans le code ou les commits —
@@ -489,6 +493,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D14 | ✅ | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Toutes les décisions de cadrage prises (5.A → 5.G, 2026-07-07/08) | ✅ Sprint 5 — backend Supabase livré (projet dédié, schéma+RLS, Storage, login/rôles, CRUD jeux, site branché). Mise en service = Sprint 6 ; espace client = sprint ultérieur (le modèle de rôles est prêt) |
 | D15 | 🟡 | (Sprint 5) Le palier gratuit Supabase met le projet en **pause après ~1 semaine d'inactivité** → le catalogue public afficherait l'état d'erreur (message i18n en place comme filet). Constaté à la conception, garde-fou peu coûteux identifié : ping hebdomadaire en CI | Sprint 6 (item 6.5 — exécutable sans utilisateur) |
 | D16 | ✅ | (Sprint 5) `useGames` ne gérait pas le **rejet** de la promesse (panne réseau avant réponse) : UI bloquée sur « Chargement… » au lieu de l'état d'erreur. Découvert en vérifiant l'app dans un vrai navigateur (item 5.13) — les tests unitaires ne simulaient que l'erreur applicative, pas le rejet | ✅ Sprint 5 (`18525a9`) — fix + cas de rejet ajouté au mock et aux tests |
+| D17 | 🟠→✅ | (Clôture Sprint 5) **Faux vert lint local** : les preuves DoD passaient par `npm run lint 2>&1 \| tail -1 && …` — le code de sortie d'un pipeline bash est celui de la dernière commande (`tail` → 0), donc 2 erreurs `react-hooks/set-state-in-effect` (`AuthProvider.jsx`, `GamesManager.jsx`, introduites aux items 5.7/5.9) ont été rapportées « lint vert » à tort. **Attrapé par la CI sur la PR #7** — le garde-fou mécanique du Sprint 1 a fait exactement son travail. Garde-fou de méthode consigné : toute commande de preuve s'exécute sans pipe masquant (ou avec `set -o pipefail`) et son exit code est vérifié explicitement | ✅ Correctif `2cfe778` (rôle dérivé au rendu dans AuthProvider ; fetch inline + clé de rechargement dans GamesManager, filet de rejet réseau aligné sur D16) — lint exit 0, 62/62, build OK |
 
 ## Changelog
 
