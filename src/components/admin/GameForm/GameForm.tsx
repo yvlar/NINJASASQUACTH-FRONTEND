@@ -3,7 +3,6 @@ import type { ChangeEvent, FormEvent } from "react";
 import { categories } from "../../../data/games";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { supabase } from "../../../lib/supabase";
-import styles from "./GameForm.module.css";
 import type {
   GameCategory,
   GameInsert,
@@ -19,6 +18,10 @@ const EXTENSIONS: Record<string, string> = {
   "image/png": "png",
   "image/webp": "webp",
 };
+
+// Classes partagées des champs de saisie (input, textarea, fichier).
+const inputBase =
+  "rounded-lg border border-dark-green bg-white px-3 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
 
 // Champs texte de la table games : la parité FR/EN est obligatoire à la
 // saisie (miroir des contraintes NOT NULL de la base).
@@ -148,7 +151,7 @@ export default function GameForm({
 
   const renderErreur = (champ: ChampTexte | "image", id: string) =>
     errors[champ] ? (
-      <p className={styles.fieldError} id={id}>
+      <p className="font-semibold text-error" id={id}>
         {t(errors[champ])}
       </p>
     ) : null;
@@ -157,7 +160,7 @@ export default function GameForm({
     const id = `game-form-${champ}`;
     const idErreur = `${id}-erreur`;
     const props = {
-      className: multiline ? styles.textarea : styles.input,
+      className: multiline ? `${inputBase} resize-y` : inputBase,
       id,
       name: champ,
       value: values[champ],
@@ -166,8 +169,8 @@ export default function GameForm({
       "aria-describedby": errors[champ] ? idErreur : undefined,
     };
     return (
-      <div className={styles.field} key={champ}>
-        <label className={styles.label} htmlFor={id}>
+      <div className="flex flex-col gap-1.5" key={champ}>
+        <label className="font-semibold" htmlFor={id}>
           {t(`admin.form.${champ}`)}
         </label>
         {multiline ? (
@@ -181,8 +184,12 @@ export default function GameForm({
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <h2 className={styles.formTitle}>
+    <form
+      className="mx-auto flex max-w-[40rem] flex-col gap-4"
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      <h2 className="text-brown">
         {t(edition ? "admin.form.editTitle" : "admin.form.createTitle")}
       </h2>
 
@@ -190,12 +197,12 @@ export default function GameForm({
       {CHAMPS_LONGS.map((champ) => renderChampTexte(champ, true))}
       {CHAMPS_COURTS.slice(2).map((champ) => renderChampTexte(champ, false))}
 
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="game-form-category">
+      <div className="flex flex-col gap-1.5">
+        <label className="font-semibold" htmlFor="game-form-category">
           {t("admin.form.category")}
         </label>
         <select
-          className={styles.input}
+          className={inputBase}
           id="game-form-category"
           name="category"
           value={category}
@@ -213,12 +220,12 @@ export default function GameForm({
         </select>
       </div>
 
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="game-form-image">
+      <div className="flex flex-col gap-1.5">
+        <label className="font-semibold" htmlFor="game-form-image">
           {t("admin.form.image")}
         </label>
         <input
-          className={styles.fileInput}
+          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
           id="game-form-image"
           name="image"
           type="file"
@@ -227,13 +234,13 @@ export default function GameForm({
           aria-invalid={Boolean(errors.image)}
           aria-describedby="game-form-image-aide"
         />
-        <p className={styles.help} id="game-form-image-aide">
+        <p className="text-sm" id="game-form-image-aide">
           {t("admin.form.imageHelp")}
         </p>
         {renderErreur("image", "game-form-image-erreur")}
       </div>
 
-      <div className={styles.checkboxField}>
+      <div className="flex items-center gap-2">
         <input
           id="game-form-eco"
           name="eco"
@@ -243,7 +250,7 @@ export default function GameForm({
         />
         <label htmlFor="game-form-eco">{t("admin.form.eco")}</label>
       </div>
-      <div className={styles.checkboxField}>
+      <div className="flex items-center gap-2">
         <input
           id="game-form-published"
           name="published"
@@ -255,14 +262,14 @@ export default function GameForm({
       </div>
 
       {status === "error" && (
-        <p className={styles.submitError} role="alert">
+        <p className="font-semibold text-error" role="alert">
           {t("admin.form.errors.save")}
         </p>
       )}
 
-      <div className={styles.actions}>
+      <div className="flex gap-3">
         <button
-          className={styles.submit}
+          className="cursor-pointer rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green disabled:cursor-wait disabled:opacity-70"
           type="submit"
           disabled={status === "saving"}
         >
@@ -270,7 +277,11 @@ export default function GameForm({
             ? t("admin.form.saving")
             : t(edition ? "admin.form.submitEdit" : "admin.form.submitCreate")}
         </button>
-        <button className={styles.cancel} type="button" onClick={onCancel}>
+        <button
+          className="cursor-pointer rounded-lg border border-dark-green bg-transparent px-4 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
+          type="button"
+          onClick={onCancel}
+        >
           {t("admin.form.cancel")}
         </button>
       </div>

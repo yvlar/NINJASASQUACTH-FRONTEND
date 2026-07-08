@@ -2,9 +2,12 @@ import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
 import { useAuth } from "../../../auth/useAuth";
 import { useLanguage } from "../../../i18n/useLanguage";
-import styles from "./LoginForm.module.css";
 
 type LoginStatus = "idle" | "loading" | "error";
+
+// Champ de saisie partagé (courriel, mot de passe).
+const inputBase =
+  "rounded-lg border border-dark-green bg-white px-3 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
 
 export default function LoginForm() {
   const { t } = useLanguage();
@@ -25,13 +28,17 @@ export default function LoginForm() {
   };
 
   return (
-    <form className={styles.form} onSubmit={handleSubmit} noValidate>
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="admin-login-email">
+    <form
+      className="mx-auto flex max-w-[22rem] flex-col gap-4"
+      onSubmit={handleSubmit}
+      noValidate
+    >
+      <div className="flex flex-col gap-1.5">
+        <label className="font-semibold" htmlFor="admin-login-email">
           {t("admin.login.email")}
         </label>
         <input
-          className={styles.input}
+          className={inputBase}
           id="admin-login-email"
           name="email"
           type="email"
@@ -41,12 +48,12 @@ export default function LoginForm() {
           onChange={handleChange}
         />
       </div>
-      <div className={styles.field}>
-        <label className={styles.label} htmlFor="admin-login-password">
+      <div className="flex flex-col gap-1.5">
+        <label className="font-semibold" htmlFor="admin-login-password">
           {t("admin.login.password")}
         </label>
         <input
-          className={styles.input}
+          className={inputBase}
           id="admin-login-password"
           name="password"
           type="password"
@@ -57,12 +64,12 @@ export default function LoginForm() {
         />
       </div>
       {status === "error" && (
-        <p className={styles.error} role="alert">
+        <p className="font-semibold text-error" role="alert">
           {t("admin.login.error")}
         </p>
       )}
       <button
-        className={styles.submit}
+        className="cursor-pointer rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green disabled:cursor-wait disabled:opacity-70"
         type="submit"
         disabled={status === "loading"}
       >
