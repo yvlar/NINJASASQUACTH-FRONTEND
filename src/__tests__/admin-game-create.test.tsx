@@ -7,12 +7,17 @@ import LanguageProvider from "../i18n/LanguageProvider";
 import GamesManager from "../components/admin/GamesManager";
 import GameForm from "../components/admin/GameForm";
 import fr from "../data/translations/fr.json";
-import { supabase } from "../lib/supabase";
+import { supabase as supabaseClient } from "../lib/supabase";
+import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
   return { supabase: makeSupabaseMock() };
 });
+
+// Cast unique : sous vi.mock, ce module est en réalité le mock complet
+// (méthodes __* incluses), pas le client Supabase typé.
+const supabase = supabaseClient as unknown as SupabaseMock;
 
 const CHAMPS_TEXTE = {
   title_fr: "Sentiers Sauvages",
@@ -35,8 +40,12 @@ function renderForm(onSaved = vi.fn()) {
   return onSaved;
 }
 
-function remplirTexte(sauf = []) {
-  for (const [nom, valeur] of Object.entries(CHAMPS_TEXTE)) {
+function remplirTexte(sauf: string[] = []) {
+  const entrees = Object.entries(CHAMPS_TEXTE) as [
+    keyof typeof CHAMPS_TEXTE,
+    string,
+  ][];
+  for (const [nom, valeur] of entrees) {
     if (sauf.includes(nom)) continue;
     fireEvent.change(screen.getByLabelText(fr.admin.form[nom]), {
       target: { value: valeur },
@@ -117,7 +126,7 @@ describe("GameForm (création)", () => {
     soumettre();
 
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
-    expect(supabase.__builders.games.insert).toHaveBeenCalledWith({
+    expect(supabase.__builders.games!.insert).toHaveBeenCalledWith({
       ...CHAMPS_TEXTE,
       category: "stratégie",
       eco: true,
@@ -183,7 +192,7 @@ describe("GameForm (création)", () => {
 
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
     expect(supabase.__storageBucket.upload).toHaveBeenCalled();
-    expect(supabase.__builders.games.insert).toHaveBeenCalledWith(
+    expect(supabase.__builders.games!.insert).toHaveBeenCalledWith(
       expect.objectContaining({
         image_url:
           "https://exemple.supabase.co/storage/v1/object/public/game-images/photo.webp",

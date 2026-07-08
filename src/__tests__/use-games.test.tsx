@@ -5,12 +5,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { useGames } from "../hooks/useGames";
 import { JEUX_FIXTURES } from "./fixtures/games";
-import { supabase } from "../lib/supabase";
+import { supabase as supabaseClient } from "../lib/supabase";
+import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
   return { supabase: makeSupabaseMock() };
 });
+
+// Cast unique : sous vi.mock, ce module est en réalité le mock complet
+// (méthodes __* incluses), pas le client Supabase typé.
+const supabase = supabaseClient as unknown as SupabaseMock;
 
 function Sonde() {
   const { games, loading, error } = useGames();

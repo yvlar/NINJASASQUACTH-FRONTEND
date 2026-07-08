@@ -14,7 +14,7 @@ vi.mock("../lib/supabase", async () => {
   return { supabase: makeSupabaseMock() };
 });
 
-function renderAt(path) {
+function renderAt(path: string) {
   render(
     <MemoryRouter initialEntries={[path]}>
       <LanguageProvider>

@@ -6,7 +6,7 @@ import fr from "../data/translations/fr.json";
 import en from "../data/translations/en.json";
 
 // Aplatit un objet de traductions en liste de chemins "a.b.c" triés.
-function keyPaths(obj, prefix = "") {
+function keyPaths(obj: object, prefix = ""): string[] {
   return Object.entries(obj)
     .flatMap(([key, value]) => {
       const path = prefix ? `${prefix}.${key}` : key;
@@ -24,7 +24,7 @@ describe("Parité des traductions fr/en", () => {
 
   it("aucune valeur feuille n'est vide", () => {
     for (const messages of [fr, en]) {
-      const check = (obj, prefix) => {
+      const check = (obj: object, prefix: string) => {
         for (const [key, value] of Object.entries(obj)) {
           const path = prefix ? `${prefix}.${key}` : key;
           if (value !== null && typeof value === "object") {

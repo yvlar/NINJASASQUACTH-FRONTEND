@@ -8,25 +8,13 @@ import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
   globalIgnores(['dist']),
-  // Bloc transitoire de la migration TypeScript (Sprint 7) : couvre les
-  // fichiers .js/.jsx pas encore migrés. Réduit à eslint.config.js seul
-  // à l'item 7.5.
+  // Migration TypeScript terminée (item 7.5) : ce bloc ne couvre plus que
+  // les fichiers JS de configuration à la racine (eslint.config.js).
   {
     files: ['**/*.{js,jsx}'],
-    extends: [
-      js.configs.recommended,
-      reactHooks.configs.flat.recommended,
-      reactRefresh.configs.vite,
-      jsxA11y.flatConfigs.recommended,
-    ],
+    extends: [js.configs.recommended],
     languageOptions: {
-      ecmaVersion: 2020,
-      globals: globals.browser,
-      parserOptions: {
-        ecmaVersion: 'latest',
-        ecmaFeatures: { jsx: true },
-        sourceType: 'module',
-      },
+      globals: globals.node,
     },
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],

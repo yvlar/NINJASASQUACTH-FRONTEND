@@ -8,12 +8,17 @@ import AuthProvider from "../auth/AuthProvider";
 import { useAuth } from "../auth/useAuth";
 import LoginForm from "../components/admin/LoginForm";
 import fr from "../data/translations/fr.json";
-import { supabase } from "../lib/supabase";
+import { supabase as supabaseClient } from "../lib/supabase";
+import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
   return { supabase: makeSupabaseMock() };
 });
+
+// Cast unique : sous vi.mock, ce module est en réalité le mock complet
+// (méthodes __* incluses), pas le client Supabase typé.
+const supabase = supabaseClient as unknown as SupabaseMock;
 
 // Aiguillage minimal : la zone protégée n'apparaît qu'avec une session.
 function ZoneProtegee() {

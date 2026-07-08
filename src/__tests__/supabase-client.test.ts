@@ -7,7 +7,7 @@ afterEach(() => {
   vi.resetModules();
 });
 
-describe("client supabase (src/lib/supabase.js)", () => {
+describe("client supabase (src/lib/supabase.ts)", () => {
   it("crée le client à partir de VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY", async () => {
     vi.stubEnv("VITE_SUPABASE_URL", "https://exemple.supabase.co");
     vi.stubEnv("VITE_SUPABASE_ANON_KEY", "cle-publique-de-test");

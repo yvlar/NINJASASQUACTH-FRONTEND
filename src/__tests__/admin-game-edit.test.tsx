@@ -7,14 +7,20 @@ import LanguageProvider from "../i18n/LanguageProvider";
 import GamesManager from "../components/admin/GamesManager";
 import GameForm from "../components/admin/GameForm";
 import fr from "../data/translations/fr.json";
-import { supabase } from "../lib/supabase";
+import { supabase as supabaseClient } from "../lib/supabase";
+import type { SupabaseMock } from "./helpers/supabaseMock";
+import type { GameRow } from "../types/database";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
   return { supabase: makeSupabaseMock() };
 });
 
-const JEU = {
+// Cast unique : sous vi.mock, ce module est en réalité le mock complet
+// (méthodes __* incluses), pas le client Supabase typé.
+const supabase = supabaseClient as unknown as SupabaseMock;
+
+const JEU: GameRow = {
   id: "jeu-42",
   category: "party",
   title_fr: "Fous Rires Garantis",
@@ -29,6 +35,8 @@ const JEU = {
   eco: true,
   published: false,
   image_url: "https://exemple.supabase.co/public/game-images/existante.webp",
+  created_at: "2026-07-08T00:00:00Z",
+  updated_at: "2026-07-08T00:00:00Z",
 };
 
 beforeEach(() => {
@@ -69,15 +77,15 @@ describe("GameForm (édition)", () => {
     );
 
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
-    expect(supabase.__builders.games.update).toHaveBeenCalledWith(
+    expect(supabase.__builders.games!.update).toHaveBeenCalledWith(
       expect.objectContaining({
         title_fr: "Fous Rires Assurés",
         image_url: JEU.image_url,
       }),
     );
-    expect(supabase.__builders.games.eq).toHaveBeenCalledWith("id", JEU.id);
+    expect(supabase.__builders.games!.eq).toHaveBeenCalledWith("id", JEU.id);
     expect(supabase.__storageBucket.upload).not.toHaveBeenCalled();
-    expect(supabase.__builders.games.insert).not.toHaveBeenCalled();
+    expect(supabase.__builders.games!.insert).not.toHaveBeenCalled();
   });
 });
 
@@ -97,16 +105,16 @@ describe("GamesManager (suppression)", () => {
     );
     // la demande de confirmation est visible, rien n'est encore supprimé
     expect(screen.getByText(fr.admin.manager.confirmDelete)).toBeInTheDocument();
-    expect(supabase.__builders.games.delete).not.toHaveBeenCalled();
+    expect(supabase.__builders.games!.delete).not.toHaveBeenCalled();
 
     fireEvent.click(
       screen.getByRole("button", { name: fr.admin.manager.confirm }),
     );
 
     await waitFor(() =>
-      expect(supabase.__builders.games.delete).toHaveBeenCalled(),
+      expect(supabase.__builders.games!.delete).toHaveBeenCalled(),
     );
-    expect(supabase.__builders.games.eq).toHaveBeenCalledWith("id", JEU.id);
+    expect(supabase.__builders.games!.eq).toHaveBeenCalledWith("id", JEU.id);
   });
 
   it("ouvre le formulaire pré-rempli au clic sur Modifier", async () => {

@@ -1,7 +1,11 @@
 // Jeux au format de la table Supabase `games` (colonnes bilingues à plat),
 // pour les tests qui rendent l'UI sans réseau. Le copy reprend celui des
 // anciens jeux statiques 1-3 (rien d'inventé côté contenu de marque).
-export const JEUX_FIXTURES = [
+// Typé en tuple (et non GameRow[]) : l'indexation JEUX_FIXTURES[0..2] des
+// tests reste sûre sous noUncheckedIndexedAccess.
+import type { GameRow } from "../../types/database";
+
+export const JEUX_FIXTURES: [GameRow, GameRow, GameRow] = [
   {
     id: "11111111-1111-4111-8111-111111111111",
     category: "famille",

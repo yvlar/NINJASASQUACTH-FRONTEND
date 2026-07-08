@@ -9,12 +9,18 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 import { JEUX_FIXTURES } from "./fixtures/games";
-import { supabase } from "../lib/supabase";
+import { supabase as supabaseClient } from "../lib/supabase";
+import type { SupabaseMock } from "./helpers/supabaseMock";
+import type { GameRow } from "../types/database";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
   return { supabase: makeSupabaseMock() };
 });
+
+// Cast unique : sous vi.mock, ce module est en réalité le mock complet
+// (méthodes __* incluses), pas le client Supabase typé.
+const supabase = supabaseClient as unknown as SupabaseMock;
 
 const renderApp = () =>
   render(
@@ -25,11 +31,11 @@ const renderApp = () =>
 
 // La carte est identifiée comme bouton accessible dont le nom contient le
 // titre du jeu (le nom accessible d'un role="button" est son contenu texte).
-const findCard = async (game) => {
+const findCard = async (game: GameRow) => {
   await screen.findByRole("heading", { level: 3, name: game.title_fr });
   return screen
     .getAllByRole("button")
-    .find((el) => el.textContent.includes(game.title_fr));
+    .find((el) => el.textContent?.includes(game.title_fr));
 };
 
 beforeEach(() => {
@@ -49,7 +55,7 @@ describe("Accessibilité clavier des cartes de jeu", () => {
 
   it("Entrée sur une carte ouvre la vue détail du jeu", async () => {
     renderApp();
-    fireEvent.keyDown(await findCard(JEUX_FIXTURES[0]), { key: "Enter" });
+    fireEvent.keyDown((await findCard(JEUX_FIXTURES[0]))!, { key: "Enter" });
     expect(
       screen.getByText(JEUX_FIXTURES[0].full_desc_fr),
     ).toBeInTheDocument();
@@ -57,7 +63,7 @@ describe("Accessibilité clavier des cartes de jeu", () => {
 
   it("Espace sur une carte ouvre la vue détail du jeu", async () => {
     renderApp();
-    fireEvent.keyDown(await findCard(JEUX_FIXTURES[1]), { key: " " });
+    fireEvent.keyDown((await findCard(JEUX_FIXTURES[1]))!, { key: " " });
     expect(
       screen.getByText(JEUX_FIXTURES[1].full_desc_fr),
     ).toBeInTheDocument();

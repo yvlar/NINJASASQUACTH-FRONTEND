@@ -31,7 +31,7 @@ describe("Contrat de navigation", () => {
     for (const id of ["accueil", "jeux", "univers", "contact"]) {
       const section = document.getElementById(id);
       expect(section, `section #${id} absente`).not.toBeNull();
-      expect(section.tagName).toBe("SECTION");
+      expect(section!.tagName).toBe("SECTION");
     }
   });
 
@@ -42,13 +42,13 @@ describe("Contrat de navigation", () => {
       ["Nos Jeux", "jeux"],
       ["Notre Univers", "univers"],
       ["Contact", "contact"],
-    ];
+    ] as const;
     for (const [label, id] of links) {
-      Element.prototype.scrollIntoView.mockClear();
+      vi.mocked(Element.prototype.scrollIntoView).mockClear();
       // Le libellé existe en nav desktop et en menu mobile : le premier suffit.
-      fireEvent.click(screen.getAllByRole("button", { name: label })[0]);
+      fireEvent.click(screen.getAllByRole("button", { name: label })[0]!);
       const target = document.getElementById(id);
-      expect(target.scrollIntoView).toHaveBeenCalledWith({
+      expect(target!.scrollIntoView).toHaveBeenCalledWith({
         behavior: "smooth",
         block: "start",
       });

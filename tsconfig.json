@@ -16,11 +16,6 @@
     "noEmit": true,
     "skipLibCheck": true,
 
-    /* Interop transitoire pendant la migration (item 7.1 → 7.5) :
-       les .js/.jsx pas encore migrés restent importables sans être
-       vérifiés. Retiré à l'item 7.5 (migration des tests). */
-    "allowJs": true,
-
     "types": ["vite/client"]
   },
   "include": ["src", "vite.config.ts"]

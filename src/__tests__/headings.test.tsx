@@ -10,12 +10,17 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 import { JEUX_FIXTURES } from "./fixtures/games";
-import { supabase } from "../lib/supabase";
+import { supabase as supabaseClient } from "../lib/supabase";
+import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
   return { supabase: makeSupabaseMock() };
 });
+
+// Cast unique : sous vi.mock, ce module est en réalité le mock complet
+// (méthodes __* incluses), pas le client Supabase typé.
+const supabase = supabaseClient as unknown as SupabaseMock;
 
 const renderApp = () =>
   render(
@@ -35,7 +40,7 @@ const expectSingleH1AndNoSkip = () => {
   levels.forEach((level, i) => {
     if (i > 0) {
       // descendre d'au plus un niveau à la fois (2→3 ok, 1→3 interdit)
-      expect(level).toBeLessThanOrEqual(levels[i - 1] + 1);
+      expect(level).toBeLessThanOrEqual(levels[i - 1]! + 1);
     }
   });
 };
