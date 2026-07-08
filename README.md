@@ -73,3 +73,5 @@ d'aucun secret (tests 100 % mockés, build tolérant l'absence d'env).
 - `prompt-executer-sprint.md` / `prompt-mise-a-jour-roadmap.md` — les deux
   prompts du workflow de sprint (gouvernés : ne pas modifier sans décision).
 - `CLAUDE.md` — règles et conventions de code.
+- `docs/STACK.md` — stack technique complète (frontend, backend Supabase,
+  tests, déploiement) avec versions.
