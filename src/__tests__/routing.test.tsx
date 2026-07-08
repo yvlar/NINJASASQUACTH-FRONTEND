@@ -34,6 +34,9 @@ describe("routage", () => {
 
   it("rend l'espace admin sur /admin (chargé à la demande)", async () => {
     renderAt("/admin");
+    // Pendant le téléchargement du bundle paresseux : état de chargement
+    // visible (D18 — le fallback null laissait un écran vide).
+    expect(screen.getByRole("status")).toHaveTextContent(fr.admin.loading);
     expect(
       await screen.findByRole("heading", { name: fr.admin.title }),
     ).toBeInTheDocument();
