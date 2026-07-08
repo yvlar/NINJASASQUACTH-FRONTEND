@@ -3,12 +3,18 @@
 // dans un élément interactif natif) : elle doit donc porter role="button",
 // être focalisable (tabIndex 0) et s'activer à Entrée ET Espace, sinon la vue
 // détail est inatteignable sans souris.
-import { describe, it, expect } from "vitest";
+// Les jeux viennent de Supabase (mocké, fixtures au format table).
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
-import { games } from "../data/games";
-import fr from "../data/translations/fr.json";
+import { JEUX_FIXTURES } from "./fixtures/games";
+import { supabase } from "../lib/supabase";
+
+vi.mock("../lib/supabase", async () => {
+  const { makeSupabaseMock } = await import("./helpers/supabaseMock");
+  return { supabase: makeSupabaseMock() };
+});
 
 const renderApp = () =>
   render(
@@ -17,35 +23,43 @@ const renderApp = () =>
     </LanguageProvider>,
   );
 
-const titleOf = (game) => fr.games.items[game.id].title;
-const fullDescOf = (game) => fr.games.items[game.id].fullDesc;
-
 // La carte est identifiée comme bouton accessible dont le nom contient le
 // titre du jeu (le nom accessible d'un role="button" est son contenu texte).
-const findCard = (game) =>
-  screen
+const findCard = async (game) => {
+  await screen.findByRole("heading", { level: 3, name: game.title_fr });
+  return screen
     .getAllByRole("button")
-    .find((el) => el.textContent.includes(titleOf(game)));
+    .find((el) => el.textContent.includes(game.title_fr));
+};
+
+beforeEach(() => {
+  supabase.__reset();
+  supabase.__setTable("games", { data: JEUX_FIXTURES, error: null });
+});
 
 describe("Accessibilité clavier des cartes de jeu", () => {
-  it("chaque carte est un bouton accessible et focalisable au clavier", () => {
+  it("chaque carte est un bouton accessible et focalisable au clavier", async () => {
     renderApp();
-    for (const game of games) {
-      const card = findCard(game);
-      expect(card, `carte « ${titleOf(game)} » sans role=button`).toBeTruthy();
+    for (const game of JEUX_FIXTURES) {
+      const card = await findCard(game);
+      expect(card, `carte « ${game.title_fr} » sans role=button`).toBeTruthy();
       expect(card).toHaveAttribute("tabindex", "0");
     }
   });
 
-  it("Entrée sur une carte ouvre la vue détail du jeu", () => {
+  it("Entrée sur une carte ouvre la vue détail du jeu", async () => {
     renderApp();
-    fireEvent.keyDown(findCard(games[0]), { key: "Enter" });
-    expect(screen.getByText(fullDescOf(games[0]))).toBeInTheDocument();
+    fireEvent.keyDown(await findCard(JEUX_FIXTURES[0]), { key: "Enter" });
+    expect(
+      screen.getByText(JEUX_FIXTURES[0].full_desc_fr),
+    ).toBeInTheDocument();
   });
 
-  it("Espace sur une carte ouvre la vue détail du jeu", () => {
+  it("Espace sur une carte ouvre la vue détail du jeu", async () => {
     renderApp();
-    fireEvent.keyDown(findCard(games[1]), { key: " " });
-    expect(screen.getByText(fullDescOf(games[1]))).toBeInTheDocument();
+    fireEvent.keyDown(await findCard(JEUX_FIXTURES[1]), { key: " " });
+    expect(
+      screen.getByText(JEUX_FIXTURES[1].full_desc_fr),
+    ).toBeInTheDocument();
   });
 });

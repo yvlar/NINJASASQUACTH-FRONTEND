@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Single-page marketing site for **Ninja Sasquatch Games**, a Québec board-game company. Bilingual FR/EN, French by default.
+Marketing site + games-catalog admin for **Ninja Sasquatch Games**, a Québec board-game company. Bilingual FR/EN, French by default. `/` is the public one-page site; `/admin` is a login-protected space where the admin creates/edits the games (photos, bilingual descriptions) served to the public site.
 
-Stack: **React 19** + **Vite 7**, `lucide-react` for icons. No backend, no router, no state-management library, no CSS framework, no TypeScript.
+Stack: **React 19** + **Vite 7**, **react-router-dom** (two routes: `/` and `/admin`), **Supabase** (`@supabase/supabase-js` — Auth, Postgres with RLS, Storage) as the backend, `lucide-react` for icons. No state-management library, no CSS framework, no TypeScript. *(Router + backend added by user decision of 2026-07-08 — Sprint 5, D14.)*
 
 ## Commands
 
@@ -23,9 +23,15 @@ Tests run on **Vitest + Testing Library** (jsdom environment, configured in the 
 
 ## Architecture
 
-Entry: `src/main.jsx` mounts `<App>` in `StrictMode`, wrapped in `<LanguageProvider>`. `src/App.jsx` is the whole page — it composes `Header` + `Footer` (layout) around `Hero`, `GamesSection`, `AboutSection`, `ContactSection`.
+Entry: `src/main.jsx` mounts `<BrowserRouter><LanguageProvider><AppRoutes/></LanguageProvider></BrowserRouter>` in `StrictMode`. `src/AppRoutes.jsx` declares the routes: `/` → `App` (the public site), `/admin` → `AdminPage` in `React.lazy` (the visitor never downloads the admin bundle), `*` → redirect to `/`. `src/App.jsx` is the whole public page — it composes `Header` + `Footer` (layout) around `Hero`, `GamesSection`, `AboutSection`, `ContactSection` and uses **no router hook** (its tests render it without a router).
 
-**Navigation is scroll-based, not routed.** `App.jsx` defines `scrollToSection(id)` and passes it as `onNavigate` to `Header` and `Hero`. Buttons call it with section anchor IDs: `accueil`, `jeux`, `univers`, `contact`. These IDs are the contract between nav buttons and the `<section id="...">` targets — keep them in sync.
+**Within `/`, navigation is scroll-based.** `App.jsx` defines `scrollToSection(id)` and passes it as `onNavigate` to `Header` and `Hero`. Buttons call it with section anchor IDs: `accueil`, `jeux`, `univers`, `contact`. These IDs are the contract between nav buttons and the `<section id="...">` targets — keep them in sync. `vercel.json` carries the SPA rewrite that makes `/admin` deep-linkable in production.
+
+**Supabase.** `src/lib/supabase.js` is the single client (created from `import.meta.env.VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY`, explicit error if missing; values live in `.env.local` — gitignored — and in Vercel env vars, never in the repo). `supabase/migrations/` holds the traced copy of every migration applied to the project (`ninja-sasquatch-games`, ref `vgmqmifgdolccquyjcoc`): tables `games` (flat bilingual columns `*_fr`/`*_en`, `category` CHECK mirroring the frontend category IDs byte-for-byte, `published`) and `profiles` (role `admin`/`client`, signup trigger), function `is_admin()`, RLS (anon reads published games only; writes require the admin role — **the RLS is the security boundary, frontend guards are UX only**), and the public `game-images` Storage bucket (5 MiB, jpeg/png/webp, admin-only writes).
+
+**Auth.** `src/auth/` mirrors the `src/i18n/` three-file split (`context.js`, `AuthProvider.jsx`, `useAuth.js`). `AuthProvider` is mounted inside `AdminPage` only — the public site makes no auth calls. It exposes `{ session, role, loading, signIn, signOut }`; `role` is read from `profiles` (never writable from the client).
+
+**Admin.** Components live in `src/components/admin/<Name>/` (same three-file pattern): `AdminPage` (h1 + sign-out + guard), `RequireAdmin` (anonymous → `LoginForm`, non-admin → refusal, admin → children), `GamesManager` (list, edit/delete with inline confirmation), `GameForm` (create/edit: FR **and** EN fields required — mirror of the DB NOT NULLs —, category select fed by `categories` minus `tous`, client-side image type/size validation **before** upload, Storage upload → `getPublicUrl` → insert/update).
 
 **Component layout.** Every component lives in its own folder under `src/components/{layout,sections}/<Name>/` with three files:
 - `<Name>.jsx` — the component (default export)
@@ -36,9 +42,11 @@ Import components by folder (`import Header from "./components/layout/Header"`),
 
 **i18n.** `src/i18n/` holds three files, deliberately split so the `react-refresh/only-export-components` lint rule stays happy: `context.js` (the context object), `LanguageProvider.jsx` (state + `t()` + `toggleLang`, syncs `document.documentElement.lang`), and `useLanguage.js` (the hook). All user-visible strings live in `src/data/translations/{fr,en}.json` (same key structure in both files) and are looked up with `t("dot.path.key")` — `t` returns the key itself when a lookup misses, so a raw key showing in the UI means a missing/typo'd translation. The FR/EN toggle button is in `Header` (desktop nav and mobile menu). Default language is `"fr"`; `index.html` also declares `lang="fr"`.
 
-**Games feature.** `GamesSection` holds `selectedCategory` (defaults to `"tous"`, i.e. all) and `selectedGame` state. It filters `games` by category and renders `GameCard`s; clicking a card sets `selectedGame`, which swaps the entire section view to `GameDetail` (with a back button) — there's no modal or route.
+**Games feature.** `GamesSection` reads the games through `src/hooks/useGames.js` (fetch on mount; the RLS serves anonymous visitors only the published games — the client filters nothing) and renders four states: loading / error / clean empty state (`games.empty` — the DB starts empty by decision 5.F) / grid. It holds `selectedCategory` (defaults to `"tous"`) and `selectedGame` state; clicking a card swaps the section view to `GameDetail` (back button) — no modal, no route. `GameCard`/`GameDetail` resolve the game copy with `localizeGame(game, lang)` (`src/utils/localizeGame.js`, pure) from the flat bilingual DB columns; `image_url` is nullable (no `<img>` rendered without it).
 
-**Data layer.** `src/data/games.js` exports `games` and `categories`, holding only non-translatable data: each `game` is `{ id, category, image, players, duration, age, eco }` (images are remote Unsplash URLs) and `categories` is `[{ id }]`. Game copy (`title`, `shortDesc`, `fullDesc`) lives in the translation JSONs under `games.items.<id>`, category labels under `games.categories.<id>`. The four category IDs are `tous`, `famille`, `stratégie`, `party` — accented values are significant: filtering and translation lookups match these exact strings, so `categories` IDs, each game's `category`, and the JSON keys must agree byte-for-byte. `src/data/site.js` exports `CONTACT_EMAIL`.
+**Data layer.** Games live in the Supabase `games` table (`title_fr/title_en`, `short_desc_*`, `full_desc_*`, `category`, `image_url`, `players`, `duration`, `age`, `eco`, `published`) and are managed through `/admin`. `src/data/games.js` now exports only `categories` (`[{ id }]`). The four category IDs are `tous`, `famille`, `stratégie`, `party` — accented values are significant: filtering, translation lookups (`games.categories.<id>`) **and the DB CHECK constraint** match these exact strings byte-for-byte (`tous` is a pseudo-filter, never stored on a game). `src/data/site.js` exports `CONTACT_EMAIL`.
+
+**Testing convention (Supabase).** Tests never touch the network: every test whose render reaches the Supabase client mocks it with `vi.mock("../lib/supabase", …)` backed by `src/__tests__/helpers/supabaseMock.js` (chainable thenable builders, auth listeners, storage stubs, `__*` control methods; a `{ reject }` table result simulates a network failure). Games for UI tests come from `src/__tests__/fixtures/games.js` (DB-shaped). The real client module is never executed under test, so no env vars are needed in CI.
 
 **Contact form.** `ContactSection` is a controlled form with client-side validation; `errors` state stores i18n *keys* (not translated strings) so messages re-render in the current language. Submit builds a `mailto:` URL to `CONTACT_EMAIL`. The `<form>` has `noValidate` on purpose — native `type="email"` validation would short-circuit the custom messages.
 

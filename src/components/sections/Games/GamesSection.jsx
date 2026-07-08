@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { games, categories } from "../../../data/games";
+import { categories } from "../../../data/games";
+import { useGames } from "../../../hooks/useGames";
 import { useLanguage } from "../../../i18n/useLanguage";
 import GameCard from "./GameCard";
 import GameDetail from "./GameDetail";
@@ -10,6 +11,9 @@ export default function GamesSection() {
   const [selectedCategory, setSelectedCategory] = useState("tous");
   const [selectedGame, setSelectedGame] = useState(null);
   const { t } = useLanguage();
+  // Les jeux viennent de Supabase (la RLS ne sert que les jeux publiés aux
+  // visiteurs anonymes) ; la base peut être vide tant que l'admin n'a rien créé.
+  const { games, loading, error } = useGames();
 
   const filteredGames =
     selectedCategory === "tous"
@@ -34,15 +38,26 @@ export default function GamesSection() {
           onSelectCategory={setSelectedCategory}
         />
 
-        <div className={styles.grid}>
-          {filteredGames.map((game) => (
-            <GameCard
-              key={game.id}
-              game={game}
-              onClick={() => setSelectedGame(game)}
-            />
-          ))}
-        </div>
+        {loading && <p className={styles.state}>{t("games.loading")}</p>}
+        {!loading && error && (
+          <p className={styles.stateError} role="alert">
+            {t("games.error")}
+          </p>
+        )}
+        {!loading && !error && filteredGames.length === 0 && (
+          <p className={styles.state}>{t("games.empty")}</p>
+        )}
+        {!loading && !error && filteredGames.length > 0 && (
+          <div className={styles.grid}>
+            {filteredGames.map((game) => (
+              <GameCard
+                key={game.id}
+                game={game}
+                onClick={() => setSelectedGame(game)}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </section>
   );

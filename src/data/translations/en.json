@@ -1,4 +1,55 @@
 {
+  "admin": {
+    "title": "Administration",
+    "loading": "Loading…",
+    "signOut": "Sign out",
+    "denied": "Access denied: this account does not have the administrator role.",
+    "login": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "loading": "Signing in…",
+      "error": "Sign-in failed: check your email and password."
+    },
+    "manager": {
+      "newGame": "Add a game",
+      "empty": "No games yet — create the first one!",
+      "loadError": "Unable to load the games.",
+      "draft": "Draft",
+      "edit": "Edit",
+      "delete": "Delete",
+      "confirmDelete": "Delete this game?",
+      "confirm": "Confirm deletion"
+    },
+    "form": {
+      "createTitle": "New game",
+      "editTitle": "Edit game",
+      "title_fr": "Title (French)",
+      "title_en": "Title (English)",
+      "short_desc_fr": "Short description (French)",
+      "short_desc_en": "Short description (English)",
+      "full_desc_fr": "Full description (French)",
+      "full_desc_en": "Full description (English)",
+      "category": "Category",
+      "players": "Number of players",
+      "duration": "Duration",
+      "age": "Age",
+      "eco": "Eco-friendly game",
+      "published": "Published on the site",
+      "image": "Game photo",
+      "imageHelp": "JPEG, PNG or WebP, 5 MB maximum.",
+      "submitCreate": "Create the game",
+      "submitEdit": "Save changes",
+      "saving": "Saving…",
+      "cancel": "Cancel",
+      "errors": {
+        "required": "This field is required.",
+        "imageType": "Unsupported image format (JPEG, PNG or WebP).",
+        "imageSize": "The image exceeds 5 MB.",
+        "save": "Saving failed. Try again."
+      }
+    }
+  },
   "nav": {
     "home": "Home",
     "games": "Our Games",
@@ -15,6 +66,9 @@
   "games": {
     "title": "Our Creations",
     "description": "Each game is thoughtfully designed to offer a unique, fun, and environmentally friendly experience.",
+    "loading": "Loading games…",
+    "empty": "No games to display at the moment.",
+    "error": "Unable to load the games. Try again later.",
     "players": "players",
     "eco": "100% compostable and eco-responsible",
     "backToGames": "Back to games",
@@ -29,38 +83,6 @@
       "famille": "Family",
       "stratégie": "Strategy",
       "party": "Party Game"
-    },
-    "items": {
-      "1": {
-        "title": "Mysterious Origins",
-        "shortDesc": "Dive into the legends of the Sasquatch and uncover its secrets",
-        "fullDesc": "Mysterious Origins transports you into the fascinating world of the Sasquatch. Explore the forests, decode the clues, and unravel the mysteries of this legendary creature. A captivating game that blends strategy and discovery for the whole family."
-      },
-      "2": {
-        "title": "Ninja Mission",
-        "shortDesc": "Infiltration, stealth, and tactics to become the ultimate ninja",
-        "fullDesc": "In Ninja Mission, become a master of stealth. Plan your moves, outwit your opponents, and complete your secret objectives. Every decision counts in this strategy game where mystery reigns."
-      },
-      "3": {
-        "title": "Forest Feast",
-        "shortDesc": "Guaranteed laughs around a wild and wacky feast",
-        "fullDesc": "Forest Feast turns your evenings into hilarious adventures. Between zany challenges and absurd situations, this party game guarantees unforgettable moments and uncontrollable laughter."
-      },
-      "4": {
-        "title": "Guardians of the Forest",
-        "shortDesc": "Work together to protect nature and its inhabitants",
-        "fullDesc": "Guardians of the Forest celebrates our environmental values. Work together to preserve the ecosystem, save the animals, and restore the natural balance. A cooperative game that raises awareness while entertaining."
-      },
-      "5": {
-        "title": "Legends of Quebec",
-        "shortDesc": "Explore the myths and fantastic creatures of Quebec",
-        "fullDesc": "Legends of Quebec invites you to discover Quebecois folklore. From the Sasquatch to creatures of local legend, travel the land and collect mythical tales in a unique strategic adventure."
-      },
-      "6": {
-        "title": "Mystery Night",
-        "shortDesc": "Investigations and riddles for an evening full of suspense",
-        "fullDesc": "Mystery Night plunges your guests into thrilling investigations. Hidden clues, intriguing suspects, and guaranteed twists for an immersive experience that will leave a lasting impression."
-      }
     }
   },
   "about": {

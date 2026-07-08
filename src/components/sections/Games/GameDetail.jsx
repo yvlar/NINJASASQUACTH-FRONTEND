@@ -1,9 +1,11 @@
 import { Users, Clock, Star, Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
+import { localizeGame } from "../../../utils/localizeGame";
 import styles from "./Games.module.css";
 
 export default function GameDetail({ game, onBack }) {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const { title, fullDesc } = localizeGame(game, lang);
 
   return (
     <div className={styles.detailContainer}>
@@ -14,11 +16,13 @@ export default function GameDetail({ game, onBack }) {
 
         <div className={styles.detailGrid}>
           <div>
-            <img
-              src={game.image}
-              alt={t(`games.items.${game.id}.title`)}
-              className={styles.detailImage}
-            />
+            {game.image_url && (
+              <img
+                src={game.image_url}
+                alt={title}
+                className={styles.detailImage}
+              />
+            )}
             {game.eco && (
               <div className={styles.ecoLabel}>
                 <Leaf size={20} />
@@ -29,9 +33,7 @@ export default function GameDetail({ game, onBack }) {
 
           <div>
             {/* h2 (pas h1) : le h1 unique de la page est celui du hero (D9) */}
-            <h2 className={styles.detailTitle}>
-              {t(`games.items.${game.id}.title`)}
-            </h2>
+            <h2 className={styles.detailTitle}>{title}</h2>
 
             <div className={styles.detailMeta}>
               <div className={styles.metaItem}>
@@ -50,9 +52,7 @@ export default function GameDetail({ game, onBack }) {
               </div>
             </div>
 
-            <p className={styles.detailDesc}>
-              {t(`games.items.${game.id}.fullDesc`)}
-            </p>
+            <p className={styles.detailDesc}>{fullDesc}</p>
 
             <div className={styles.characteristics}>
               <h3 className={styles.characteristicsTitle}>

@@ -1,4 +1,55 @@
 {
+  "admin": {
+    "title": "Administration",
+    "loading": "Chargement…",
+    "signOut": "Se déconnecter",
+    "denied": "Accès refusé : ce compte n'a pas le rôle administrateur.",
+    "login": {
+      "email": "Courriel",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "loading": "Connexion…",
+      "error": "Échec de la connexion : vérifiez le courriel et le mot de passe."
+    },
+    "manager": {
+      "newGame": "Ajouter un jeu",
+      "empty": "Aucun jeu pour l'instant — créez le premier !",
+      "loadError": "Impossible de charger les jeux.",
+      "draft": "Brouillon",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "confirmDelete": "Supprimer ce jeu ?",
+      "confirm": "Confirmer la suppression"
+    },
+    "form": {
+      "createTitle": "Nouveau jeu",
+      "editTitle": "Modifier le jeu",
+      "title_fr": "Titre (français)",
+      "title_en": "Titre (anglais)",
+      "short_desc_fr": "Description courte (français)",
+      "short_desc_en": "Description courte (anglais)",
+      "full_desc_fr": "Description complète (français)",
+      "full_desc_en": "Description complète (anglais)",
+      "category": "Catégorie",
+      "players": "Nombre de joueurs",
+      "duration": "Durée",
+      "age": "Âge",
+      "eco": "Jeu écoresponsable",
+      "published": "Publié sur le site",
+      "image": "Photo du jeu",
+      "imageHelp": "JPEG, PNG ou WebP, 5 Mo maximum.",
+      "submitCreate": "Créer le jeu",
+      "submitEdit": "Enregistrer les modifications",
+      "saving": "Enregistrement…",
+      "cancel": "Annuler",
+      "errors": {
+        "required": "Ce champ est requis.",
+        "imageType": "Format d'image non pris en charge (JPEG, PNG ou WebP).",
+        "imageSize": "L'image dépasse 5 Mo.",
+        "save": "L'enregistrement a échoué. Réessayez."
+      }
+    }
+  },
   "nav": {
     "home": "Accueil",
     "games": "Nos Jeux",
@@ -15,6 +66,9 @@
   "games": {
     "title": "Nos Créations",
     "description": "Chaque jeu est pensé avec passion pour offrir une expérience unique, amusante et respectueuse de l'environnement.",
+    "loading": "Chargement des jeux…",
+    "empty": "Aucun jeu à afficher pour le moment.",
+    "error": "Impossible de charger les jeux. Réessayez plus tard.",
     "players": "joueurs",
     "eco": "100% compostable et écoresponsable",
     "backToGames": "Retour aux jeux",
@@ -29,38 +83,6 @@
       "famille": "Famille",
       "stratégie": "Stratégie",
       "party": "Party Game"
-    },
-    "items": {
-      "1": {
-        "title": "Origines Mystérieuses",
-        "shortDesc": "Plongez dans les légendes du Sasquatch et découvrez ses secrets",
-        "fullDesc": "Origines Mystérieuses vous transporte dans l'univers fascinant du Sasquatch. Explorez les forêts, décodez les indices et percez les mystères de cette créature légendaire. Un jeu captivant qui allie stratégie et découverte pour toute la famille."
-      },
-      "2": {
-        "title": "Mission Ninja",
-        "shortDesc": "Infiltration, discrétion et tactiques pour devenir le meilleur ninja",
-        "fullDesc": "Dans Mission Ninja, devenez un maître de la discrétion. Planifiez vos mouvements, déjouez vos adversaires et accomplissez vos objectifs secrets. Chaque décision compte dans ce jeu de stratégie où le mystère règne."
-      },
-      "3": {
-        "title": "Festin Forestier",
-        "shortDesc": "Des rires garantis autour d'un festin sauvage et déjanté",
-        "fullDesc": "Festin Forestier transforme vos soirées en aventures hilarantes. Entre défis loufoques et situations absurdes, ce party game garantit des moments inoubliables et des fous rires incontrôlables."
-      },
-      "4": {
-        "title": "Gardiens de la Forêt",
-        "shortDesc": "Coopérez pour protéger la nature et ses habitants",
-        "fullDesc": "Gardiens de la Forêt célèbre nos valeurs environnementales. Travaillez ensemble pour préserver l'écosystème, sauver les animaux et restaurer l'équilibre naturel. Un jeu coopératif qui sensibilise tout en amusant."
-      },
-      "5": {
-        "title": "Légendes du Québec",
-        "shortDesc": "Explorez les mythes et créatures fantastiques du Québec",
-        "fullDesc": "Légendes du Québec vous invite à découvrir le folklore québécois. Du Sasquatch aux créatures des légendes locales, parcourez le territoire et collectez les récits mythiques dans une aventure stratégique unique."
-      },
-      "6": {
-        "title": "Soirée Mystère",
-        "shortDesc": "Enquêtes et énigmes pour une soirée pleine de suspense",
-        "fullDesc": "Soirée Mystère plonge vos invités dans des enquêtes palpitantes. Indices cachés, suspects intrigants et rebondissements garantis pour une expérience immersive qui marquera les esprits."
-      }
     }
   },
   "about": {
