@@ -5,9 +5,17 @@ import { useLanguage } from "../../../i18n/useLanguage";
 import { CONTACT_EMAIL } from "../../../data/site";
 import { buildMailtoUrl } from "../../../utils/mailto";
 import type { ContactFormValues } from "../../../utils/mailto";
-import styles from "./Contact.module.css";
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
+
+// Classes communes aux champs (input et textarea) ; la couleur de bordure
+// vit dans le ternaire d'erreur (border-error/border-brown) car l'ordre des
+// classes dans className ne départage pas deux utilitaires en conflit.
+const fieldBase =
+  "w-full rounded-lg border-2 bg-cream px-4 py-3 text-[1rem] transition-colors duration-300 focus:border-eco-green focus:outline-none motion-reduce:transition-none";
+
+const socialLink =
+  "text-dark-green transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
 
 // errors contient des clés i18n (jamais du texte), traduites au rendu pour
 // que les messages suivent la bascule de langue.
@@ -60,24 +68,31 @@ export default function ContactSection() {
   };
 
   return (
-    <section id="contact" className={styles.section}>
-      <div className={styles.container}>
-        <h2 className={styles.title}>{t("contact.title")}</h2>
-        <p className={styles.description}>{t("contact.description")}</p>
+    <section id="contact" className="bg-cream py-20">
+      <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
+        <h2 className="mb-4 text-center text-[2.5rem] font-extrabold tracking-[-0.01em] text-brown md:text-[3rem]">
+          {t("contact.title")}
+        </h2>
+        <p className="mb-12 text-center text-lg/[1.6] text-dark-green">
+          {t("contact.description")}
+        </p>
 
-        <div className={styles.formCard}>
-          <form className={styles.form} noValidate onSubmit={handleSubmit}>
-            <div className={styles.formRow}>
-              <div className={styles.formGroup}>
-                <label htmlFor="contact-name" className={styles.label}>
+        <div className="rounded-lg bg-white p-8 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
+          <form className="flex flex-col gap-8" noValidate onSubmit={handleSubmit}>
+            <div className="grid grid-cols-[1fr] gap-8 md:grid-cols-[repeat(2,1fr)]">
+              <div className="flex flex-col">
+                <label
+                  htmlFor="contact-name"
+                  className="mb-2 block font-medium text-dark-green"
+                >
                   {t("contact.name")}
                 </label>
                 <input
                   id="contact-name"
                   name="name"
                   type="text"
-                  className={`${styles.input} ${
-                    errors.name ? styles.inputError : ""
+                  className={`${fieldBase} ${
+                    errors.name ? "border-error" : "border-brown"
                   }`}
                   placeholder={t("contact.namePlaceholder")}
                   value={values.name}
@@ -85,19 +100,24 @@ export default function ContactSection() {
                   aria-invalid={Boolean(errors.name)}
                 />
                 {errors.name && (
-                  <p className={styles.errorText}>{t(errors.name)}</p>
+                  <p className="mt-2 text-sm/[1.6] text-error">
+                    {t(errors.name)}
+                  </p>
                 )}
               </div>
-              <div className={styles.formGroup}>
-                <label htmlFor="contact-email" className={styles.label}>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="contact-email"
+                  className="mb-2 block font-medium text-dark-green"
+                >
                   {t("contact.email")}
                 </label>
                 <input
                   id="contact-email"
                   name="email"
                   type="email"
-                  className={`${styles.input} ${
-                    errors.email ? styles.inputError : ""
+                  className={`${fieldBase} ${
+                    errors.email ? "border-error" : "border-brown"
                   }`}
                   placeholder={t("contact.emailPlaceholder")}
                   value={values.email}
@@ -105,21 +125,26 @@ export default function ContactSection() {
                   aria-invalid={Boolean(errors.email)}
                 />
                 {errors.email && (
-                  <p className={styles.errorText}>{t(errors.email)}</p>
+                  <p className="mt-2 text-sm/[1.6] text-error">
+                    {t(errors.email)}
+                  </p>
                 )}
               </div>
             </div>
 
-            <div className={styles.formGroup}>
-              <label htmlFor="contact-message" className={styles.label}>
+            <div className="flex flex-col">
+              <label
+                htmlFor="contact-message"
+                className="mb-2 block font-medium text-dark-green"
+              >
                 {t("contact.message")}
               </label>
               <textarea
                 id="contact-message"
                 name="message"
                 rows={5}
-                className={`${styles.textarea} ${
-                  errors.message ? styles.inputError : ""
+                className={`${fieldBase} min-h-32 resize-y ${
+                  errors.message ? "border-error" : "border-brown"
                 }`}
                 placeholder={t("contact.messagePlaceholder")}
                 value={values.message}
@@ -127,38 +152,43 @@ export default function ContactSection() {
                 aria-invalid={Boolean(errors.message)}
               />
               {errors.message && (
-                <p className={styles.errorText}>{t(errors.message)}</p>
+                <p className="mt-2 text-sm/[1.6] text-error">
+                  {t(errors.message)}
+                </p>
               )}
             </div>
 
-            <button type="submit" className={styles.submitButton}>
+            <button
+              type="submit"
+              className="w-full cursor-pointer rounded-lg bg-eco-green px-8 py-4 font-heading text-[1rem] font-bold tracking-[0.02em] text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
+            >
               {t("contact.send")}
             </button>
 
             {submitted && (
-              <p className={styles.successText} role="status">
+              <p className="text-center font-medium text-eco-green" role="status">
                 {t("contact.success")}
               </p>
             )}
           </form>
         </div>
 
-        <div className={styles.socialLinks}>
+        <div className="mt-12 flex justify-center gap-6">
           {/* href="#" = placeholders D12 (ROADMAP item 4.4, Décision requise :
               URLs réelles à fournir ou icônes à retirer). Le verrou
               anchor-is-valid est suspendu localement en attendant la décision —
               retirer ces disables en résolvant 4.4. */}
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className={styles.socialLink} aria-label="Instagram">
+          <a href="#" className={socialLink} aria-label="Instagram">
             <Instagram size={28} />
           </a>
           {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className={styles.socialLink} aria-label="Facebook">
+          <a href="#" className={socialLink} aria-label="Facebook">
             <Facebook size={28} />
           </a>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
-            className={styles.socialLink}
+            className={socialLink}
             aria-label="Email"
           >
             <Mail size={28} />
