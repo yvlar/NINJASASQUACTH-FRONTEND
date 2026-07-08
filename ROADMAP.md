@@ -422,12 +422,15 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 > utilisateur → 6.5 (garde-fou anti-pause Supabase, D15). Ordre conseillé :
 > 6.1 → 6.2 → 6.3 (dépendances strictes), 6.4/6.5 indépendants.
 
-- [ ] **6.1** **Compte admin actif** (report de 5.4) — **Prérequis d'accès
-  utilisateur** : créer l'utilisateur `ivess49@gmail.com` dans le dashboard
-  Supabase du projet `ninja-sasquatch-games` (Authentication → Add user,
-  auto-confirm). Ensuite (exécutable via MCP) : promotion `role='admin'`
-  en SQL, preuve par `execute_sql`.
-  **Acceptation** : rôle admin prouvé en base ; aucun identifiant committé.
+- [x] **6.1** **Compte admin actif** (report de 5.4) — **fait le 2026-07-08
+  sur instruction utilisateur** (« le MCP Supabase est connecté, fais ces
+  2 étapes ») : utilisateur `ivess49@gmail.com` créé via l'API publique
+  `/auth/v1/signup` (mot de passe temporaire transmis en session, à changer),
+  email confirmé et promotion `role='admin'` en SQL via MCP.
+  **Acceptation SATISFAITE** : rôle admin prouvé en base (`profiles.role =
+  'admin'`), connexion par mot de passe vérifiée (HTTP 200, jeton émis),
+  écriture RLS prouvée sous le vrai JWT (insert 201 / delete 204 d'un
+  brouillon de test, base revenue à 0) ; aucun identifiant committé.
 - [ ] **6.2** **Variables Vercel + vérification prod** (reliquat de 5.13) —
   **Prérequis d'accès utilisateur** : poser `VITE_SUPABASE_URL` et
   `VITE_SUPABASE_ANON_KEY` dans le dashboard Vercel (Settings → Environment
