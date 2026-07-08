@@ -1,6 +1,15 @@
 {
   "admin": {
-    "title": "Administration"
+    "title": "Administration",
+    "loading": "Loading…",
+    "signOut": "Sign out",
+    "login": {
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "loading": "Signing in…",
+      "error": "Sign-in failed: check your email and password."
+    }
   },
   "nav": {
     "home": "Home",

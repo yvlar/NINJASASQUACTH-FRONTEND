@@ -1,11 +1,18 @@
 // Verrou du routage : « / » = site vitrine inchangé, « /admin » = espace
 // d'administration, chemin inconnu = retour au site vitrine.
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import LanguageProvider from "../i18n/LanguageProvider";
 import AppRoutes from "../AppRoutes";
 import fr from "../data/translations/fr.json";
+
+// /admin monte AuthProvider → le client Supabase doit être mocké
+// (aucun test ne touche le réseau, aucune env requise).
+vi.mock("../lib/supabase", async () => {
+  const { makeSupabaseMock } = await import("./helpers/supabaseMock");
+  return { supabase: makeSupabaseMock() };
+});
 
 function renderAt(path) {
   render(

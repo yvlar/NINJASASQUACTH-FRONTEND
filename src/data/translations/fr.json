@@ -1,6 +1,15 @@
 {
   "admin": {
-    "title": "Administration"
+    "title": "Administration",
+    "loading": "Chargement…",
+    "signOut": "Se déconnecter",
+    "login": {
+      "email": "Courriel",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "loading": "Connexion…",
+      "error": "Échec de la connexion : vérifiez le courriel et le mot de passe."
+    }
   },
   "nav": {
     "home": "Accueil",
