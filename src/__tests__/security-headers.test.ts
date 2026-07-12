@@ -3,14 +3,11 @@
 // se fait en preview/production — voir README). La CSP n'autorise QUE ce qui
 // est réellement utilisé (self, Supabase, Google Fonts, Storage).
 import { describe, it, expect } from "vitest";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+// Import direct du JSON (moduleResolution bundler) : pas de dépendance Node.
+import vercelConfig from "../../vercel.json";
 
-// Vitest s'exécute à la racine du dépôt (cwd) : lecture directe de vercel.json.
-const config = JSON.parse(
-  readFileSync(join(process.cwd(), "vercel.json"), "utf8"),
-) as {
-  rewrites: unknown[];
+const config = vercelConfig as {
+  rewrites: { source: string; destination: string }[];
   headers: { source: string; headers: { key: string; value: string }[] }[];
 };
 
