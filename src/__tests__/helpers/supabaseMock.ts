@@ -74,6 +74,13 @@ function makeBuilder(getResult: () => TableResult): SupabaseMockBuilder {
   return builder;
 }
 
+// Résultat d'un appel d'Edge Function (supabase.functions.invoke).
+export interface InvokeResult {
+  data?: unknown;
+  error?: unknown;
+  reject?: unknown;
+}
+
 // État interne mutable du mock (piloté par les méthodes __*).
 interface MockState {
   session: MockSession | null;
@@ -82,6 +89,7 @@ interface MockState {
   uploadError: unknown;
   removeError: unknown;
   publicUrl: string;
+  invokeResult: InvokeResult;
 }
 
 export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
@@ -94,6 +102,7 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
     publicUrl:
       initial.publicUrl ??
       "https://exemple.supabase.co/storage/v1/object/public/game-images/photo.webp",
+    invokeResult: { data: { ok: true }, error: null },
   });
 
   let state = initialState();
@@ -162,6 +171,13 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
       }),
     },
     storage: { from: vi.fn(() => storageBucket) },
+    functions: {
+      invoke: vi.fn(async () => {
+        const result = state.invokeResult;
+        if (result.reject) return Promise.reject(result.reject);
+        return { data: result.data ?? null, error: result.error ?? null };
+      }),
+    },
 
     // ——— pilotage/inspection depuis les tests ———
     __builders: builders,
@@ -177,6 +193,9 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
     },
     __setRemoveError(error: unknown) {
       state.removeError = error;
+    },
+    __setInvokeResult(result: InvokeResult) {
+      state.invokeResult = result;
     },
     __emitAuthChange(session: MockSession | null) {
       state.session = session;
