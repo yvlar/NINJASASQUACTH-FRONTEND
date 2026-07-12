@@ -95,6 +95,34 @@
       }
     }
   },
+  "home": {
+    "hero": {
+      "featured": "Featured",
+      "notify": "Get notified at launch",
+      "discoverGame": "Discover the game",
+      "brandKicker": "Quebec game studio",
+      "brandTitle": "Board games that break the mold",
+      "brandLead": "Original, fun and accessible board games — designed in Quebec, 100% compostable.",
+      "discover": "Discover our games"
+    }
+  },
+  "reassurance": {
+    "title": "Our commitments",
+    "items": {
+      "strategy": "Strategic gameplay",
+      "quebec": "Made in Quebec",
+      "eco": "100% compostable"
+    }
+  },
+  "founder": {
+    "title": "Behind the studio",
+    "lead": "Ninja Sasquatch Games is an independent game studio based in Quebec, driven by a passion for creating unforgettable moments around the table.",
+    "follow": "Follow the studio's behind-the-scenes and news on our channels."
+  },
+  "newsletter": {
+    "title": "Don't miss the launch",
+    "lead": "Want to know as soon as a new game arrives or a campaign starts? Write to us and we'll keep you posted."
+  },
   "nav": {
     "home": "Home",
     "games": "Our Games",
@@ -129,6 +157,7 @@
     "rules": "Clear rules accessible to all",
     "commitment": "Guaranteed environmental commitment",
     "viewGame": "View the game page",
+    "englishContent": "Game content in English",
     "detail": {
       "comingSoon": "Coming soon",
       "summary": "Overview",

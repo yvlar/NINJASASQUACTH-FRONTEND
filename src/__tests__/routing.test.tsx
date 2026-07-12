@@ -32,21 +32,21 @@ describe("routage localisé", () => {
   it("redirige / vers l'accueil français /fr", () => {
     renderAt("/");
     expect(
-      screen.getByRole("heading", { level: 1, name: fr.hero.title }),
+      screen.getByRole("heading", { level: 1, name: fr.home.hero.brandTitle }),
     ).toBeInTheDocument();
   });
 
   it("rend l'accueil français sur /fr", () => {
     renderAt("/fr");
     expect(
-      screen.getByRole("heading", { level: 1, name: fr.hero.title }),
+      screen.getByRole("heading", { level: 1, name: fr.home.hero.brandTitle }),
     ).toBeInTheDocument();
   });
 
   it("rend l'accueil anglais sur /en", () => {
     renderAt("/en");
     expect(
-      screen.getByRole("heading", { level: 1, name: en.hero.title }),
+      screen.getByRole("heading", { level: 1, name: en.home.hero.brandTitle }),
     ).toBeInTheDocument();
   });
 
@@ -65,7 +65,7 @@ describe("routage localisé", () => {
     ).toBeInTheDocument();
     // ce n'est PAS l'accueil (plus de redirection muette)
     expect(
-      screen.queryByRole("heading", { level: 1, name: fr.hero.title }),
+      screen.queryByRole("heading", { level: 1, name: fr.home.hero.brandTitle }),
     ).not.toBeInTheDocument();
   });
 });

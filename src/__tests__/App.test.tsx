@@ -12,7 +12,7 @@ vi.mock("../lib/supabase", async () => {
 });
 
 describe("App", () => {
-  it("se monte et affiche le titre du hero (FR par défaut)", () => {
+  it("se monte et affiche le hero de repli de marque (base vide, FR par défaut)", () => {
     // App contient des liens (cartes de jeu) et le bouton de langue :
     // un routeur est requis depuis le routage localisé.
     render(
@@ -22,10 +22,13 @@ describe("App", () => {
         </LanguageProvider>
       </MemoryRouter>,
     );
-    // « Origines Mystérieuses » existe aussi en titre de carte de jeu :
-    // on cible le <h1> du hero.
+    // Base mockée vide → aucun jeu vedette → hero de repli de marque
+    // (« Origines Mystérieuses » n'est plus le hero principal, Sprint 10).
     expect(
-      screen.getByRole("heading", { level: 1, name: "Origines Mystérieuses" }),
+      screen.getByRole("heading", {
+        level: 1,
+        name: "Des jeux qui sortent des sentiers battus",
+      }),
     ).toBeInTheDocument();
   });
 });

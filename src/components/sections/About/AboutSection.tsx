@@ -14,7 +14,13 @@ export default function AboutSection() {
             les colonnes différemment que l'ancien module (1fr ≙ minmax(auto,1fr)). */}
         <div className="grid grid-cols-[1fr] items-center gap-12 md:grid-cols-[repeat(2,1fr)]">
           <div>
-            <h2 className="mb-6 text-[2.5rem] font-extrabold tracking-[-0.01em] text-roux md:text-[3rem]">
+            {/* « Origines Mystérieuses » / « L'univers de Ninja Sasquatch
+                Games » : l'ancien copy du hero, réutilisé ici comme intro de
+                la section univers (il n'est plus le hero principal). */}
+            <p className="mb-2 font-brand text-sm tracking-[0.08em] text-forest">
+              {t("hero.subtitle")}
+            </p>
+            <h2 className="mb-6 text-[2.5rem] tracking-[-0.01em] text-roux md:text-[3rem]">
               {t("about.title")}
             </h2>
             <p className="mb-4 text-lg/[1.6] text-charcoal">
