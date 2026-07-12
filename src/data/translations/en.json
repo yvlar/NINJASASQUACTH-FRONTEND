@@ -99,7 +99,8 @@
     "home": "Home",
     "games": "Our Games",
     "universe": "Our Universe",
-    "contact": "Contact"
+    "contact": "Contact",
+    "switchLanguage": "Switch language"
   },
   "hero": {
     "title": "Mysterious Origins",
@@ -123,6 +124,28 @@
     "madeIn": "Designed and made in Quebec",
     "rules": "Clear rules accessible to all",
     "commitment": "Guaranteed environmental commitment",
+    "viewGame": "View the game page",
+    "detail": {
+      "comingSoon": "Coming soon",
+      "summary": "Overview",
+      "howToPlay": "How to play",
+      "mechanics": "Mechanics",
+      "languages": "Component languages",
+      "gallery": "Gallery",
+      "rules": "Game rules",
+      "download": "Download the rules (PDF)",
+      "rulesComingSoon": "Rules coming soon.",
+      "kickstarter": "Kickstarter campaign",
+      "kickstarterCta": "View on Kickstarter",
+      "campaign": {
+        "none": "No active campaign.",
+        "coming-soon": "Campaign coming soon — stay tuned.",
+        "live": "Campaign live on Kickstarter.",
+        "completed": "Campaign successfully funded."
+      },
+      "fullRules": "Full rules",
+      "related": "Similar games"
+    },
     "categories": {
       "tous": "All our games",
       "famille": "Family",
@@ -174,6 +197,11 @@
       "title": "An unexpected error occurred.",
       "reload": "Reload the page"
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The page you are looking for does not exist or has been moved.",
+    "home": "Back to home"
   },
   "footer": {
     "copyright": "© 2026 Ninja Sasquatch Games.",

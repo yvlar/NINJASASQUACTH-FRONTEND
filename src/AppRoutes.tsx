@@ -1,10 +1,15 @@
-// Routage de l'application : « / » = site vitrine (App, inchangé),
-// « /admin » = espace d'administration chargé à la demande (le visiteur du
-// site ne télécharge jamais le bundle admin), tout le reste revient au site.
+// Routage localisé : la langue est portée par l'URL.
+//   /          → redirection vers /fr
+//   /fr, /en   → accueil localisé
+//   /fr/jeux/:slug, /en/games/:slug → fiche jeu partageable
+//   /admin     → espace d'administration (chargé à la demande)
+//   *          → vraie page 404 (plus de redirection muette vers l'accueil)
 import { lazy, Suspense } from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
-import App from "./App";
 import { useLanguage } from "./i18n/useLanguage";
+import HomePage from "./pages/HomePage";
+import GamePage from "./pages/GamePage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const AdminPage = lazy(() => import("./components/admin/AdminPage"));
 
@@ -13,7 +18,11 @@ export default function AppRoutes() {
 
   return (
     <Routes>
-      <Route path="/" element={<App />} />
+      <Route path="/" element={<Navigate to="/fr" replace />} />
+      <Route path="/fr" element={<HomePage lang="fr" />} />
+      <Route path="/en" element={<HomePage lang="en" />} />
+      <Route path="/fr/jeux/:slug" element={<GamePage lang="fr" />} />
+      <Route path="/en/games/:slug" element={<GamePage lang="en" />} />
       <Route
         path="/admin"
         element={
@@ -23,7 +32,7 @@ export default function AppRoutes() {
           </Suspense>
         }
       />
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 }

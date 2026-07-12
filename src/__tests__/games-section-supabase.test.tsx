@@ -3,11 +3,13 @@
 // cartes selon la langue. Client 100 % mocké — aucun réseau.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import LanguageProvider from "../i18n/LanguageProvider";
 import GamesSection from "../components/sections/Games";
 import fr from "../data/translations/fr.json";
 import en from "../data/translations/en.json";
 import { JEUX_FIXTURES } from "./fixtures/games";
+import { gamePath } from "../utils/routes";
 import { supabase as supabaseClient } from "../lib/supabase";
 import type { SupabaseMock } from "./helpers/supabaseMock";
 
@@ -22,9 +24,11 @@ const supabase = supabaseClient as unknown as SupabaseMock;
 
 const renderSection = () =>
   render(
-    <LanguageProvider>
-      <GamesSection />
-    </LanguageProvider>,
+    <MemoryRouter>
+      <LanguageProvider>
+        <GamesSection />
+      </LanguageProvider>
+    </MemoryRouter>,
   );
 
 beforeEach(() => {
@@ -86,23 +90,20 @@ describe("GamesSection branchée sur Supabase", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("ouvre la vue détail avec la description complète localisée", async () => {
+  it("chaque carte est un lien vers la fiche partageable du jeu", async () => {
     supabase.__setTable("games", { data: JEUX_FIXTURES, error: null });
     renderSection();
 
-    fireEvent.click(
-      await screen.findByRole("heading", {
-        level: 3,
-        name: JEUX_FIXTURES[0].title_fr,
-      }),
+    const heading = await screen.findByRole("heading", {
+      level: 3,
+      name: JEUX_FIXTURES[0].title_fr,
+    });
+    const link = heading.closest("a");
+    expect(link).not.toBeNull();
+    expect(link).toHaveAttribute(
+      "href",
+      gamePath("fr", JEUX_FIXTURES[0].slug!),
     );
-
-    expect(
-      screen.getByText(JEUX_FIXTURES[0].full_desc_fr),
-    ).toBeInTheDocument();
-    expect(
-      screen.getByText(new RegExp(fr.games.categories.famille)),
-    ).toBeInTheDocument();
   });
 });
 

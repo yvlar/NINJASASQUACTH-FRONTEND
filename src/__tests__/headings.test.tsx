@@ -1,12 +1,13 @@
 // Test verrou : hiérarchie des headings (D9). « Origines Mystérieuses »
-// existe en h1 du hero ET en titre du jeu 1 (fixture) : la page doit garder
-// un h1 unique dans toutes les vues (y compris la vue détail d'un jeu, qui
-// rendait un second h1) et une hiérarchie sans saut de niveau :
-// h1 (hero) → h2 (sous-titre du hero, sections, titre du détail)
-// → h3 (cartes de jeux, blocs éco/caractéristiques).
+// existe en h1 du hero ET en titre de carte de jeu (fixture) : l'accueil doit
+// garder un h1 unique et une hiérarchie sans saut de niveau :
+// h1 (hero) → h2 (sous-titre du hero, sections) → h3 (cartes, blocs).
+// Depuis le Sprint 9, la vue détail est une route dédiée (fiche jeu) : plus
+// de bascule inline dans la page d'accueil.
 // Les jeux viennent de Supabase (mocké, fixtures au format table).
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 import { JEUX_FIXTURES } from "./fixtures/games";
@@ -24,9 +25,11 @@ const supabase = supabaseClient as unknown as SupabaseMock;
 
 const renderApp = () =>
   render(
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>,
+    <MemoryRouter>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </MemoryRouter>,
   );
 
 // Niveaux des headings dans l'ordre du document (H1 → 1, H2 → 2…).
@@ -51,7 +54,7 @@ beforeEach(() => {
 });
 
 describe("Hiérarchie des headings", () => {
-  it("vue par défaut : un seul h1 (le hero), aucun saut de niveau", async () => {
+  it("accueil : un seul h1 (le hero), aucun saut de niveau", async () => {
     renderApp();
     // attendre le rendu asynchrone des cartes (h3) avant d'auditer
     await screen.findByRole("heading", {
@@ -64,19 +67,15 @@ describe("Hiérarchie des headings", () => {
     ).toBeInTheDocument();
   });
 
-  it("vue détail d'un jeu : toujours un seul h1, le titre du jeu est un h2", async () => {
+  it("le titre de carte homonyme du hero est un h3, pas un second h1", async () => {
     renderApp();
-    // Ouvre la vue détail du jeu 1 (clic sur sa carte, homonyme du hero).
-    fireEvent.click(
-      await screen.findByRole("heading", {
-        level: 3,
-        name: "Origines Mystérieuses",
-      }),
-    );
-    expect(screen.getByText("← Retour aux jeux")).toBeInTheDocument();
-    expectSingleH1AndNoSkip();
+    await screen.findByRole("heading", {
+      level: 3,
+      name: "Origines Mystérieuses",
+    });
+    // un seul h1 malgré l'homonymie hero/carte
     expect(
-      screen.getByRole("heading", { level: 2, name: "Origines Mystérieuses" }),
-    ).toBeInTheDocument();
+      screen.getAllByRole("heading", { level: 1, name: "Origines Mystérieuses" }),
+    ).toHaveLength(1);
   });
 });

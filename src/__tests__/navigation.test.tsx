@@ -3,6 +3,7 @@
 // <section id="..."> réellement rendue par App, sinon le clic ne fait rien.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 
@@ -20,9 +21,11 @@ beforeEach(() => {
 
 const renderApp = () =>
   render(
-    <LanguageProvider>
-      <App />
-    </LanguageProvider>,
+    <MemoryRouter>
+      <LanguageProvider>
+        <App />
+      </LanguageProvider>
+    </MemoryRouter>,
   );
 
 describe("Contrat de navigation", () => {
