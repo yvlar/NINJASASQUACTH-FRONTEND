@@ -1,10 +1,11 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { Instagram, Facebook, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { CONTACT_EMAIL } from "../../../data/site";
 import { buildMailtoUrl } from "../../../utils/mailto";
 import type { ContactFormValues } from "../../../utils/mailto";
+import SocialLinks from "../../layout/SocialLinks";
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 
@@ -98,9 +99,16 @@ export default function ContactSection() {
                   value={values.name}
                   onChange={handleChange("name")}
                   aria-invalid={Boolean(errors.name)}
+                  aria-describedby={
+                    errors.name ? "contact-name-error" : undefined
+                  }
                 />
                 {errors.name && (
-                  <p className="mt-2 text-sm/[1.6] text-error">
+                  <p
+                    id="contact-name-error"
+                    role="alert"
+                    className="mt-2 text-sm/[1.6] text-error"
+                  >
                     {t(errors.name)}
                   </p>
                 )}
@@ -123,9 +131,16 @@ export default function ContactSection() {
                   value={values.email}
                   onChange={handleChange("email")}
                   aria-invalid={Boolean(errors.email)}
+                  aria-describedby={
+                    errors.email ? "contact-email-error" : undefined
+                  }
                 />
                 {errors.email && (
-                  <p className="mt-2 text-sm/[1.6] text-error">
+                  <p
+                    id="contact-email-error"
+                    role="alert"
+                    className="mt-2 text-sm/[1.6] text-error"
+                  >
                     {t(errors.email)}
                   </p>
                 )}
@@ -150,9 +165,16 @@ export default function ContactSection() {
                 value={values.message}
                 onChange={handleChange("message")}
                 aria-invalid={Boolean(errors.message)}
+                aria-describedby={
+                  errors.message ? "contact-message-error" : undefined
+                }
               />
               {errors.message && (
-                <p className="mt-2 text-sm/[1.6] text-error">
+                <p
+                  id="contact-message-error"
+                  role="alert"
+                  className="mt-2 text-sm/[1.6] text-error"
+                >
                   {t(errors.message)}
                 </p>
               )}
@@ -173,25 +195,16 @@ export default function ContactSection() {
           </form>
         </div>
 
-        <div className="mt-12 flex justify-center gap-6">
-          {/* href="#" = placeholders D12 (ROADMAP item 4.4, Décision requise :
-              URLs réelles à fournir ou icônes à retirer). Le verrou
-              anchor-is-valid est suspendu localement en attendant la décision —
-              retirer ces disables en résolvant 4.4. */}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className={socialLink} aria-label="Instagram">
-            <Instagram size={28} />
-          </a>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className={socialLink} aria-label="Facebook">
-            <Facebook size={28} />
-          </a>
+        {/* Réseaux sociaux réels (D12 résolue) + courriel — plus aucun
+            href="#". Icônes décoratives masquées aux lecteurs d'écran. */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
+          <SocialLinks linkClassName="text-charcoal hover:text-roux" />
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className={socialLink}
-            aria-label="Email"
+            aria-label={t("contact.emailAria")}
           >
-            <Mail size={28} />
+            <Mail size={24} aria-hidden />
           </a>
         </div>
       </div>

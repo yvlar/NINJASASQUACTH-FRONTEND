@@ -184,6 +184,7 @@
     "messagePlaceholder": "Your message...",
     "send": "Send message",
     "subject": "Message from the Ninja Sasquatch Games website",
+    "emailAria": "Email us",
     "success": "Thank you! Your email client will open to send your message.",
     "errors": {
       "nameRequired": "Please enter your name.",
@@ -202,6 +203,11 @@
     "title": "Page not found",
     "message": "The page you are looking for does not exist or has been moved.",
     "home": "Back to home"
+  },
+  "social": {
+    "facebook": "Ninja Sasquatch Games on Facebook",
+    "youtube": "Ninja Sasquatch Games on YouTube",
+    "linkedin": "Ninja Sasquatch Games on LinkedIn"
   },
   "footer": {
     "copyright": "© 2026 Ninja Sasquatch Games.",
