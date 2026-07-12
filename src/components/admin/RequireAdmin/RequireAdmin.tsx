@@ -27,7 +27,7 @@ export default function RequireAdmin({ children }: { children: ReactNode }) {
           {t("admin.denied")}
         </p>
         <button
-          className="cursor-pointer rounded-lg border border-dark-green bg-transparent px-[0.9rem] py-2 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
+          className="cursor-pointer rounded-lg border border-charcoal bg-transparent px-[0.9rem] py-2 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           type="button"
           onClick={signOut}
         >

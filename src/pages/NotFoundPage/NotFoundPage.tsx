@@ -8,14 +8,14 @@ export default function NotFoundPage() {
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-4 text-center">
-      <p className="text-[4rem] font-extrabold leading-none text-brown">404</p>
-      <h1 className="text-2xl font-bold text-dark-green">
+      <p className="text-[4rem] font-extrabold leading-none text-roux">404</p>
+      <h1 className="text-2xl font-bold text-charcoal">
         {t("notFound.title")}
       </h1>
-      <p className="max-w-md text-dark-green">{t("notFound.message")}</p>
+      <p className="max-w-md text-charcoal">{t("notFound.message")}</p>
       <Link
         to={homePath(lang)}
-        className="rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-cream transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
+        className="rounded-lg bg-forest px-4 py-2.5 font-semibold text-cream transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
       >
         {t("notFound.home")}
       </Link>

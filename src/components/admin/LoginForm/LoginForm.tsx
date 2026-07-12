@@ -7,7 +7,7 @@ type LoginStatus = "idle" | "loading" | "error";
 
 // Champ de saisie partagé (courriel, mot de passe).
 const inputBase =
-  "rounded-lg border border-dark-green bg-white px-3 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "rounded-lg border border-charcoal bg-white px-3 py-2.5 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 export default function LoginForm() {
   const { t } = useLanguage();
@@ -69,7 +69,7 @@ export default function LoginForm() {
         </p>
       )}
       <button
-        className="cursor-pointer rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green disabled:cursor-wait disabled:opacity-70"
+        className="cursor-pointer rounded-lg bg-forest px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal disabled:cursor-wait disabled:opacity-70"
         type="submit"
         disabled={status === "loading"}
       >

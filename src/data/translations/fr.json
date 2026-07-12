@@ -95,12 +95,44 @@
       }
     }
   },
+  "home": {
+    "hero": {
+      "featured": "En vedette",
+      "notify": "Être notifié au lancement",
+      "discoverGame": "Découvrir le jeu",
+      "brandKicker": "Studio de jeux québécois",
+      "brandTitle": "Des jeux qui sortent des sentiers battus",
+      "brandLead": "Des jeux de société originaux, amusants et accessibles à tous — pensés au Québec, 100 % compostables.",
+      "discover": "Découvrir nos jeux"
+    }
+  },
+  "reassurance": {
+    "title": "Nos engagements",
+    "items": {
+      "strategy": "Gameplay stratégique",
+      "quebec": "Fait au Québec",
+      "eco": "100 % compostable"
+    }
+  },
+  "founder": {
+    "title": "Derrière le studio",
+    "lead": "Ninja Sasquatch Games est un studio de jeux indépendant basé au Québec, animé par la passion de créer des moments inoubliables autour de la table.",
+    "follow": "Suivez les coulisses et l'actualité du studio sur nos réseaux."
+  },
+  "newsletter": {
+    "title": "Ne manquez pas le lancement",
+    "lead": "Envie d'être prévenu dès qu'un nouveau jeu arrive ou qu'une campagne démarre ? Écrivez-nous et nous vous tiendrons au courant."
+  },
   "nav": {
     "home": "Accueil",
     "games": "Nos Jeux",
     "universe": "Notre Univers",
     "contact": "Contact",
-    "switchLanguage": "Changer de langue"
+    "switchLanguage": "Changer de langue",
+    "primary": "Navigation principale",
+    "homeLink": "Ninja Sasquatch Games — retour à l'accueil",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "hero": {
     "title": "Origines Mystérieuses",
@@ -125,6 +157,7 @@
     "rules": "Règles claires et accessibles à tous",
     "commitment": "Engagement environnemental garanti",
     "viewGame": "Voir la fiche du jeu",
+    "englishContent": "Contenu du jeu en anglais",
     "detail": {
       "comingSoon": "À venir",
       "summary": "Résumé",
@@ -144,6 +177,8 @@
         "completed": "Campagne financée avec succès."
       },
       "fullRules": "Règles complètes",
+      "credits": "Crédits",
+      "creditsStudio": "Un jeu Ninja Sasquatch Games — conçu au Québec.",
       "related": "Jeux similaires"
     },
     "categories": {
@@ -184,6 +219,7 @@
     "messagePlaceholder": "Votre message...",
     "send": "Envoyer le message",
     "subject": "Message du site Ninja Sasquatch Games",
+    "emailAria": "Nous écrire par courriel",
     "success": "Merci ! Votre logiciel de messagerie va s'ouvrir pour envoyer votre message.",
     "errors": {
       "nameRequired": "Veuillez entrer votre nom.",
@@ -202,6 +238,11 @@
     "title": "Page introuvable",
     "message": "La page que vous cherchez n'existe pas ou a été déplacée.",
     "home": "Retour à l'accueil"
+  },
+  "social": {
+    "facebook": "Ninja Sasquatch Games sur Facebook",
+    "youtube": "Ninja Sasquatch Games sur YouTube",
+    "linkedin": "Ninja Sasquatch Games sur LinkedIn"
   },
   "footer": {
     "copyright": "© 2026 Ninja Sasquatch Games.",

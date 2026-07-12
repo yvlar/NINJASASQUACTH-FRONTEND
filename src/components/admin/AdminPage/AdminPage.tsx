@@ -9,12 +9,12 @@ function AdminContent() {
   const { session, signOut } = useAuth();
 
   return (
-    <main className="min-h-screen bg-cream px-4 py-8 text-dark-green md:px-8 md:py-12">
+    <main className="min-h-screen bg-cream px-4 py-8 text-charcoal md:px-8 md:py-12">
       <div className="mx-auto mb-6 flex max-w-[60rem] items-center justify-between gap-4">
-        <h1 className="text-brown">{t("admin.title")}</h1>
+        <h1 className="text-roux">{t("admin.title")}</h1>
         {session && (
           <button
-            className="cursor-pointer rounded-lg border border-dark-green bg-transparent px-[0.9rem] py-2 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
+            className="cursor-pointer rounded-lg border border-charcoal bg-transparent px-[0.9rem] py-2 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
             type="button"
             onClick={signOut}
           >

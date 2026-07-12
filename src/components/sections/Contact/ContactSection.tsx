@@ -1,21 +1,22 @@
 import { useState } from "react";
 import type { ChangeEvent, FormEvent } from "react";
-import { Instagram, Facebook, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { CONTACT_EMAIL } from "../../../data/site";
 import { buildMailtoUrl } from "../../../utils/mailto";
 import type { ContactFormValues } from "../../../utils/mailto";
+import SocialLinks from "../../layout/SocialLinks";
 
 const EMAIL_PATTERN = /^\S+@\S+\.\S+$/;
 
 // Classes communes aux champs (input et textarea) ; la couleur de bordure
-// vit dans le ternaire d'erreur (border-error/border-brown) car l'ordre des
+// vit dans le ternaire d'erreur (border-error/border-roux) car l'ordre des
 // classes dans className ne départage pas deux utilitaires en conflit.
 const fieldBase =
-  "w-full rounded-lg border-2 bg-cream px-4 py-3 text-[1rem] transition-colors duration-300 focus:border-eco-green focus:outline-none motion-reduce:transition-none";
+  "w-full rounded-lg border-2 bg-cream px-4 py-3 text-[1rem] transition-colors duration-300 focus:border-forest focus:outline-none motion-reduce:transition-none";
 
 const socialLink =
-  "text-dark-green transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "text-charcoal transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 // errors contient des clés i18n (jamais du texte), traduites au rendu pour
 // que les messages suivent la bascule de langue.
@@ -70,10 +71,10 @@ export default function ContactSection() {
   return (
     <section id="contact" className="bg-cream py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-4 text-center text-[2.5rem] font-extrabold tracking-[-0.01em] text-brown md:text-[3rem]">
+        <h2 className="mb-4 text-center text-[2.5rem] font-extrabold tracking-[-0.01em] text-roux md:text-[3rem]">
           {t("contact.title")}
         </h2>
-        <p className="mb-12 text-center text-lg/[1.6] text-dark-green">
+        <p className="mb-12 text-center text-lg/[1.6] text-charcoal">
           {t("contact.description")}
         </p>
 
@@ -83,7 +84,7 @@ export default function ContactSection() {
               <div className="flex flex-col">
                 <label
                   htmlFor="contact-name"
-                  className="mb-2 block font-medium text-dark-green"
+                  className="mb-2 block font-medium text-charcoal"
                 >
                   {t("contact.name")}
                 </label>
@@ -92,15 +93,22 @@ export default function ContactSection() {
                   name="name"
                   type="text"
                   className={`${fieldBase} ${
-                    errors.name ? "border-error" : "border-brown"
+                    errors.name ? "border-error" : "border-roux"
                   }`}
                   placeholder={t("contact.namePlaceholder")}
                   value={values.name}
                   onChange={handleChange("name")}
                   aria-invalid={Boolean(errors.name)}
+                  aria-describedby={
+                    errors.name ? "contact-name-error" : undefined
+                  }
                 />
                 {errors.name && (
-                  <p className="mt-2 text-sm/[1.6] text-error">
+                  <p
+                    id="contact-name-error"
+                    role="alert"
+                    className="mt-2 text-sm/[1.6] text-error"
+                  >
                     {t(errors.name)}
                   </p>
                 )}
@@ -108,7 +116,7 @@ export default function ContactSection() {
               <div className="flex flex-col">
                 <label
                   htmlFor="contact-email"
-                  className="mb-2 block font-medium text-dark-green"
+                  className="mb-2 block font-medium text-charcoal"
                 >
                   {t("contact.email")}
                 </label>
@@ -117,15 +125,22 @@ export default function ContactSection() {
                   name="email"
                   type="email"
                   className={`${fieldBase} ${
-                    errors.email ? "border-error" : "border-brown"
+                    errors.email ? "border-error" : "border-roux"
                   }`}
                   placeholder={t("contact.emailPlaceholder")}
                   value={values.email}
                   onChange={handleChange("email")}
                   aria-invalid={Boolean(errors.email)}
+                  aria-describedby={
+                    errors.email ? "contact-email-error" : undefined
+                  }
                 />
                 {errors.email && (
-                  <p className="mt-2 text-sm/[1.6] text-error">
+                  <p
+                    id="contact-email-error"
+                    role="alert"
+                    className="mt-2 text-sm/[1.6] text-error"
+                  >
                     {t(errors.email)}
                   </p>
                 )}
@@ -135,7 +150,7 @@ export default function ContactSection() {
             <div className="flex flex-col">
               <label
                 htmlFor="contact-message"
-                className="mb-2 block font-medium text-dark-green"
+                className="mb-2 block font-medium text-charcoal"
               >
                 {t("contact.message")}
               </label>
@@ -144,15 +159,22 @@ export default function ContactSection() {
                 name="message"
                 rows={5}
                 className={`${fieldBase} min-h-32 resize-y ${
-                  errors.message ? "border-error" : "border-brown"
+                  errors.message ? "border-error" : "border-roux"
                 }`}
                 placeholder={t("contact.messagePlaceholder")}
                 value={values.message}
                 onChange={handleChange("message")}
                 aria-invalid={Boolean(errors.message)}
+                aria-describedby={
+                  errors.message ? "contact-message-error" : undefined
+                }
               />
               {errors.message && (
-                <p className="mt-2 text-sm/[1.6] text-error">
+                <p
+                  id="contact-message-error"
+                  role="alert"
+                  className="mt-2 text-sm/[1.6] text-error"
+                >
                   {t(errors.message)}
                 </p>
               )}
@@ -160,38 +182,29 @@ export default function ContactSection() {
 
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-eco-green px-8 py-4 font-heading text-[1rem] font-bold tracking-[0.02em] text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
+              className="w-full cursor-pointer rounded-lg bg-forest px-8 py-4 font-brand text-[1rem] font-bold tracking-[0.02em] text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
             >
               {t("contact.send")}
             </button>
 
             {submitted && (
-              <p className="text-center font-medium text-eco-green" role="status">
+              <p className="text-center font-medium text-forest" role="status">
                 {t("contact.success")}
               </p>
             )}
           </form>
         </div>
 
-        <div className="mt-12 flex justify-center gap-6">
-          {/* href="#" = placeholders D12 (ROADMAP item 4.4, Décision requise :
-              URLs réelles à fournir ou icônes à retirer). Le verrou
-              anchor-is-valid est suspendu localement en attendant la décision —
-              retirer ces disables en résolvant 4.4. */}
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className={socialLink} aria-label="Instagram">
-            <Instagram size={28} />
-          </a>
-          {/* eslint-disable-next-line jsx-a11y/anchor-is-valid */}
-          <a href="#" className={socialLink} aria-label="Facebook">
-            <Facebook size={28} />
-          </a>
+        {/* Réseaux sociaux réels (D12 résolue) + courriel — plus aucun
+            href="#". Icônes décoratives masquées aux lecteurs d'écran. */}
+        <div className="mt-12 flex flex-wrap items-center justify-center gap-6">
+          <SocialLinks linkClassName="text-charcoal hover:text-roux" />
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className={socialLink}
-            aria-label="Email"
+            aria-label={t("contact.emailAria")}
           >
-            <Mail size={28} />
+            <Mail size={24} aria-hidden />
           </a>
         </div>
       </div>

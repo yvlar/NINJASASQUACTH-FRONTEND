@@ -9,7 +9,7 @@ type StringFieldName = {
 }[keyof GameFormValues];
 
 const inputBase =
-  "rounded-lg border border-dark-green bg-white px-3 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "rounded-lg border border-charcoal bg-white px-3 py-2.5 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 export default function FormField({
   name,
@@ -49,7 +49,7 @@ export default function FormField({
       <label className="font-semibold" htmlFor={id}>
         {t(`admin.form.${name}`)}
         {optional && (
-          <span className="ml-1 font-normal text-dark-green/60">
+          <span className="ml-1 font-normal text-charcoal/60">
             {t("admin.form.optional")}
           </span>
         )}

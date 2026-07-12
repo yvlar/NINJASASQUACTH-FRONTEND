@@ -131,7 +131,7 @@ export default function GameForm({
       onSubmit={handleSubmit}
       noValidate
     >
-      <h2 className="text-brown">
+      <h2 className="text-roux">
         {t(edition ? "admin.form.editTitle" : "admin.form.createTitle")}
       </h2>
 
@@ -154,7 +154,7 @@ export default function GameForm({
 
       <div className="flex gap-3">
         <button
-          className="cursor-pointer rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green disabled:cursor-wait disabled:opacity-70"
+          className="cursor-pointer rounded-lg bg-forest px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal disabled:cursor-wait disabled:opacity-70"
           type="submit"
           disabled={status === "saving"}
         >
@@ -163,7 +163,7 @@ export default function GameForm({
             : t(edition ? "admin.form.submitEdit" : "admin.form.submitCreate")}
         </button>
         <button
-          className="cursor-pointer rounded-lg border border-dark-green bg-transparent px-4 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
+          className="cursor-pointer rounded-lg border border-charcoal bg-transparent px-4 py-2.5 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
           type="button"
           onClick={onCancel}
         >

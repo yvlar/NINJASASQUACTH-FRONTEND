@@ -12,9 +12,9 @@ type ManagerStatus = "loading" | "error" | "ready";
 
 // Boutons d'action secondaires (modifier / annuler la confirmation).
 const actionButton =
-  "cursor-pointer rounded-lg border border-dark-green bg-transparent px-3 py-1.5 text-sm text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "cursor-pointer rounded-lg border border-charcoal bg-transparent px-3 py-1.5 text-sm text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 const deleteButton =
-  "cursor-pointer rounded-lg border border-error bg-transparent px-3 py-1.5 text-sm font-semibold text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "cursor-pointer rounded-lg border border-error bg-transparent px-3 py-1.5 text-sm font-semibold text-error focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 // Gestion des jeux côté admin : la RLS laisse l'admin voir aussi les
 // brouillons (published = false), invisibles du site public.
@@ -124,7 +124,7 @@ export default function GamesManager() {
   return (
     <section className="mx-auto flex max-w-[60rem] flex-col gap-5">
       <button
-        className="cursor-pointer self-start rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
+        className="cursor-pointer self-start rounded-lg bg-forest px-4 py-2.5 font-semibold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
         type="button"
         onClick={() => setCreating(true)}
       >
@@ -153,7 +153,7 @@ export default function GamesManager() {
         <ul className="flex list-none flex-col gap-2">
           {games.map((game) => (
             <li
-              className="flex items-center gap-4 rounded-lg border border-dark-green/20 bg-white px-4 py-3"
+              className="flex items-center gap-4 rounded-lg border border-charcoal/20 bg-white px-4 py-3"
               key={game.id}
             >
               <span className="mr-auto font-semibold">{game.title_fr}</span>
@@ -161,7 +161,7 @@ export default function GamesManager() {
                 {t(`games.categories.${game.category}`)}
               </span>
               {!game.published && (
-                <span className="rounded-full bg-brown/15 px-2 py-0.5 text-sm font-semibold text-brown">
+                <span className="rounded-full bg-roux/15 px-2 py-0.5 text-sm font-semibold text-roux">
                   {t("admin.manager.draft")}
                 </span>
               )}

@@ -35,7 +35,7 @@ export default function GameBadges({ game }: { game: GameRow }) {
       {badges.map((badge) => (
         <li
           key={badge.label}
-          className="flex items-center gap-2 rounded-lg bg-brown/10 px-4 py-2 text-dark-green"
+          className="flex items-center gap-2 rounded-lg bg-roux/10 px-4 py-2 text-charcoal"
         >
           {badge.icon}
           <span>{badge.label}</span>

@@ -1,21 +1,26 @@
 import { Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
+import SocialLinks from "../SocialLinks";
 
 export default function Footer() {
   const { t } = useLanguage();
 
   return (
-    <footer className="bg-dark-green py-8 text-center text-white">
-      <div className="mx-auto max-w-[1280px] px-4">
-        <p className="mb-2 font-heading text-lg/[1.6] font-bold text-white">
-          <span className="text-brown">Ninja </span>
+    <footer className="bg-charcoal py-10 text-center text-white">
+      <div className="mx-auto flex max-w-[1280px] flex-col items-center px-4">
+        <p className="mb-2 font-brand text-lg/[1.6] text-white">
+          <span className="text-roux">Ninja </span>
           <span className="text-cream">Sasquatch Games</span>
         </p>
-        <p className="mb-2 text-cream opacity-80">
+        <p className="mb-4 text-cream opacity-80">
           {t("footer.copyright")} {t("footer.rights")}
         </p>
-        <p className="mt-2 flex items-center justify-center gap-2 text-eco-green">
-          <Leaf size={16} />
+        <SocialLinks
+          className="mb-4 justify-center"
+          linkClassName="text-cream hover:text-roux"
+        />
+        <p className="mt-2 flex items-center justify-center gap-2 text-cream">
+          <Leaf size={16} aria-hidden />
           <span>{t("footer.tagline")}</span>
         </p>
       </div>

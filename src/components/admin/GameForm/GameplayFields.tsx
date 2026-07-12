@@ -23,7 +23,7 @@ export default function GameplayFields({
 
   return (
     <fieldset className="flex flex-col gap-4 border-0 p-0">
-      <legend className="mb-1 text-lg font-bold text-brown">
+      <legend className="mb-1 text-lg font-bold text-roux">
         {t("admin.form.sections.gameplay")}
       </legend>
 
