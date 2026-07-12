@@ -10,6 +10,7 @@ import { homePath } from "../../utils/routes";
 import LanguageToggle from "../../components/layout/LanguageToggle";
 import Footer from "../../components/layout/Footer";
 import NotFoundPage from "../NotFoundPage";
+import PageMeta from "../../components/seo/PageMeta";
 import GameHero from "../../components/game/GameHero";
 import GameBadges from "../../components/game/GameBadges";
 import NarrativeSummary from "../../components/game/NarrativeSummary";
@@ -69,6 +70,7 @@ export default function GameContent({ slug }: { slug: string }) {
         )}
         {!loading && error == null && game && (
           <>
+            <PageMeta input={{ kind: "game", lang, game }} />
             <GameHero game={game} />
             <GameBadges game={game} />
             <NarrativeSummary game={game} />

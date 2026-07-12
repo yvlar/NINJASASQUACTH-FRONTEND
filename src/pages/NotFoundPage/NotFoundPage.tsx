@@ -2,12 +2,14 @@
 import { Link } from "react-router-dom";
 import { useLanguage } from "../../i18n/useLanguage";
 import { homePath } from "../../utils/routes";
+import PageMeta from "../../components/seo/PageMeta";
 
 export default function NotFoundPage() {
   const { t, lang } = useLanguage();
 
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-4 text-center">
+      <PageMeta input={{ kind: "notFound", lang }} />
       <p className="text-[4rem] font-extrabold leading-none text-roux">404</p>
       <h1 className="text-2xl font-bold text-charcoal">
         {t("notFound.title")}
