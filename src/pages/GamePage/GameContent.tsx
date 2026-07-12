@@ -18,6 +18,7 @@ import GameGallery from "../../components/game/GameGallery";
 import RulesDownload from "../../components/game/RulesDownload";
 import KickstarterCallToAction from "../../components/game/KickstarterCallToAction";
 import FullRulesAccordion from "../../components/game/FullRulesAccordion";
+import GameCredits from "../../components/game/GameCredits";
 import RelatedGames from "../../components/game/RelatedGames";
 
 function TopBar() {
@@ -76,6 +77,7 @@ export default function GameContent({ slug }: { slug: string }) {
             <RulesDownload game={game} />
             <KickstarterCallToAction game={game} />
             <FullRulesAccordion game={game} />
+            <GameCredits game={game} />
             <RelatedGames current={game} games={games} />
           </>
         )}

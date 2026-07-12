@@ -88,6 +88,38 @@ describe("Fiche jeu — routes localisées", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("badge « contenu en anglais » quand le matériel est en anglais seulement", async () => {
+    const enOnly: GameRow = {
+      ...JEU,
+      game_languages: ["en"],
+      theme_key: "heroes-rising",
+    };
+    supabase.__setTable("games", { data: [enOnly], error: null });
+    renderAt(`/fr/jeux/${JEU.slug}`);
+    await screen.findByRole("heading", { level: 1, name: JEU.title_fr });
+    expect(screen.getByText(fr.games.englishContent)).toBeInTheDocument();
+  });
+
+  it("pas de badge « contenu en anglais » quand le matériel est bilingue", async () => {
+    // fixture 0 : game_languages ["fr", "en"] → bilingue
+    supabase.__setTable("games", { data: [JEU], error: null });
+    renderAt(`/fr/jeux/${JEU.slug}`);
+    await screen.findByRole("heading", { level: 1, name: JEU.title_fr });
+    expect(screen.queryByText(fr.games.englishContent)).not.toBeInTheDocument();
+  });
+
+  it("affiche la section crédits (crédit studio, rien d'inventé)", async () => {
+    supabase.__setTable("games", { data: [JEU], error: null });
+    renderAt(`/fr/jeux/${JEU.slug}`);
+    await screen.findByRole("heading", { level: 1, name: JEU.title_fr });
+    expect(
+      screen.getByRole("heading", { name: fr.games.detail.credits }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(fr.games.detail.creditsStudio),
+    ).toBeInTheDocument();
+  });
+
   it("changement de langue conserve le slug (/fr/jeux/x → /en/games/x)", async () => {
     supabase.__setTable("games", { data: JEUX_FIXTURES, error: null });
     renderAt(`/fr/jeux/${JEU.slug}`);
