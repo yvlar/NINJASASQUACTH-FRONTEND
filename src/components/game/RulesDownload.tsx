@@ -12,7 +12,7 @@ export default function RulesDownload({ game }: { game: GameRow }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="mb-3 text-2xl font-bold text-brown">
+      <h2 className="mb-3 text-2xl font-bold text-roux">
         {t("games.detail.rules")}
       </h2>
       {href ? (
@@ -20,13 +20,13 @@ export default function RulesDownload({ game }: { game: GameRow }) {
           href={href}
           type="application/pdf"
           download
-          className="inline-flex items-center gap-2 rounded-lg bg-eco-green px-4 py-2.5 font-semibold text-cream transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-dark-green"
+          className="inline-flex items-center gap-2 rounded-lg bg-forest px-4 py-2.5 font-semibold text-cream transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-charcoal"
         >
           <FileText size={18} />
           {t("games.detail.download")}
         </a>
       ) : (
-        <p className="text-dark-green italic">
+        <p className="text-charcoal italic">
           {t("games.detail.rulesComingSoon")}
         </p>
       )}

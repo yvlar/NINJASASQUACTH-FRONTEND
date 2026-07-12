@@ -24,14 +24,14 @@ export default function GameCard({ game }: { game: GameRow }) {
           />
         )}
         {game.eco && (
-          <div className="absolute top-2 right-2 rounded-full bg-eco-green p-2 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
+          <div className="absolute top-2 right-2 rounded-full bg-forest p-2 shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)]">
             <Leaf size={20} color="var(--color-cream)" />
           </div>
         )}
       </div>
-      <h3 className="mb-2 text-xl/[1.6] font-bold text-brown">{title}</h3>
-      <p className="mb-3 text-dark-green">{shortDesc}</p>
-      <div className="flex gap-4 text-sm/[1.6] text-dark-green">
+      <h3 className="mb-2 text-xl/[1.6] font-bold text-roux">{title}</h3>
+      <p className="mb-3 text-charcoal">{shortDesc}</p>
+      <div className="flex gap-4 text-sm/[1.6] text-charcoal">
         <span className="flex items-center gap-1">
           <Users size={16} />
           {game.players}
@@ -52,7 +52,7 @@ export default function GameCard({ game }: { game: GameRow }) {
     <Link
       to={gamePath(lang, game.slug)}
       aria-label={`${title} — ${t("games.viewGame")}`}
-      className="block transition-transform duration-300 hover:scale-[1.02] motion-reduce:transition-none focus-visible:rounded-lg focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-eco-green"
+      className="block transition-transform duration-300 hover:scale-[1.02] motion-reduce:transition-none focus-visible:rounded-lg focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-forest"
     >
       {media}
     </Link>

@@ -22,20 +22,20 @@ export default function GameHero({ game }: { game: GameRow }) {
       </div>
       <div className="flex flex-col justify-center gap-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="rounded-full bg-brown/15 px-3 py-1 text-sm font-semibold text-brown">
+          <span className="rounded-full bg-roux/15 px-3 py-1 text-sm font-semibold text-roux">
             {t(`games.categories.${game.category}`)}
           </span>
           {game.coming_soon && (
-            <span className="rounded-full bg-eco-green px-3 py-1 text-sm font-semibold text-cream">
+            <span className="rounded-full bg-forest px-3 py-1 text-sm font-semibold text-cream">
               {t("games.detail.comingSoon")}
             </span>
           )}
         </div>
-        <h1 className="text-4xl/[1.6] font-extrabold tracking-[-0.01em] text-brown">
+        <h1 className="text-4xl/[1.6] font-extrabold tracking-[-0.01em] text-roux">
           {title}
         </h1>
         {tagline && (
-          <p className="text-xl/[1.5] font-medium text-dark-green">{tagline}</p>
+          <p className="text-xl/[1.5] font-medium text-charcoal">{tagline}</p>
         )}
       </div>
     </header>

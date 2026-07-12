@@ -25,9 +25,9 @@ function TopBar() {
   return (
     <nav className="fixed top-0 left-0 right-0 z-[1000] w-full bg-cream/95 shadow-[0_2px_8px_rgba(0,0,0,0.05)] backdrop-blur-[10px]">
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4">
-        <Link to={homePath(lang)} className="select-none font-heading text-2xl font-extrabold tracking-[0.02em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green">
-          <span className="text-brown">Ninja </span>
-          <span className="text-dark-green">Sasquatch</span>
+        <Link to={homePath(lang)} className="select-none font-brand text-2xl font-extrabold tracking-[0.02em] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest">
+          <span className="text-roux">Ninja </span>
+          <span className="text-charcoal">Sasquatch</span>
         </Link>
         <LanguageToggle />
       </div>
@@ -50,14 +50,14 @@ export default function GameContent({ slug }: { slug: string }) {
         <div className="mx-auto max-w-6xl px-4 pt-6">
           <Link
             to={homePath(lang)}
-            className="font-medium text-dark-green transition-opacity duration-300 hover:opacity-80 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
+            className="font-medium text-charcoal transition-opacity duration-300 hover:opacity-80 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           >
             ← {t("games.backToGames")}
           </Link>
         </div>
 
         {loading && (
-          <p role="status" className="my-16 text-center text-dark-green">
+          <p role="status" className="my-16 text-center text-charcoal">
             {t("games.loading")}
           </p>
         )}

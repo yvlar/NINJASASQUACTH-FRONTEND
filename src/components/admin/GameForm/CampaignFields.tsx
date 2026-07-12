@@ -4,7 +4,7 @@ import type { FieldGroupProps } from "./gameFormTypes";
 import type { CampaignStatus } from "../../../types/database";
 
 const selectBase =
-  "rounded-lg border border-dark-green bg-white px-3 py-2.5 text-dark-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "rounded-lg border border-charcoal bg-white px-3 py-2.5 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 const CAMPAIGN_STATUSES: CampaignStatus[] = [
   "none",
@@ -22,7 +22,7 @@ export default function CampaignFields({
 }: FieldGroupProps) {
   return (
     <fieldset className="flex flex-col gap-4 border-0 p-0">
-      <legend className="mb-1 text-lg font-bold text-brown">
+      <legend className="mb-1 text-lg font-bold text-roux">
         {t("admin.form.sections.campaign")}
       </legend>
 

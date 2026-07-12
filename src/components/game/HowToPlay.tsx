@@ -10,20 +10,20 @@ export default function HowToPlay({ game }: { game: GameRow }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="mb-3 text-2xl font-bold text-brown">
+      <h2 className="mb-3 text-2xl font-bold text-roux">
         {t("games.detail.howToPlay")}
       </h2>
       <div className="flex flex-col gap-4">
         {mechanics.length > 0 && (
           <div>
-            <h3 className="mb-2 font-semibold text-dark-green">
+            <h3 className="mb-2 font-semibold text-charcoal">
               {t("games.detail.mechanics")}
             </h3>
             <ul className="flex flex-wrap gap-2">
               {mechanics.map((mechanic) => (
                 <li
                   key={mechanic}
-                  className="rounded-full bg-eco-green/10 px-3 py-1 text-sm text-dark-green"
+                  className="rounded-full bg-forest/10 px-3 py-1 text-sm text-charcoal"
                 >
                   {mechanic}
                 </li>
@@ -33,10 +33,10 @@ export default function HowToPlay({ game }: { game: GameRow }) {
         )}
         {languages.length > 0 && (
           <div>
-            <h3 className="mb-2 font-semibold text-dark-green">
+            <h3 className="mb-2 font-semibold text-charcoal">
               {t("games.detail.languages")}
             </h3>
-            <p className="text-dark-green">{languages.join(" · ")}</p>
+            <p className="text-charcoal">{languages.join(" · ")}</p>
           </div>
         )}
       </div>

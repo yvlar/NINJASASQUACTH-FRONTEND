@@ -13,7 +13,7 @@ export default function MediaFields({
 }: FieldGroupProps & { onFile: (file: File | null) => void }) {
   return (
     <fieldset className="flex flex-col gap-4 border-0 p-0">
-      <legend className="mb-1 text-lg font-bold text-brown">
+      <legend className="mb-1 text-lg font-bold text-roux">
         {t("admin.form.sections.media")}
       </legend>
 
@@ -22,7 +22,7 @@ export default function MediaFields({
           {t("admin.form.image")}
         </label>
         <input
-          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green"
+          className="focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           id="game-form-image"
           name="image"
           type="file"

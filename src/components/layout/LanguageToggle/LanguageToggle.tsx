@@ -6,7 +6,7 @@ import { useLanguage } from "../../../i18n/useLanguage";
 import { otherLangPath } from "../../../utils/routes";
 
 const langButtonBase =
-  "cursor-pointer rounded-full border-2 border-brown px-3 py-1 font-bold text-brown transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
+  "cursor-pointer rounded-full border-2 border-roux px-3 py-1 font-bold text-roux transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 export default function LanguageToggle({
   className = "",

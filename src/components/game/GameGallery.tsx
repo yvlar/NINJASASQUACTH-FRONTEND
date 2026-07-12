@@ -15,7 +15,7 @@ export default function GameGallery({ media }: { media: GameMediaRow[] }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="mb-3 text-2xl font-bold text-brown">
+      <h2 className="mb-3 text-2xl font-bold text-roux">
         {t("games.detail.gallery")}
       </h2>
       <div className="grid grid-cols-[repeat(auto-fill,minmax(12rem,1fr))] gap-4">
