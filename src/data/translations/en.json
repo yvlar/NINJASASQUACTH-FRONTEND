@@ -19,7 +19,9 @@
       "edit": "Edit",
       "delete": "Delete",
       "confirmDelete": "Delete this game?",
-      "confirm": "Confirm deletion"
+      "confirm": "Confirm deletion",
+      "deleteError": "Deletion failed. Try again.",
+      "cleanupError": "The game was deleted, but some image files could not be cleaned up. Please notify an administrator."
     },
     "form": {
       "createTitle": "New game",

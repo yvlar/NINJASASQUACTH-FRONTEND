@@ -19,7 +19,9 @@
       "edit": "Modifier",
       "delete": "Supprimer",
       "confirmDelete": "Supprimer ce jeu ?",
-      "confirm": "Confirmer la suppression"
+      "confirm": "Confirmer la suppression",
+      "deleteError": "La suppression a échoué. Réessayez.",
+      "cleanupError": "Le jeu a été supprimé, mais certains fichiers image n'ont pas pu être nettoyés. Prévenez un administrateur."
     },
     "form": {
       "createTitle": "Nouveau jeu",
