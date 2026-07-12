@@ -1,7 +1,9 @@
 # NINJASASQUACTH-FRONTEND
 
-Projet frontend React de Ninja Sasquatch Games — site vitrine une page,
-bilingue FR/EN (français par défaut).
+Projet frontend de Ninja Sasquatch Games — site vitrine bilingue FR/EN
+(français par défaut) avec fiches de jeux partageables et administration du
+catalogue. La langue est portée par l'URL (`/fr`, `/en`), chaque jeu a une
+route publique (`/fr/jeux/:slug`, `/en/games/:slug`).
 
 Ninja Sasquatch Games est née de la passion de créer des moments inoubliables autour de la table. Nous croyons fermement que les jeux de société ont le pouvoir de rassembler les gens et de créer des souvenirs durables.
 
@@ -30,12 +32,14 @@ trouvent dans le tableau de bord Supabase du projet `ninja-sasquatch-games`
 Sans ces variables, le build passe (la CI n'a pas de secrets) mais le
 catalogue et l'admin afficheront une erreur à l'exécution.
 
-Stack : React 19 + Vite 7, `react-router-dom` (`/` site vitrine, `/admin`
-espace d'administration), Supabase (`@supabase/supabase-js` — Auth, Postgres
-avec RLS, Storage), CSS Modules, `lucide-react`. Pas de TypeScript — voir
-`CLAUDE.md` pour l'architecture et les conventions de code, et
+Stack : **React 19 + Vite 7 + TypeScript strict**, `react-router-dom`
+(routes localisées `/fr` · `/en` · `/fr/jeux/:slug` · `/en/games/:slug`,
+`/admin` protégé par login, et une vraie page 404), **Tailwind CSS v4**
+(`@tailwindcss/vite`, palette de marque en tokens `@theme`), **Supabase**
+(`@supabase/supabase-js` — Auth, Postgres avec RLS, Storage), `lucide-react`.
+Voir `CLAUDE.md` pour l'architecture et les conventions de code, et
 `supabase/migrations/` pour le schéma de la base (copie tracée des migrations
-appliquées).
+appliquées, dont le modèle produit des jeux et la table `game_media`).
 
 ## Déploiement (Vercel)
 
