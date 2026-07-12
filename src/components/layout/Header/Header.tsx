@@ -1,16 +1,12 @@
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
+import LanguageToggle from "../LanguageToggle";
 
 // Classes partagées par les liens de navigation (desktop et mobile) :
 // mêmes couleur, graisse et transition d'opacité que l'ancien module.
 const navLinkBase =
   "cursor-pointer font-medium text-dark-green transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
-
-// Bouton de langue : pilule bordée brune, réutilisé tel quel dans le menu
-// mobile avec `self-start` en plus (équivalent de `.mobileMenu .langButton`).
-const langButtonBase =
-  "cursor-pointer rounded-full border-2 border-brown px-3 py-1 font-bold text-brown transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-eco-green";
 
 export default function Header({
   onNavigate,
@@ -18,7 +14,7 @@ export default function Header({
   onNavigate: (id: string) => void;
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { lang, t, toggleLang } = useLanguage();
+  const { t } = useLanguage();
 
   const handleNavClick = (sectionId: string) => {
     onNavigate(sectionId);
@@ -31,8 +27,6 @@ export default function Header({
     { id: "univers", label: t("nav.universe") },
     { id: "contact", label: t("nav.contact") },
   ];
-
-  const targetLang = lang === "fr" ? "EN" : "FR";
 
   return (
     // bg-cream/95 = rgba(255, 255, 233, 0.95), la crème de la palette à 95 %.
@@ -53,9 +47,7 @@ export default function Header({
               {item.label}
             </button>
           ))}
-          <button onClick={toggleLang} className={langButtonBase}>
-            {targetLang}
-          </button>
+          <LanguageToggle />
         </div>
 
         <button
@@ -77,12 +69,7 @@ export default function Header({
               {item.label}
             </button>
           ))}
-          <button
-            onClick={toggleLang}
-            className={`${langButtonBase} self-start`}
-          >
-            {targetLang}
-          </button>
+          <LanguageToggle className="self-start" />
         </div>
       )}
     </nav>

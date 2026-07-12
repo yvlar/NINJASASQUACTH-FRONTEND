@@ -11,7 +11,7 @@ export default function LanguageProvider({
 }: {
   children: ReactNode;
 }) {
-  const [lang, setLang] = useState<Lang>("fr");
+  const [lang, setLangState] = useState<Lang>("fr");
 
   useEffect(() => {
     document.documentElement.lang = lang;
@@ -36,10 +36,15 @@ export default function LanguageProvider({
   );
 
   const toggleLang = useCallback(() => {
-    setLang((current) => (current === "fr" ? "en" : "fr"));
+    setLangState((current) => (current === "fr" ? "en" : "fr"));
   }, []);
 
-  const value = useMemo(() => ({ lang, t, toggleLang }), [lang, t, toggleLang]);
+  const setLang = useCallback((next: Lang) => setLangState(next), []);
+
+  const value = useMemo(
+    () => ({ lang, t, toggleLang, setLang }),
+    [lang, t, toggleLang, setLang],
+  );
 
   return (
     <LanguageContext.Provider value={value}>

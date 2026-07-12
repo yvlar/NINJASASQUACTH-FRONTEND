@@ -9,6 +9,9 @@ export interface LanguageContextValue {
   lang: Lang;
   t: (key: string) => string;
   toggleLang: () => void;
+  // Fixe la langue courante (utilisé pour synchroniser l'état sur l'URL :
+  // la langue est portée par la route /fr | /en).
+  setLang: (lang: Lang) => void;
 }
 
 export const LanguageContext = createContext<LanguageContextValue | null>(

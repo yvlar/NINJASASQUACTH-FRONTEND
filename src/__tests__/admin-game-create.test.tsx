@@ -1,6 +1,7 @@
-// Verrous de la création de jeux dans l'admin : payload d'insertion exact
-// (champs bilingues, catégorie accentuée), fichier invalide bloqué AVANT
-// tout upload, parité FR/EN obligatoire à la saisie. Supabase 100 % mocké.
+// Verrous de la création de jeux dans l'admin : payload d'insertion (champs
+// bilingues, catégorie accentuée, colonnes texte dérivées des champs
+// structurés), fichier invalide bloqué AVANT tout upload, parité FR/EN
+// obligatoire à la saisie. Supabase 100 % mocké.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import LanguageProvider from "../i18n/LanguageProvider";
@@ -19,17 +20,19 @@ vi.mock("../lib/supabase", async () => {
 // (méthodes __* incluses), pas le client Supabase typé.
 const supabase = supabaseClient as unknown as SupabaseMock;
 
-const CHAMPS_TEXTE = {
+// Champs requis pour un formulaire valide (parité FR/EN + structurés).
+const REQUIS = {
+  slug: "sentiers-sauvages",
   title_fr: "Sentiers Sauvages",
   title_en: "Wild Trails",
   short_desc_fr: "Une exploration coopérative.",
   short_desc_en: "A cooperative exploration.",
   full_desc_fr: "Description complète en français.",
   full_desc_en: "Full description in English.",
-  players: "2-4",
-  duration: "45 min",
-  age: "10+",
-};
+  players_min: "2",
+  duration_min: "45",
+  minimum_age: "10",
+} as const;
 
 function renderForm(onSaved = vi.fn()) {
   render(
@@ -40,11 +43,8 @@ function renderForm(onSaved = vi.fn()) {
   return onSaved;
 }
 
-function remplirTexte(sauf: string[] = []) {
-  const entrees = Object.entries(CHAMPS_TEXTE) as [
-    keyof typeof CHAMPS_TEXTE,
-    string,
-  ][];
+function remplirRequis(sauf: string[] = []) {
+  const entrees = Object.entries(REQUIS) as [keyof typeof REQUIS, string][];
   for (const [nom, valeur] of entrees) {
     if (sauf.includes(nom)) continue;
     fireEvent.change(screen.getByLabelText(fr.admin.form[nom]), {
@@ -117,27 +117,44 @@ describe("GamesManager (liste admin)", () => {
 });
 
 describe("GameForm (création)", () => {
-  it("insère le payload exact — champs bilingues et catégorie accentuée", async () => {
+  it("insère le payload attendu — bilingue, catégorie accentuée, colonnes dérivées", async () => {
     const onSaved = renderForm();
-    remplirTexte();
+    remplirRequis();
     fireEvent.change(screen.getByLabelText(fr.admin.form.category), {
       target: { value: "stratégie" },
     });
     soumettre();
 
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
-    expect(supabase.__builders.games!.insert).toHaveBeenCalledWith({
-      ...CHAMPS_TEXTE,
-      category: "stratégie",
-      eco: true,
-      published: true,
-      image_url: null,
-    });
+    expect(supabase.__builders.games!.insert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        slug: "sentiers-sauvages",
+        title_fr: "Sentiers Sauvages",
+        title_en: "Wild Trails",
+        short_desc_fr: "Une exploration coopérative.",
+        short_desc_en: "A cooperative exploration.",
+        full_desc_fr: "Description complète en français.",
+        full_desc_en: "Full description in English.",
+        category: "stratégie",
+        // colonnes texte héritées dérivées des champs structurés
+        players: "2",
+        duration: "45 min",
+        age: "10+",
+        players_min: 2,
+        duration_min: 45,
+        minimum_age: 10,
+        campaign_status: "none",
+        coming_soon: false,
+        eco: true,
+        published: true,
+        image_url: null,
+      }),
+    );
   });
 
   it("bloque la soumission si un champ anglais manque (parité FR/EN)", async () => {
     renderForm();
-    remplirTexte(["title_en"]);
+    remplirRequis(["title_en"]);
     soumettre();
 
     expect(
@@ -148,7 +165,7 @@ describe("GameForm (création)", () => {
 
   it("refuse un fichier au mauvais format sans lancer d'upload", async () => {
     renderForm();
-    remplirTexte();
+    remplirRequis();
     const fichier = new File(["contenu"], "regles.pdf", {
       type: "application/pdf",
     });
@@ -166,7 +183,7 @@ describe("GameForm (création)", () => {
 
   it("refuse un fichier de plus de 5 Mo sans lancer d'upload", async () => {
     renderForm();
-    remplirTexte();
+    remplirRequis();
     const gros = new File([new ArrayBuffer(5 * 1024 * 1024 + 1)], "photo.png", {
       type: "image/png",
     });
@@ -183,7 +200,7 @@ describe("GameForm (création)", () => {
 
   it("téléverse la photo valide puis insère son URL publique", async () => {
     const onSaved = renderForm();
-    remplirTexte();
+    remplirRequis();
     const photo = new File(["image"], "photo.webp", { type: "image/webp" });
     fireEvent.change(screen.getByLabelText(fr.admin.form.image), {
       target: { files: [photo] },

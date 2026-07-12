@@ -19,34 +19,79 @@
       "edit": "Edit",
       "delete": "Delete",
       "confirmDelete": "Delete this game?",
-      "confirm": "Confirm deletion"
+      "confirm": "Confirm deletion",
+      "deleteError": "Deletion failed. Try again.",
+      "cleanupError": "The game was deleted, but some image files could not be cleaned up. Please notify an administrator."
     },
     "form": {
       "createTitle": "New game",
       "editTitle": "Edit game",
+      "optional": "(optional)",
+      "sections": {
+        "basic": "Main information",
+        "gameplay": "Gameplay",
+        "campaign": "Kickstarter campaign",
+        "media": "Documents and media",
+        "publishing": "Presentation and publishing"
+      },
+      "slug": "URL identifier (slug)",
       "title_fr": "Title (French)",
       "title_en": "Title (English)",
+      "tagline_fr": "Tagline (French)",
+      "tagline_en": "Tagline (English)",
       "short_desc_fr": "Short description (French)",
       "short_desc_en": "Short description (English)",
       "full_desc_fr": "Full description (French)",
       "full_desc_en": "Full description (English)",
       "category": "Category",
-      "players": "Number of players",
-      "duration": "Duration",
-      "age": "Age",
+      "players_min": "Minimum players",
+      "players_max": "Maximum players",
+      "duration_min": "Minimum duration (min)",
+      "duration_max": "Maximum duration (min)",
+      "minimum_age": "Minimum age",
+      "complexity": "Complexity",
+      "mechanics": "Mechanics (comma-separated)",
+      "game_languages": "Component languages (comma-separated)",
       "eco": "Eco-friendly game",
-      "published": "Published on the site",
+      "campaign_status": "Campaign status",
+      "campaignStatuses": {
+        "none": "No campaign",
+        "coming-soon": "Coming soon",
+        "live": "Live",
+        "completed": "Completed"
+      },
+      "kickstarter_url": "Kickstarter URL",
+      "coming_soon": "Mark as “coming soon”",
       "image": "Game photo",
       "imageHelp": "JPEG, PNG or WebP, 5 MB maximum.",
+      "rules_pdf_fr": "Rules PDF path (French)",
+      "rules_pdf_en": "Rules PDF path (English)",
+      "theme_key": "Visual theme",
+      "themeKeys": {
+        "default": "None (default brand theme)",
+        "brand": "Ninja Sasquatch brand",
+        "heroes-rising": "Heroes Rising",
+        "burgle-jack": "Burgle Jack",
+        "flickle-mania": "Flickle Mania"
+      },
+      "featured_order": "Featured order",
+      "published": "Published on the site",
       "submitCreate": "Create the game",
       "submitEdit": "Save changes",
       "saving": "Saving…",
       "cancel": "Cancel",
       "errors": {
         "required": "This field is required.",
+        "slug": "Invalid identifier: lowercase letters, digits and single hyphens only.",
+        "positiveInt": "Enter a positive whole number.",
+        "playersRange": "The maximum number of players must be greater than or equal to the minimum.",
+        "durationRange": "The maximum duration must be greater than or equal to the minimum.",
+        "url": "Enter a valid URL (http or https).",
+        "kickstarterRequired": "A live or completed campaign requires a Kickstarter URL.",
         "imageType": "Unsupported image format (JPEG, PNG or WebP).",
         "imageSize": "The image exceeds 5 MB.",
-        "save": "Saving failed. Try again."
+        "save": "Saving failed. Try again.",
+        "cleanup": "Saving failed and the uploaded image could not be cleaned up. Please notify an administrator."
       }
     }
   },
@@ -54,7 +99,8 @@
     "home": "Home",
     "games": "Our Games",
     "universe": "Our Universe",
-    "contact": "Contact"
+    "contact": "Contact",
+    "switchLanguage": "Switch language"
   },
   "hero": {
     "title": "Mysterious Origins",
@@ -78,6 +124,28 @@
     "madeIn": "Designed and made in Quebec",
     "rules": "Clear rules accessible to all",
     "commitment": "Guaranteed environmental commitment",
+    "viewGame": "View the game page",
+    "detail": {
+      "comingSoon": "Coming soon",
+      "summary": "Overview",
+      "howToPlay": "How to play",
+      "mechanics": "Mechanics",
+      "languages": "Component languages",
+      "gallery": "Gallery",
+      "rules": "Game rules",
+      "download": "Download the rules (PDF)",
+      "rulesComingSoon": "Rules coming soon.",
+      "kickstarter": "Kickstarter campaign",
+      "kickstarterCta": "View on Kickstarter",
+      "campaign": {
+        "none": "No active campaign.",
+        "coming-soon": "Campaign coming soon — stay tuned.",
+        "live": "Campaign live on Kickstarter.",
+        "completed": "Campaign successfully funded."
+      },
+      "fullRules": "Full rules",
+      "related": "Similar games"
+    },
     "categories": {
       "tous": "All our games",
       "famille": "Family",
@@ -129,6 +197,11 @@
       "title": "An unexpected error occurred.",
       "reload": "Reload the page"
     }
+  },
+  "notFound": {
+    "title": "Page not found",
+    "message": "The page you are looking for does not exist or has been moved.",
+    "home": "Back to home"
   },
   "footer": {
     "copyright": "© 2026 Ninja Sasquatch Games.",

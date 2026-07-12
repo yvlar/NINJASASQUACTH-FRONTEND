@@ -9,14 +9,14 @@
 
 | Dimension        | Note /100 | Baseline (audit 2026-07-07) |
 |------------------|-----------|------------------------------|
-| **Architecture** | 88        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
-| **Qualité**      | 89        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
-| **UX/Contenu**   | 62        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
-| **Production**   | 78        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
+| **Architecture** | 91        | 75 — patterns propres (dossiers de composants + barrels, i18n bien découpé, données séparées du copy), pas de dette structurelle notable |
+| **Qualité**      | 92        | 40 — ESLint strict configuré et vert, mais zéro test, zéro CI : les contrats critiques (parité i18n, IDs de catégories accentués, ancres de navigation) ne sont protégés par rien |
+| **UX/Contenu**   | 68        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
+| **Production**   | 80        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-08 — **Sprint 7 clos** : site transformé en qualité production — migration complète vers **TypeScript strict** (tout `src/`, tests compris), remplacement des CSS Modules par **Tailwind CSS v4** (palette en tokens `@theme`), et socle robustesse (error boundary, `tsc --noEmit` en CI, types Database Supabase, fallback Suspense visible). Décision utilisateur du 2026-07-08. Restent en « Actions utilisateur » : secrets CI keepalive (6.5), variables Vercel (6.2), vrais jeux+photos (6.3, D3), email/liens sociaux (6.4, D7/D12).
-- **Sprint courant** : **Sprint 8 — Durcissement production & mise en service** (défini ci-dessous, à ouvrir ; 8.1 E2E Playwright exécutable sans utilisateur, 8.2 headers D19 sur « go », 8.3 actions utilisateur en attente, 8.4 backend de contact D6).
-- **État des tests** : **64/64 verts** (19 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 7 — Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **Dernière mise à jour** : 2026-07-12 — **Sprint 9 clos** : modèle produit des jeux, administration enrichie et vraies routes de jeux — migration Supabase additive (colonnes produit + table `game_media` + RLS prouvée), types alignés sur le schéma réel, `GameForm` scindé en groupes de champs, cycle de vie des images sans orphelin, **routes localisées** (`/fr`, `/en`, `/fr/jeux/:slug`, `/en/games/:slug`, vraie 404), fiches jeux en sections réutilisables, cartes-liens, téléchargement PDF sans lien mort. Décision utilisateur du 2026-07-12. **Spec produit `docs/brand-seo-spec.md` absente** (D21) : l'infrastructure est livrée, le contenu de marque réel (copies SEO, jeux Heroes Rising/Burgle Jack/Flickle Mania) reste une action utilisateur via `/admin` — rien inventé.
+- **Sprint courant** : **Sprint 10 — à définir** (candidats : E2E Playwright 8.1, headers de sécurité D19/8.2, actions utilisateur en attente 8.3, backend de contact D6/8.4 ; contenu réel des jeux via `/admin` + spec `brand-seo-spec.md`).
+- **État des tests** : **96/96 verts** (24 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 9 — Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS : audit → lint → typecheck → tests → build) + `.github/workflows/supabase-keepalive.yml` (ping REST hebdomadaire, D15).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -647,6 +647,85 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
+# 🟢 SPRINT 9 — Modèle Supabase, administration et vraies routes de jeux ✅ (clos le 2026-07-12, verdict : DoD satisfaite)
+
+> **Objectif** (décision utilisateur 2026-07-12) : permettre au site et à
+> l'administration de gérer de vraies fiches de jeux bilingues — modèle de
+> données produit, galerie/documents, routes publiques partageables, langue
+> portée par l'URL — sans jamais inventer de contenu de marque. La spec produit
+> `docs/brand-seo-spec.md` référencée par le prompt est **absente du dépôt**
+> (D21) : sur décision utilisateur (« Build the infrastructure now »),
+> l'infrastructure est livrée et le contenu réel (copies SEO, jeux Heroes
+> Rising / Burgle Jack / Flickle Mania) reste une action utilisateur via
+> `/admin`. Migration additive uniquement ; aucune donnée existante perdue.
+
+- [x] **9.1** **Migration additive + `game_media` + RLS** → `0b35b53`
+  Colonnes produit sur `games` (slug unique, taglines, players/duration
+  min/max, minimum_age, complexity, mechanics[], game_languages[], theme_key
+  CHECK, campaign_status CHECK, kickstarter_url, rules_pdf_*, featured_order,
+  coming_soon — toutes nullables ou défaut sûr) ; table `game_media` (FK cascade,
+  storage_path, media_type, alt_*, sort_order) + RLS. Appliquée au projet
+  `vgmqmifgdolccquyjcoc`, tracée dans `supabase/migrations/`.
+  **Acceptation SATISFAITE** : RLS prouvée sous rôle `anon` (lecture publiés
+  seuls pour games ET game_media, écritures rejetées 42501) et sous JWT admin
+  (écritures autorisées, en transactions annulées) ; ligne existante « Mario »
+  préservée, `campaign_status`/`coming_soon` backfillés sûrs ; advisors : seuls
+  les 3 WARN pré-existants documentés (is_admin 0028/0029, bucket, mot de passe).
+- [x] **9.2** **Types alignés sur le schéma réel** → `aac6cfe`
+  `src/types/database.ts` couvre toutes les colonnes ; `GameMediaRow/Insert/
+  Update`, `GameThemeKey`, `CampaignStatus` exposés. Les unions des colonnes
+  sous CHECK (category/theme_key/campaign_status) sont écrites à la main — le
+  codegen supabase-js les émet en `string` (une CHECK n'est pas un enum) — et
+  miroir byte-for-byte la migration.
+  **Acceptation SATISFAITE** : typecheck vert, fixtures alignées, contrat
+  catégories inchangé.
+- [x] **9.3** **`GameForm` scindé en groupes de champs** → `de3250b`
+  BasicInformation/Gameplay/Campaign/Media/PublishingFields + `gameFormTypes`
+  (état, buildPayload, dérivation players/duration/age) + `gameFormValidation`
+  (pure, clés i18n) + `FormField`. Thème stocké comme clé contrôlée, jamais une
+  classe/hex. Validation client complète, base autorité finale.
+  **Acceptation SATISFAITE** : tests de création réécrits, i18n FR/EN à parité.
+- [x] **9.4** **Cycle de vie des images sans orphelin** → `a4bf89c`
+  `imagePathFromPublicUrl` (chemin déduit de l'URL) ; rollback du fichier après
+  échec SQL ; suppression de l'ancienne image seulement après update réussie ;
+  suppression des fichiers (photo + game_media) à la suppression d'un jeu ;
+  erreur claire si le nettoyage échoue. Compensation côté client (admin-only,
+  simple, testable) plutôt qu'Edge Function.
+  **Acceptation SATISFAITE** : tests rollback/replace/delete rouges avant fix.
+- [x] **9.5** **Routes localisées + fiches + cartes-liens + PDF + 404** → `b4420eb`
+  `/`→`/fr` ; `/fr`,`/en` ; `/fr/jeux/:slug`,`/en/games/:slug` ; `/admin` ;
+  vraie 404. `setLang`/`useSyncLang`/`LanguageToggle` (bascule conservant le
+  slug). `useGameBySlug` (chargement/erreur/rejet/absent/démontage, publié via
+  RLS). Fiche en 9 sections réutilisables recevant la donnée Supabase (aucun
+  jeu codé en dur). Cartes = vrais `Link` (plus de `selectedGame`, `GameDetail`
+  supprimé). `RulesDownload` = vrai `<a download>` annonçant le PDF, ou mention
+  « bientôt disponible » (aucun lien mort, aucun faux PDF).
+  **Acceptation SATISFAITE** : tests routes FR/EN, 404, trouvé/absent/rejet,
+  PDF présent/absent, bascule langue conservant le slug.
+- [x] **9.6** **Tests complémentaires** → `79bf43e`
+  Validation joueurs/durée/URL Kickstarter (`game-form-validation`), chemins
+  localisés (`routes`).
+  **Acceptation SATISFAITE** : 64 → 96 tests, chaque comportement rouge avant vert.
+- [x] **9.7** **Documentation** → `923cd21`
+  README : incohérence de stack corrigée (TypeScript strict + Tailwind v4,
+  routes localisées). CLAUDE.md : architecture Sprint 9 (routes, modèle produit,
+  game_media, GameForm scindé, cycle image, fiches, dossiers pages/game).
+- [x] **9.8** **Clôture Sprint 9** → ce commit (ROADMAP).
+
+> **Definition of Done du Sprint 9** (en plus de la DoD standard) : migration
+> appliquée ET tracée ; RLS prouvée (anon + admin) ; types conformes au schéma
+> réel ; admin gère les nouveaux champs ; images non-orphelines dans les
+> scénarios testés ; routes FR/EN fonctionnelles ; cartes = vrais liens ; vraie
+> 404 ; aucune donnée existante perdue ; aucun contenu de marque manquant
+> inventé ; aucun secret committé ; lint/typecheck/tests/build/audit verts. —
+> **SATISFAITE** (migration additive appliquée et tracée, RLS prouvée sous anon
+> et JWT admin ; types = schéma réel ; GameForm gère tous les champs produit ;
+> tests d'images verts ; routes localisées et 404 réelles vérifiées par tests ;
+> « Mario » préservé ; D21 : contenu de marque laissé aux actions utilisateur ;
+> zéro secret ; lint 0, typecheck 0, 96 tests, build OK, audit high 0).
+
+---
+
 ## Découvertes
 
 | #   | Gravité | Constat | Affectation |
@@ -671,8 +750,48 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D18 | ✅ | (Sprint 6) **Aucun error boundary React** : toute exception au rendu produisait un écran blanc ; et `/admin` chargeait son chunk lazy avec `Suspense fallback={null}` — rien d'affiché pendant le chargement | ✅ Sprint 7 (item 7.6 `9ddc150`) — `ErrorBoundary` + repli i18n, fallback /admin visible ; limite documentée : le throw à l'import de `lib/supabase.ts` (env manquante) précède React (fail-fast intentionnel) |
 | D19 | 🟡 | (Sprint 6) **Aucun header de sécurité** dans `vercel.json` (pas de CSP, HSTS, X-Frame-Options, X-Content-Type-Options) — le fichier ne porte que le rewrite SPA. Hors périmètre décidé du Sprint 7 (TS + Tailwind + socle robustesse) | Backlog — proposé pour le Sprint 8, attend un « go » utilisateur |
 | D20 | ✅ | (Sprint 6) **Poppins chargée par `@import` CSS bloquant** : police résolue après le CSS, sans préconnexion | ✅ Sprint 7 (item 7.7 `06fa650`) — bascule en `<link rel="preconnect">` + `<link>` dans `index.html` pendant la réécriture de `global.css` |
+| D21 | 🟡 | (Sprint 9) **Spec produit `docs/brand-seo-spec.md` absente** : le prompt la déclare lecture obligatoire (copies SEO, données des jeux Heroes Rising / Burgle Jack / Flickle Mania), mais le fichier n'existe ni dans le dépôt, ni dans l'historique, ni sur une branche. Sur décision utilisateur (« Build the infrastructure now »), l'infrastructure est livrée sans inventer de contenu de marque — le contenu réel passe par `/admin` (comme D3). Divergence mineure notée au passage : l'historique de migration Supabase a une migration `revoke_trigger_function_execute` séparée que le dépôt replie dans l'init (SQL équivalent, non destructif) | **Action utilisateur** : fournir `docs/brand-seo-spec.md` + saisir les vrais jeux via `/admin` (Sprint 10) |
 
 ## Changelog
+
+### Sprint 9 — Modèle Supabase, administration et vraies routes de jeux (2026-07-12)
+
+- **Contexte** : décision utilisateur du 2026-07-12 — gérer de vraies fiches
+  de jeux bilingues (modèle produit, galerie/PDF, routes partageables, langue
+  portée par l'URL). Spec produit `docs/brand-seo-spec.md` **absente** (D21) :
+  cadrage via AskUserQuestion → « Build the infrastructure now » (infrastructure
+  livrée, contenu de marque laissé aux actions utilisateur, rien inventé).
+- **Baseline à l'ouverture** : lint 0, typecheck 0, **64 tests**, build vert,
+  audit high 0 (branche partie de `main` à `746c792`). Schéma Supabase réel
+  conforme au dépôt (divergence mineure non destructive tracée en D21) ; table
+  `games` contenait 1 ligne de test « Mario » — préservée.
+- **Commits** :
+  - `0b35b53` feat(db) : modèle produit games + game_media + RLS (étape 2)
+  - `aac6cfe` feat(types) : database.ts au schéma produit + game_media (étape 3)
+  - `de3250b` refactor(admin) : GameForm modulaire + champs produit (étape 4)
+  - `a4bf89c` feat(admin) : intégrité des images Storage (étape 5)
+  - `b4420eb` feat(routes) : routes FR/EN, fiches, cartes-liens, PDF, 404 (6-9)
+  - `79bf43e` test : validation + chemins localisés (étape 10)
+  - `923cd21` docs : README (stack réelle) + CLAUDE.md (architecture Sprint 9)
+  - (clôture) docs : clôture sprint 9 — mise à jour roadmap
+- **Tests** : 64 → **96** (+32 ; nouveaux fichiers : image-lifecycle, game-page,
+  use-game-by-slug, game-form-validation, routes ; tests existants adaptés au
+  routeur et au nouveau payload). Chaque comportement rouge avant vert. Zéro
+  réseau (client mocké, mock étendu `__setRemoveError`).
+- **Supabase** : migration additive `20260712120000_games_product_fields_media`
+  appliquée et tracée. RLS prouvée sous rôle `anon` (lecture publiés seuls games
+  ET game_media ; écritures 42501) et sous JWT admin (écritures autorisées, en
+  transactions annulées — aucune donnée de test laissée). Advisors : 3 WARN
+  pré-existants documentés, aucun nouveau.
+- **Front** : routes localisées (langue portée par l'URL) + vraie 404 ;
+  `useGameBySlug` ; fiche en sections réutilisables recevant la donnée Supabase ;
+  cartes = vrais `Link` ; téléchargement PDF sans lien mort ; cycle de vie des
+  images sans orphelin.
+- **Sécurité/contenu** : audit high 0 ; aucun secret committé ; aucun contenu
+  de marque inventé (D21 — copies SEO et jeux réels = actions utilisateur via
+  `/admin`) ; aucune donnée existante perdue (« Mario » intact).
+- **Verdict de clôture** : DoD standard et DoD Sprint 9 satisfaites. Découverte
+  nouvelle : D21 (spec absente + contenu de marque en action utilisateur).
 
 ### Sprint 7 — Production : TypeScript strict, Tailwind v4 et durcissement (2026-07-08)
 
@@ -952,6 +1071,41 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
   `fdca579` (vérifié par diff). Découvertes nouvelles : D9, D10, D11, D12.
 
 ## Rétrospectives
+
+### Sprint 9 — Modèle Supabase, administration et vraies routes de jeux (2026-07-12)
+
+1. **Découpage** : bon pour un sprint transverse de 8 items. L'ordre
+   backend-d'abord (migration → types → form → images → routes) a tenu chaque
+   commit vert. La dérivation des colonnes texte héritées (players/duration/age)
+   depuis les champs structurés a évité une double saisie et gardé la migration
+   strictement additive (contrainte NOT NULL héritée respectée sans casse). Le
+   remontage de la fiche par slug (clé de route) a résolu proprement l'état de
+   chargement sans setState synchrone dans l'effet (leçon D17 respectée).
+2. **Suffisance des prompts** : suffisants. Cas limite majeur : la lecture
+   obligatoire `docs/brand-seo-spec.md` était **absente** — traité par le
+   garde-fou contenu (ne rien inventer) + AskUserQuestion (décision « build the
+   infrastructure now »), exactement comme D3. Aucun diff de prompt proposé.
+3. **À détecter plus tôt** : le partage d'un résultat par table dans le mock
+   Supabase aurait pu piéger la fiche (useGameBySlug + useGames lisent `games`) ;
+   anticipé en filtrant côté client par slug (robuste pour le mock ET le vrai
+   serveur). Garde-fou général retenu : pour tout code Storage, écrire les
+   scénarios de compensation (rollback, suppression d'orphelins) AVANT de livrer
+   — fait ici (tests rouges d'abord). La spec produit manquante aurait dû être
+   détectée à la première lecture obligatoire (elle l'a été, avant tout code).
+4. **Notes /100** (précédent : 88/89/62/78) :
+   - **Architecture 91 (+3)** : modèle produit typé de bout en bout, routes
+     localisées propres (langue portée par l'URL), fiche en sections découplées
+     recevant la donnée, GameForm scindé, cycle d'images robuste. Réserve : la
+     compensation d'images reste côté client (acceptable, admin-only).
+   - **Qualité 92 (+3)** : 96 tests (rollback/replace/delete d'images, routes,
+     hook, validation), RLS prouvée anon + admin, zéro réseau. Manque toujours
+     un E2E automatisé (candidat 8.1).
+   - **UX/Contenu 68 (+6)** : vraies fiches partageables, galerie, PDF sans lien
+     mort, bilingue par l'URL — le socle UX bondit ; toujours plafonné par le
+     contenu réel des jeux (D21/D3, action utilisateur via `/admin`).
+   - **Production 80 (+2)** : modèle de données prêt pour le catalogue réel,
+     migration additive prouvée non destructive ; retenue par les headers de
+     sécurité (D19) et les actions utilisateur en attente.
 
 ### Sprint 7 — Production : TypeScript strict, Tailwind v4 et durcissement (2026-07-08)
 

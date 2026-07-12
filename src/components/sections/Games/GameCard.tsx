@@ -1,40 +1,20 @@
-import type { KeyboardEvent } from "react";
+import { Link } from "react-router-dom";
 import { Users, Clock, Leaf } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { localizeGame } from "../../../utils/localizeGame";
+import { gamePath } from "../../../utils/routes";
 import type { GameRow } from "../../../types/database";
 
-export default function GameCard({
-  game,
-  onClick,
-}: {
-  game: GameRow;
-  onClick: () => void;
-}) {
-  const { lang } = useLanguage();
-  // Contenu bilingue porté par le jeu lui-même (colonnes *_fr/*_en de la
-  // base), résolu selon la langue courante — plus de clés games.items.*
+// Carte du catalogue : un VRAI lien vers la fiche partageable du jeu
+// (/fr/jeux/:slug ou /en/games/:slug) — nativement accessible au clavier,
+// plus de div role="button". Un jeu sans slug (donnée héritée) reste affiché
+// mais non cliquable.
+export default function GameCard({ game }: { game: GameRow }) {
+  const { lang, t } = useLanguage();
   const { title, shortDesc } = localizeGame(game, lang);
 
-  // Bouton non natif (la carte contient un h3, interdit dans un <button>) :
-  // activation clavier Entrée/Espace pour rendre la vue détail atteignable
-  // sans souris.
-  const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === "Enter" || event.key === " ") {
-      event.preventDefault();
-      onClick();
-    }
-  };
-
-  return (
-    // La carte est focalisable au clavier (role="button") : focus visible requis.
-    <div
-      className="cursor-pointer transition-transform duration-300 hover:scale-[1.02] motion-reduce:transition-none focus-visible:rounded-lg focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-eco-green"
-      onClick={onClick}
-      onKeyDown={handleKeyDown}
-      role="button"
-      tabIndex={0}
-    >
+  const media = (
+    <>
       <div className="relative mb-4 overflow-hidden rounded-lg shadow-[0_4px_6px_-1px_rgba(0,0,0,0.1)]">
         {game.image_url && (
           <img
@@ -61,6 +41,20 @@ export default function GameCard({
           {game.duration}
         </span>
       </div>
-    </div>
+    </>
+  );
+
+  if (!game.slug) {
+    return <div className="block">{media}</div>;
+  }
+
+  return (
+    <Link
+      to={gamePath(lang, game.slug)}
+      aria-label={`${title} — ${t("games.viewGame")}`}
+      className="block transition-transform duration-300 hover:scale-[1.02] motion-reduce:transition-none focus-visible:rounded-lg focus-visible:outline-[3px] focus-visible:outline-offset-4 focus-visible:outline-eco-green"
+    >
+      {media}
+    </Link>
   );
 }

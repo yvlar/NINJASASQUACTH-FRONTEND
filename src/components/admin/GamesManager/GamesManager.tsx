@@ -1,6 +1,10 @@
 import { useEffect, useState } from "react";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { supabase } from "../../../lib/supabase";
+import {
+  GAME_IMAGES_BUCKET,
+  imagePathFromPublicUrl,
+} from "../../../utils/storagePath";
 import GameForm from "../GameForm";
 import type { GameRow } from "../../../types/database";
 
@@ -23,6 +27,10 @@ export default function GamesManager() {
   const [editing, setEditing] = useState<GameRow | null>(null);
   // confirmation de suppression en cours
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  // erreur d'action ponctuelle (suppression de ligne, ou nettoyage Storage)
+  const [actionError, setActionError] = useState<"delete" | "cleanup" | null>(
+    null,
+  );
   // Incrémentée pour relancer la lecture (après création/édition/suppression) :
   // le fetch vit dans l'effet, les setState n'y sont qu'en callbacks
   // asynchrones (règle react-hooks set-state-in-effect).
@@ -61,10 +69,39 @@ export default function GamesManager() {
     setReloadKey((key) => key + 1);
   };
 
-  const handleDelete = async (id: string) => {
-    const { error } = await supabase.from("games").delete().eq("id", id);
+  // Supprime un jeu ET ses fichiers Storage associés (photo principale + médias).
+  // Les chemins sont rassemblés AVANT la suppression de la ligne (le cascade
+  // efface les lignes game_media, pas les objets Storage) ; les fichiers ne
+  // sont retirés qu'APRÈS le succès de la suppression. Un échec de nettoyage
+  // laisse un orphelin sans compromettre la donnée : il est signalé clairement.
+  const handleDelete = async (game: GameRow) => {
     setDeletingId(null);
-    if (!error) reload();
+    setActionError(null);
+
+    const paths: string[] = [];
+    const mainPath = imagePathFromPublicUrl(game.image_url);
+    if (mainPath) paths.push(mainPath);
+    const { data: media } = await supabase
+      .from("game_media")
+      .select("storage_path")
+      .eq("game_id", game.id);
+    for (const item of (media as { storage_path: string }[] | null) ?? []) {
+      if (item.storage_path) paths.push(item.storage_path);
+    }
+
+    const { error } = await supabase.from("games").delete().eq("id", game.id);
+    if (error) {
+      setActionError("delete");
+      return;
+    }
+
+    if (paths.length > 0) {
+      const { error: removeError } = await supabase.storage
+        .from(GAME_IMAGES_BUCKET)
+        .remove(paths);
+      if (removeError) setActionError("cleanup");
+    }
+    reload();
   };
 
   if (creating || editing) {
@@ -100,6 +137,15 @@ export default function GamesManager() {
           {t("admin.manager.loadError")}
         </p>
       )}
+      {actionError && (
+        <p className="font-semibold text-error" role="alert">
+          {t(
+            actionError === "cleanup"
+              ? "admin.manager.cleanupError"
+              : "admin.manager.deleteError",
+          )}
+        </p>
+      )}
       {status === "ready" && games.length === 0 && (
         <p>{t("admin.manager.empty")}</p>
       )}
@@ -127,7 +173,7 @@ export default function GamesManager() {
                   <button
                     className={deleteButton}
                     type="button"
-                    onClick={() => handleDelete(game.id)}
+                    onClick={() => handleDelete(game)}
                   >
                     {t("admin.manager.confirm")}
                   </button>

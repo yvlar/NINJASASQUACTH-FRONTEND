@@ -80,6 +80,7 @@ interface MockState {
   signInError: unknown;
   tables: Record<string, TableResult>;
   uploadError: unknown;
+  removeError: unknown;
   publicUrl: string;
 }
 
@@ -89,6 +90,7 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
     signInError: initial.signInError ?? null,
     tables: { ...(initial.tables ?? {}) },
     uploadError: initial.uploadError ?? null,
+    removeError: null,
     publicUrl:
       initial.publicUrl ??
       "https://exemple.supabase.co/storage/v1/object/public/game-images/photo.webp",
@@ -119,7 +121,11 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
         : { data: { path: "photo.webp" }, error: null },
     ),
     getPublicUrl: vi.fn(() => ({ data: { publicUrl: state.publicUrl } })),
-    remove: vi.fn(async () => ({ data: null, error: null })),
+    remove: vi.fn(async () =>
+      state.removeError
+        ? { data: null, error: state.removeError }
+        : { data: null, error: null },
+    ),
   };
 
   return {
@@ -168,6 +174,9 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
     },
     __setUploadError(error: unknown) {
       state.uploadError = error;
+    },
+    __setRemoveError(error: unknown) {
+      state.removeError = error;
     },
     __emitAuthChange(session: MockSession | null) {
       state.session = session;
