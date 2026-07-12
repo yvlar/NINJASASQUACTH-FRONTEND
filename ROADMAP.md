@@ -14,9 +14,9 @@
 | **UX/Contenu**   | 68        | 50 — site bilingue fonctionnel (nav, jeux, formulaire), mais images Unsplash placeholder, favicon Vite par défaut, aucune balise SEO/OpenGraph |
 | **Production**   | 80        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
-- **Dernière mise à jour** : 2026-07-12 — **Sprint 9 clos** : modèle produit des jeux, administration enrichie et vraies routes de jeux — migration Supabase additive (colonnes produit + table `game_media` + RLS prouvée), types alignés sur le schéma réel, `GameForm` scindé en groupes de champs, cycle de vie des images sans orphelin, **routes localisées** (`/fr`, `/en`, `/fr/jeux/:slug`, `/en/games/:slug`, vraie 404), fiches jeux en sections réutilisables, cartes-liens, téléchargement PDF sans lien mort. Décision utilisateur du 2026-07-12. **Spec produit `docs/brand-seo-spec.md` absente** (D21) : l'infrastructure est livrée, le contenu de marque réel (copies SEO, jeux Heroes Rising/Burgle Jack/Flickle Mania) reste une action utilisateur via `/admin` — rien inventé.
-- **Sprint courant** : **Sprint 10 — à définir** (candidats : E2E Playwright 8.1, headers de sécurité D19/8.2, actions utilisateur en attente 8.3, backend de contact D6/8.4 ; contenu réel des jeux via `/admin` + spec `brand-seo-spec.md`).
-- **État des tests** : **96/96 verts** (24 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 9 — Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **Dernière mise à jour** : 2026-07-12 — **Sprint 10 clos** : refonte visuelle Ninja Sasquatch Games. Nouvelle palette (Sasquatch roux, vert forêt, crème, charbon) + sous-palettes locales aux jeux (Heroes Rising, Burgle Jack) et typographie (Alfa Slab One, Atkinson Hyperlegible, Black Ops One) centralisées dans `@theme` ; `src/data/gameThemes.ts` (variantes statiques typées) ; **liens sociaux réels** (`src/data/socialLinks.ts` — Facebook/YouTube/LinkedIn, résout D12) ; header à menu mobile **accessible** (aria + Échap + focus) et logo cliquable ; **accueil refondu** (hero Heroes Rising alimenté par Supabase, bandeau de réassurance, univers, créations, fondateur, notification de lancement, contact) ; fiches homogènes (badge « contenu en anglais », accent de sous-palette, crédits). Aucun contenu de marque inventé : logo officiel, photo/biographie du fondateur, photos produits et URLs Kickstarter restent des actions utilisateur (D3/D21/D22).
+- **Sprint courant** : **Sprint 11 — à définir** (candidats : E2E Playwright 8.1, headers de sécurité D19/8.2, actions utilisateur en attente 8.3, backend de contact D6/8.4 ; contenu réel des jeux via `/admin` + spec `brand-seo-spec.md` D21 ; logo/portrait fondateur D22).
+- **État des tests** : **114/114 verts** (27 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 10 — Sprint 9 : 96 ; Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS : audit → lint → typecheck → tests → build) + `.github/workflows/supabase-keepalive.yml` (ping REST hebdomadaire, D15).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -726,6 +726,81 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 
 ---
 
+# 🟢 SPRINT 10 — Refonte visuelle Ninja Sasquatch et accueil Heroes Rising ✅ (clos le 2026-07-12, verdict : DoD satisfaite)
+
+> **Objectif** (prompt utilisateur du 2026-07-12) : appliquer la nouvelle
+> direction visuelle Ninja Sasquatch Games (palette, sous-palettes locales aux
+> jeux, typographie) sans casser bilinguisme, accessibilité, responsive, routes,
+> administration, tests ni sécurité Supabase. Heroes Rising devient le hero
+> principal, **lu depuis Supabase**. **Aucun contenu de marque inventé** : logo
+> officiel, photo/biographie du fondateur, photos produits et URLs Kickstarter
+> restent des actions utilisateur ; les contenus manquants utilisent un état
+> neutre ou restent masqués. La spec `docs/brand-seo-spec.md` reste **absente**
+> (D21) — la direction de marque (palette, polices, liens sociaux réels) est
+> fournie par le prompt lui-même et appliquée telle quelle.
+
+- [x] **10.1** **Tokens de marque + typographie** → `feat(theme)`
+  `global.css` réécrit : palette principale (roux/forêt/crème/charbon) + sous-
+  palettes Heroes Rising / Burgle Jack + polices (`--font-brand` Alfa Slab One,
+  `--font-body` Atkinson Hyperlegible, `--font-accent` Black Ops One) dans
+  `@theme` ; tokens de couleur renommés dans tous les composants (aucun hex de
+  marque hors `@theme`) ; `index.html` charge les 3 polices. Nouveau
+  `src/data/gameThemes.ts` : registre statique, exhaustif, typé sur
+  `GameThemeKey` (jamais de classe Tailwind construite dynamiquement).
+  **Acceptation SATISFAITE** : lint/typecheck/tests/build verts, grep sans hex de
+  marque dans les composants.
+- [x] **10.2** **Liens sociaux réels + composant accessible** → `feat(social)`
+  `src/data/socialLinks.ts` (URLs réelles Facebook/YouTube/LinkedIn — **résout
+  D12**) ; composant partagé `SocialLinks` (nouvel onglet, `rel="noreferrer"`,
+  `aria-label` localisé, icônes décoratives masquées) dans Footer + Contact ;
+  suppression des `href="#"` et de la suspension `anchor-is-valid` ; champs de
+  contact reliés à leurs erreurs par `aria-describedby` + `role="alert"`.
+  **Acceptation SATISFAITE** : `social-links.test` (4 cas) rouge avant vert,
+  aucun `href="#"` restant.
+- [x] **10.3** **Header accessible + logo cliquable** → `feat(header)`
+  Menu mobile : `aria-label`/`aria-expanded`/`aria-controls`, fermeture par Échap
+  avec retour du focus au bouton ; wordmark = lien vers l'accueil localisé
+  (aucun logo officiel fourni → repli textuel) ; micro-interactions avec
+  `motion-reduce`. Header dans l'identité de marque (aucune sous-palette).
+  **Acceptation SATISFAITE** : `header-a11y.test` (4 cas) vert.
+- [x] **10.4** **Accueil refondu** → `feat(home)`
+  Ordre : hero vedette → réassurance → univers → créations → fondateur →
+  notification de lancement → contact. Hero **alimenté par Supabase**
+  (`selectFeaturedGame`, Heroes Rising prioritaire) : titre, accroche, mention
+  Kickstarter selon `campaign_status`, CTA « Être notifié au lancement » + CTA
+  secondaire vers la fiche, badge « contenu en anglais » (`isEnglishOnly`) ;
+  sans image → composition de marque sobre ; base vide → repli de marque.
+  Bandeau de réassurance (3 promesses validées). « Origines Mystérieuses »
+  réutilisé dans la section univers. Cartes stylées par `theme_key` (structure
+  identique). Section fondateur sans biographie/photo inventée. Notification :
+  Kickstarter seulement si URL publique.
+  **Acceptation SATISFAITE** : `home-redesign.test` (7 cas) vert.
+- [x] **10.5** **Fiches homogènes** → `feat(fiche)`
+  GameHero applique la sous-palette en accent local (barre + pastille) et le
+  badge « contenu en anglais » ; texte jamais sur la photo ; section crédits
+  (crédit studio réel) ; bouton PDF visible hors accordéon.
+  **Acceptation SATISFAITE** : `game-page.test` étendu (badge présent/absent,
+  crédits) vert.
+- [x] **10.6** **Vérifications visuelles + clôture** → ce commit
+  Captures Chromium headless (Playwright) à 375/768/1280 px en FR et EN
+  (accueil + menu mobile ouvert) ; CLAUDE.md (styling/architecture) et ROADMAP
+  mis à jour.
+
+> **Definition of Done du Sprint 10** (en plus de la DoD standard) : nouvelle
+> identité appliquée ; logo officiel utilisé seulement s'il est fourni (il ne
+> l'est pas → repli) ; Heroes Rising = hero principal lu depuis Supabase ; site
+> cohérent sans photos manquantes ; trois fiches à structure homogène ; menu
+> mobile accessible ; réseaux sociaux réels fonctionnels ; aucun lien fictif ;
+> aucun contenu manquant inventé ; aucun hex de marque hors `@theme` ; FR/EN
+> fonctionnels ; responsive validé (375/768/1280) ; lint/typecheck/tests/build/
+> audit high verts. — **SATISFAITE** (lint 0, typecheck 0, **114 tests**, build
+> OK, audit high 0 ; palette + polices en `@theme` seul ; D12 résolue ; hero
+> Supabase + repli sobre ; menu mobile aria + Échap + focus ; captures FR/EN aux
+> 3 largeurs ; logo/portrait fondateur/photos produits/URLs Kickstarter non
+> inventés — D3/D21/D22 restent des actions utilisateur).
+
+---
+
 ## Découvertes
 
 | #   | Gravité | Constat | Affectation |
@@ -741,7 +816,7 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D9  | ✅ | (Sprint 1) « Origines Mystérieuses » est à la fois le h1 du hero et le titre du jeu 1 : sélection accessible par nom ambiguë — et la vue détail rendait un second h1 | ✅ Sprint 2 (item 2.3 `a474915`) — h1 unique verrouillé par test |
 | D10 | ✅ | (Sprint 1) La construction de l'URL `mailto:` (`ContactSection.jsx:47-51`) n'est pas interceptable sous jsdom : le verrou 1.2 couvre erreurs/succès mais pas l'URL elle-même | ✅ Sprint 2 (item 2.2 `42cc330`) — `src/utils/mailto.js` + 3 tests |
 | D11 | ✅ | (Sprint 1) `npm audit` : 10 vulnérabilités (1 low, 4 moderate, 5 high) dans l'arbre devDependencies, constatées à la clôture | ✅ Sprint 2 (item 2.1 `ede7103`) — 0 vulnérabilité ; garde-fou CI proposé en 3.1 |
-| D12 | 🟡 | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` (`ContactSection.jsx:137-142`) — placeholders cliquables sans destination | **Décision requise** — Sprint 3 (item 3.4, report de 2.5) |
+| D12 | ✅ | (Sprint 1) Liens sociaux Instagram/Facebook en `href="#"` — placeholders cliquables sans destination | ✅ Sprint 10 (item 10.2) — URLs réelles fournies par l'utilisateur (Facebook, YouTube, LinkedIn) dans `src/data/socialLinks.ts`, composant `SocialLinks` accessible ; suppression des `href="#"` et de la suspension `anchor-is-valid`. Instagram non fourni → retiré |
 | D13 | ✅ | (Sprint 2) Déploiement demandé (décision utilisateur 2026-07-07). Résolu au Sprint 4 : intégration Git Vercel en place, **site en ligne et public** à `https://ninjasasquacth-frontend.vercel.app` (HTTP 200, build identique à `main`). Reliquat connu, sans impact sur la mise en ligne : le token de l'intégration MCP Vercel est scoppé au seul projet `grandford`. Confirmé comme un refus d'autorisation (et non de découverte) : avec l'ID projet fourni `prj_mQkt78gkQIeDB1ccAHBV8895HAox`, `get_project`→404 et `list_deployments`→403. L'ID de déploiement/SHA n'est donc pas relevable via MCP tant que l'accès n'est pas accordé au projet côté Vercel — vérification faite par requête HTTP sur l'URL publique | ✅ Sprint 4 (item 4.2) — URL de production consignée (ROADMAP + README) |
 | D14 | ✅ | Décision utilisateur (2026-07-07) : ajouter un **backend** — authentification (login) et socle pour extensions futures. Toutes les décisions de cadrage prises (5.A → 5.G, 2026-07-07/08) | ✅ Sprint 5 — backend Supabase livré (projet dédié, schéma+RLS, Storage, login/rôles, CRUD jeux, site branché). Mise en service = Sprint 6 ; espace client = sprint ultérieur (le modèle de rôles est prêt) |
 | D15 | 🟡 | (Sprint 5) Le palier gratuit Supabase met le projet en **pause après ~1 semaine d'inactivité** → le catalogue public afficherait l'état d'erreur (message i18n en place comme filet). Constaté à la conception, garde-fou peu coûteux identifié : ping hebdomadaire en CI | Sprint 6 (item 6.5 — exécutable sans utilisateur) |
@@ -750,9 +825,59 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D18 | ✅ | (Sprint 6) **Aucun error boundary React** : toute exception au rendu produisait un écran blanc ; et `/admin` chargeait son chunk lazy avec `Suspense fallback={null}` — rien d'affiché pendant le chargement | ✅ Sprint 7 (item 7.6 `9ddc150`) — `ErrorBoundary` + repli i18n, fallback /admin visible ; limite documentée : le throw à l'import de `lib/supabase.ts` (env manquante) précède React (fail-fast intentionnel) |
 | D19 | 🟡 | (Sprint 6) **Aucun header de sécurité** dans `vercel.json` (pas de CSP, HSTS, X-Frame-Options, X-Content-Type-Options) — le fichier ne porte que le rewrite SPA. Hors périmètre décidé du Sprint 7 (TS + Tailwind + socle robustesse) | Backlog — proposé pour le Sprint 8, attend un « go » utilisateur |
 | D20 | ✅ | (Sprint 6) **Poppins chargée par `@import` CSS bloquant** : police résolue après le CSS, sans préconnexion | ✅ Sprint 7 (item 7.7 `06fa650`) — bascule en `<link rel="preconnect">` + `<link>` dans `index.html` pendant la réécriture de `global.css` |
-| D21 | 🟡 | (Sprint 9) **Spec produit `docs/brand-seo-spec.md` absente** : le prompt la déclare lecture obligatoire (copies SEO, données des jeux Heroes Rising / Burgle Jack / Flickle Mania), mais le fichier n'existe ni dans le dépôt, ni dans l'historique, ni sur une branche. Sur décision utilisateur (« Build the infrastructure now »), l'infrastructure est livrée sans inventer de contenu de marque — le contenu réel passe par `/admin` (comme D3). Divergence mineure notée au passage : l'historique de migration Supabase a une migration `revoke_trigger_function_execute` séparée que le dépôt replie dans l'init (SQL équivalent, non destructif) | **Action utilisateur** : fournir `docs/brand-seo-spec.md` + saisir les vrais jeux via `/admin` (Sprint 10) |
+| D21 | 🟡 | (Sprint 9) **Spec produit `docs/brand-seo-spec.md` absente** : le prompt la déclare lecture obligatoire (copies SEO, données des jeux Heroes Rising / Burgle Jack / Flickle Mania), mais le fichier n'existe ni dans le dépôt, ni dans l'historique, ni sur une branche. Sur décision utilisateur (« Build the infrastructure now »), l'infrastructure est livrée sans inventer de contenu de marque — le contenu réel passe par `/admin` (comme D3). Sprint 10 : la direction de marque (palette, polices, liens sociaux réels) est fournie par le prompt lui-même et appliquée ; la spec produit détaillée reste absente | **Action utilisateur** : fournir `docs/brand-seo-spec.md` + saisir les vrais jeux via `/admin` |
+| D22 | 🟡 | (Sprint 10) **Aucun logo officiel ni portrait/biographie du fondateur fourni** : le prompt interdit d'inventer un logo, une photo produit, une photo du fondateur ou un lien Kickstarter. Le header retombe donc sur un wordmark textuel propre, la section fondateur affiche du contenu studio validé sans photo ni biographie nominative, le hero sans image officielle utilise une composition de marque sobre (jamais de fausse boîte), et aucun `og:image` n'est ajouté. Rien n'est inventé | **Action utilisateur** : fournir le logo officiel (SVG/PNG sous `public/`), le portrait + la biographie du fondateur, et les vraies photos produits + URLs Kickstarter via `/admin` |
 
 ## Changelog
+
+### Sprint 10 — Refonte visuelle Ninja Sasquatch et accueil Heroes Rising (2026-07-12)
+
+- **Contexte** : prompt utilisateur — appliquer la nouvelle direction visuelle
+  (palette Sasquatch roux / vert forêt / crème / charbon + sous-palettes locales
+  Heroes Rising / Burgle Jack, typographie Alfa Slab One / Atkinson Hyperlegible
+  / Black Ops One) sans casser bilinguisme, a11y, responsive, routes, admin,
+  tests ni sécurité. Heroes Rising = hero principal **lu depuis Supabase**. La
+  spec `docs/brand-seo-spec.md` reste absente (D21) ; la direction de marque et
+  les liens sociaux réels sont fournis par le prompt et appliqués. **Aucun
+  contenu de marque inventé** (logo, photo/bio fondateur, photos produits, URLs
+  Kickstarter → D3/D22).
+- **Baseline à l'ouverture** : lint 0, typecheck 0, **96 tests**, build vert,
+  audit high 0 (branche partie de `2eaf942`). Captures visuelles de référence
+  prises avant/après (Chromium headless) aux largeurs 375/768/1280, FR et EN.
+- **Commits** :
+  - `feat(theme)` : palette + sous-palettes + polices en `@theme`, tokens
+    renommés, `src/data/gameThemes.ts` (étape 2)
+  - `feat(social)` : liens sociaux réels + composant `SocialLinks` accessible,
+    D12 résolue (étape 6)
+  - `feat(header)` : menu mobile accessible (aria/Échap/focus) + logo cliquable
+    (étape 3)
+  - `feat(home)` : accueil refondu — hero Heroes Rising alimenté par Supabase,
+    réassurance, univers, créations, fondateur, notification, contact (étape 4)
+  - `feat(fiche)` : badge « contenu en anglais », accent de sous-palette,
+    crédits (étape 5)
+  - (clôture) `docs` : CLAUDE.md (styling/architecture) + ROADMAP (étape 6)
+- **Tests** : 96 → **114** (+18 ; nouveaux fichiers `social-links`,
+  `header-a11y`, `home-redesign` ; `game-page` étendu ; `App`/`routing` adaptés
+  au nouveau hero de repli). Chaque comportement rouge avant vert. Zéro réseau.
+- **Front** : `global.css` réécrit (palette + polices en `@theme` seul, body
+  Atkinson + interligne 1.6 + alignement gauche, headings Alfa Slab poids 400) ;
+  tokens de couleur renommés dans tous les composants (aucun hex de marque hors
+  `@theme`, vérifié par grep) ; `src/data/gameThemes.ts` (variantes statiques
+  typées, jamais de classe construite dynamiquement) ; `src/data/socialLinks.ts`
+  + `SocialLinks` (nouvel onglet, `rel=noreferrer`, `aria-label` localisé, icônes
+  décoratives masquées) ; header à menu mobile accessible ; accueil réordonné
+  avec hero vedette lu depuis Supabase (`selectFeaturedGame`, `isEnglishOnly`) et
+  repli de marque sobre ; fiches homogènes (badge anglais, accent, crédits).
+- **Accessibilité** : cartes = vrais liens (déjà) ; `aria-describedby` +
+  `role="alert"` sur les champs de contact ; icônes décoratives `aria-hidden` ;
+  hiérarchie des headings préservée (verrou `headings.test`) ; micro-interactions
+  toutes accompagnées d'une variante `motion-reduce`.
+- **Sécurité/contenu** : audit high 0 ; aucun secret committé ; aucun contenu de
+  marque inventé (D3/D21/D22 restent des actions utilisateur) ; sécurité Supabase
+  (RLS) inchangée.
+- **Verdict de clôture** : DoD standard et DoD Sprint 10 satisfaites. Découverte
+  nouvelle : D22 (logo officiel + portrait/bio fondateur non fournis). D12
+  résolue.
 
 ### Sprint 9 — Modèle Supabase, administration et vraies routes de jeux (2026-07-12)
 
