@@ -1,12 +1,15 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { Link } from "react-router-dom";
 import { useLanguage } from "../../../i18n/useLanguage";
+import { homePath } from "../../../utils/routes";
 import LanguageToggle from "../LanguageToggle";
 
-// Classes partagées par les liens de navigation (desktop et mobile) :
-// mêmes couleur, graisse et transition d'opacité que l'ancien module.
+// Classes partagées par les liens de navigation (desktop et mobile) : couleur
+// de marque, virage vers le roux au survol (motion-reduce le neutralise) et
+// anneau de focus visible.
 const navLinkBase =
-  "cursor-pointer font-medium text-charcoal transition-opacity duration-300 hover:opacity-70 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
+  "cursor-pointer font-medium text-charcoal transition-colors duration-300 hover:text-roux motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 export default function Header({
   onNavigate,
@@ -14,12 +17,27 @@ export default function Header({
   onNavigate: (id: string) => void;
 }) {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
+  const toggleRef = useRef<HTMLButtonElement>(null);
 
   const handleNavClick = (sectionId: string) => {
     onNavigate(sectionId);
     setIsMenuOpen(false);
   };
+
+  // Accessibilité du menu mobile : Échap ferme le menu et rend le focus au
+  // bouton d'ouverture (pas de focus perdu dans le vide).
+  useEffect(() => {
+    if (!isMenuOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setIsMenuOpen(false);
+        toggleRef.current?.focus();
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [isMenuOpen]);
 
   const navItems = [
     { id: "accueil", label: t("nav.home") },
@@ -29,15 +47,25 @@ export default function Header({
   ];
 
   return (
-    // bg-cream/95 = rgba(255, 255, 233, 0.95), la crème de la palette à 95 %.
-    <nav className="fixed top-0 left-0 right-0 z-[1000] w-full bg-cream/95 backdrop-blur-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.05)]">
+    // bg-cream/95 = rgba(251, 248, 233, 0.95), la crème de la palette à 95 %.
+    // Le header reste dans l'identité Ninja Sasquatch (aucune sous-palette).
+    <nav
+      aria-label={t("nav.primary")}
+      className="fixed top-0 left-0 right-0 z-[1000] w-full bg-cream/95 backdrop-blur-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
+    >
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4">
-        <div className="select-none font-brand text-2xl font-extrabold tracking-[0.02em]">
+        {/* Pas de logo officiel fourni → repli textuel propre en police de
+            marque, cliquable vers l'accueil localisé (/fr ou /en). */}
+        <Link
+          to={homePath(lang)}
+          aria-label={t("nav.homeLink")}
+          className="select-none font-brand text-2xl tracking-[0.02em] transition-transform duration-300 hover:scale-[1.03] motion-reduce:transition-none motion-reduce:hover:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+        >
           <span className="text-roux">Ninja </span>
           <span className="text-charcoal">Sasquatch</span>
-        </div>
+        </Link>
 
-        <div className="hidden gap-8 md:flex">
+        <div className="hidden gap-8 md:flex md:items-center">
           {navItems.map((item) => (
             <button
               key={item.id}
@@ -51,15 +79,27 @@ export default function Header({
         </div>
 
         <button
-          className="flex cursor-pointer text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest md:hidden"
-          onClick={() => setIsMenuOpen(!isMenuOpen)}
+          ref={toggleRef}
+          type="button"
+          aria-label={isMenuOpen ? t("nav.closeMenu") : t("nav.openMenu")}
+          aria-expanded={isMenuOpen}
+          aria-controls="mobile-menu"
+          className="flex cursor-pointer text-charcoal transition-transform duration-300 hover:scale-110 motion-reduce:transition-none motion-reduce:hover:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest md:hidden"
+          onClick={() => setIsMenuOpen((open) => !open)}
         >
-          {isMenuOpen ? <X size={24} /> : <Menu size={24} />}
+          {isMenuOpen ? (
+            <X size={24} aria-hidden />
+          ) : (
+            <Menu size={24} aria-hidden />
+          )}
         </button>
       </div>
 
       {isMenuOpen && (
-        <div className="flex flex-col gap-3 border-t border-roux bg-cream p-4">
+        <div
+          id="mobile-menu"
+          className="flex flex-col gap-3 border-t border-roux bg-cream p-4 md:hidden"
+        >
           {navItems.map((item) => (
             <button
               key={item.id}

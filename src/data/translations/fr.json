@@ -100,7 +100,11 @@
     "games": "Nos Jeux",
     "universe": "Notre Univers",
     "contact": "Contact",
-    "switchLanguage": "Changer de langue"
+    "switchLanguage": "Changer de langue",
+    "primary": "Navigation principale",
+    "homeLink": "Ninja Sasquatch Games — retour à l'accueil",
+    "openMenu": "Ouvrir le menu",
+    "closeMenu": "Fermer le menu"
   },
   "hero": {
     "title": "Origines Mystérieuses",
