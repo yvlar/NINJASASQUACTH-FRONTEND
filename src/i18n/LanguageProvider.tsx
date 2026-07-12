@@ -8,10 +8,15 @@ const messages: Record<Lang, unknown> = { fr, en };
 
 export default function LanguageProvider({
   children,
+  initialLang = "fr",
 }: {
   children: ReactNode;
+  // Langue initiale — le client garde le défaut « fr » puis useSyncLang
+  // réconcilie sur l'URL ; le PRÉ-RENDU la fixe directement (pas d'effet au
+  // rendu serveur) pour que /en produise bien du HTML anglais.
+  initialLang?: Lang;
 }) {
-  const [lang, setLangState] = useState<Lang>("fr");
+  const [lang, setLangState] = useState<Lang>(initialLang);
 
   useEffect(() => {
     document.documentElement.lang = lang;

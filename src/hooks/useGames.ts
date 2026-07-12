@@ -2,6 +2,7 @@
 // ne filtre rien) — un visiteur anonyme ne reçoit que les jeux publiés.
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { usePrerenderData } from "../ssr/prerenderContext";
 import type { GameRow } from "../types/database";
 
 export interface UseGamesResult {
@@ -13,11 +14,15 @@ export interface UseGamesResult {
 }
 
 export function useGames(): UseGamesResult {
-  const [games, setGames] = useState<GameRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Amorce de pré-rendu : si présente, la donnée est renvoyée synchronement
+  // (aucun fetch) pour que le HTML produit contienne le vrai catalogue.
+  const seed = usePrerenderData();
+  const [games, setGames] = useState<GameRow[]>(seed?.games ?? []);
+  const [loading, setLoading] = useState(seed == null);
   const [error, setError] = useState<unknown>(null);
 
   useEffect(() => {
+    if (seed != null) return; // pré-rendu : donnée déjà en place
     let active = true;
 
     supabase
@@ -46,7 +51,7 @@ export function useGames(): UseGamesResult {
     return () => {
       active = false;
     };
-  }, []);
+  }, [seed]);
 
   return { games, loading, error };
 }
