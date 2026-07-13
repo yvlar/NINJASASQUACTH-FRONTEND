@@ -158,7 +158,9 @@ n'est jamais stockée en clair (haché salé par `RATE_LIMIT_SALT`).
 
 Distinction stricte entre *code présent* et *réellement opérationnel*. Vérifié
 le 2026-07-13 sur le projet Supabase `vgmqmifgdolccquyjcoc` et le déploiement
-Vercel actuel.
+Vercel actuel (`https://ninjasasquacth-frontend.vercel.app`), re-vérifié après la
+fusion de la PR de stabilisation dans `main` : `npm run verify:production` passe
+au vert (`/`→308→/fr, /fr et /en 200, route inconnue 404, en-têtes présents).
 
 | Élément | Code | Migration/déploiement | Secret/config | Testé |
 |---|---|---|---|---|
@@ -170,7 +172,7 @@ Vercel actuel.
 | Edge Function `subscribe-kickstarter` | ✅ | ✅ **déployée (ACTIVE)** | ⛔ `ALLOWED_ORIGIN`, `RATE_LIMIT_SALT` à poser | ✅ live : `not_configured` (fail-closed) |
 | Edge Function `trigger-rebuild` | ✅ | ✅ **déployée (ACTIVE)** | ⛔ Deploy Hook, `WEBHOOK_SECRET` à poser | ✅ live : `unauthorized` (fail-closed) |
 | Database Webhook (games → rebuild) | — | ⛔ à créer | ⛔ | ⛔ |
-| Routage Vercel (`/`→/fr, vraie 404, fiches statiques) | ✅ | ⏳ effectif au prochain déploiement | — | ⏳ `npm run verify:production` (2 bugs confirmés sur la prod actuelle, corrigés par `vercel.json`) |
+| Routage Vercel (`/`→/fr, vraie 404, fiches statiques) | ✅ | ✅ **déployé sur `main`** | — | ✅ `npm run verify:production` vert le 2026-07-13 (redirection, 404 réelle, en-têtes, pré-rendu servi) |
 
 **Actions utilisateur restantes (ne peuvent pas être automatisées)** :
 1. Poser les secrets des Edge Functions (domaine de prod pour `ALLOWED_ORIGIN`,
@@ -181,8 +183,10 @@ Vercel actuel.
 3. Fixer `VITE_SITE_URL` / `SITE_URL` sur le domaine définitif et, pour les
    builds de production, `REQUIRE_PRERENDER_GAMES=true` (échoue si une fiche
    attendue n'est pas générée).
-4. Déployer la branche (merge → déploiement Vercel) puis
-   `npm run verify:production https://<domaine>` — doit passer au vert.
+4. Le routage Vercel est **déployé et vérifié** (`verify:production` vert). Après
+   avoir posé les secrets (point 1) et le webhook (point 2), redéployer une fois
+   pour que la newsletter et le rebuild deviennent réellement opérationnels, puis
+   ré-exécuter `npm run verify:production https://<domaine>`.
 5. Donner un `slug` au jeu publié « Mario » (ou le repasser en brouillon) :
    il est publié **sans slug**, donc sans fiche partageable — capté par le
    garde `REQUIRE_PRERENDER_GAMES`.

@@ -1553,6 +1553,28 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 - **D24** 🟢 Le `throw` à l'import de `lib/supabase.ts`, documenté comme
   fail-fast intentionnel (Sprint 7, D18), était en réalité un risque d'écran
   blanc — corrigé en Partie B (décision du prompt PROMPT 3).
+- **D25** 🟢 **Vérification production réelle du 2026-07-13** (session de
+  stabilisation, sans supposer). Confirmé sur l'infra réelle — un fichier dans
+  Git ne prouve rien : **8 migrations appliquées** (produit + `game_media` +
+  `newsletter_subscribers` + `newsletter_consent_columns` +
+  `newsletter_rate_limit_rpc` + `deploy_rebuild_state`), **6 tables avec RLS**,
+  **2 Edge Functions ACTIVE** dont la source déployée est bien la version durcie
+  (CORS liste blanche + 4 en-têtes requis, consentement + version côté serveur,
+  secrets obligatoires sans repli, RPC de rate-limit atomique fail-closed,
+  opt-in `confirmed`). **Vercel** : `/`→308→`/fr`, `/fr` et `/en` 200, route
+  inconnue **404 réelle**, HTML pré-rendu servi (H1, canonical, hreflang
+  fr/en/x-default, JSON-LD ×2), 404 en `noindex, follow` ; `verify:production`
+  **vert**. **Reste strictement des actions utilisateur non automatisables**
+  (aucun outil MCP pour poser des secrets Edge Function) : (a) poser
+  `ALLOWED_ORIGIN`/`RATE_LIMIT_SALT` sur `subscribe-kickstarter` — testé live,
+  répond `not_configured` (fail-closed correct) tant qu'ils manquent ; (b) poser
+  `VERCEL_DEPLOY_HOOK_URL`/`WEBHOOK_SECRET` sur `trigger-rebuild` ; (c) créer le
+  Database Webhook `games`→`trigger-rebuild` (aucun trigger `http_request`
+  présent sur `games` ce jour) ; (d) donner un `slug` au jeu publié « Mario »
+  (publié sans slug → aucune fiche pré-rendue, capté par `REQUIRE_PRERENDER_GAMES`).
+  Points 1 et 2 de la liste « actions restantes » ci-dessous sont désormais
+  **faits** (migrations appliquées, fonctions déployées) ; restent les points
+  3–6 (secrets, webhook, Deploy Hook, domaine, contenu).
 
 **Actions utilisateur / infra restantes (jamais faites à sa place) :**
 
