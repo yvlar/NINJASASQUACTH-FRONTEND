@@ -76,10 +76,22 @@ les fige dans le bundle au moment du build. Sans elles, le site se déploie
 mais le catalogue affiche une erreur localisée (le reste de la vitrine reste
 visible — plus d'écran blanc, Sprint 11 Partie B).
 
-`vercel.json` contient le rewrite SPA (`/(.*) → /index.html`) — les fichiers
-statiques pré-rendus ont priorité (Vercel sert le disque avant la réécriture) —
-ainsi que les **headers de sécurité** (CSP stricte, HSTS, X-Frame-Options,
-Referrer-Policy, Permissions-Policy) et `X-Robots-Tag: noindex` sur `/admin`.
+`vercel.json` (Sprint 11.1 — routage réel) :
+- **redirect** `/` → `/fr` (permanent) — plus de shell client à la racine ;
+- **rewrites limités à `/admin`** (seule route rendue côté client) → shell SPA.
+  Le rewrite catch-all vers `/index.html` a été **supprimé** : il masquait les
+  fichiers pré-rendus et servait une *soft-404* en HTTP 200. Désormais Vercel
+  sert `dist/fr/index.html`, `dist/en/...`, les fiches, et **`dist/404.html`
+  en vrai HTTP 404** pour toute route inconnue ;
+- `cleanUrls` + `trailingSlash: false` ;
+- **headers de sécurité** (CSP stricte, HSTS, X-Frame-Options, Referrer-Policy,
+  Permissions-Policy) et `X-Robots-Tag: noindex` sur `/admin`.
+
+**Hydratation** : le client lit l'amorce `<script id="__PRERENDER_DATA__">`
+(données publiques du build, échappées) AVANT le premier rendu et **hydrate**
+(`hydrateRoot`) le HTML pré-rendu au lieu de le remplacer ; la langue initiale
+est déduite de l'URL (`/en` démarre en anglais, aucun flash FR→EN). Les données
+sont ensuite rafraîchies en arrière-plan sans vider le contenu.
 
 ### Reconstruction après publication admin (Deploy Hook)
 
@@ -110,6 +122,78 @@ n'est **jamais** lisible publiquement (RLS : lecture admin seule, aucune
 écriture navigateur). Antispam : honeypot + limitation de fréquence + validation
 serveur ; réponse toujours générique (aucune fuite d'existence) ; l'email n'est
 jamais journalisé.
+
+**Stratégie d'opt-in** : **opt-in simple explicite**. Le serveur exige
+`consent === true` ET une version de consentement attendue
+(`newsletter-v1-2026-07`) avant d'écrire quoi que ce soit ; l'abonné est alors
+enregistré en statut `confirmed`. Pas de statut `pending` orphelin : aucun
+double opt-in tant qu'aucun courriel de confirmation n'est envoyé. La preuve de
+consentement (`consent_at`, `consent_version`, `consent_source`) n'est écrite
+qu'après cette validation serveur — **aucune fausse preuve possible**.
+
+**Désinscription** (procédure manuelle temporaire) : aucun lien automatique
+n'est encore implémenté ; le libellé de consentement le dit honnêtement
+(« se désinscrire en nous écrivant »). Pour désinscrire une adresse, un admin
+passe son statut à `unsubscribed` :
+`update public.newsletter_subscribers set status = 'unsubscribed' where email_normalized = lower('…');`
+Une Edge Function `unsubscribe-newsletter` à jeton signé reste une évolution
+possible (voir ROADMAP, risques résiduels).
+
+### CORS de l'Edge Function newsletter
+
+`ALLOWED_ORIGIN` est une **liste blanche** d'origines (séparées par des
+virgules) — jamais `*`. Le preflight autorise `authorization, x-client-info,
+apikey, content-type` (les en-têtes que `supabase.functions.invoke` envoie).
+Une origine hors liste ne reçoit aucun `Access-Control-Allow-Origin`.
+
+### Limitation de fréquence atomique
+
+La fonction `check_newsletter_rate_limit(p_ip_hash, p_window_seconds,
+p_max_attempts)` (Postgres, verrou de ligne) remplace le schéma
+lecture→calcul→écriture (condition de course). L'Edge Function l'appelle en RPC
+et **échoue fermée** si le limiteur est indisponible (aucune inscription). L'IP
+n'est jamais stockée en clair (haché salé par `RATE_LIMIT_SALT`).
+
+## État réel de production (Sprint 11.1)
+
+Distinction stricte entre *code présent* et *réellement opérationnel*. Vérifié
+le 2026-07-13 sur le projet Supabase `vgmqmifgdolccquyjcoc` et le déploiement
+Vercel actuel.
+
+| Élément | Code | Migration/déploiement | Secret/config | Testé |
+|---|---|---|---|---|
+| Migrations produit + `game_media` | ✅ | ✅ appliquées | — | ✅ |
+| Migration `newsletter_subscribers` (+ rate_limits) | ✅ | ✅ **appliquée ce sprint** | — | ✅ |
+| Colonnes `consent_version` / `consent_source` | ✅ | ✅ appliquée | — | ✅ |
+| RPC `check_newsletter_rate_limit` | ✅ | ✅ appliquée | — | ✅ vérifié sur la base (5 ok, 6e refusé) |
+| Migration `deploy_rebuilds` | ✅ | ✅ **appliquée ce sprint** | — | ✅ |
+| Edge Function `subscribe-kickstarter` | ✅ | ✅ **déployée (ACTIVE)** | ⛔ `ALLOWED_ORIGIN`, `RATE_LIMIT_SALT` à poser | ✅ live : `not_configured` (fail-closed) |
+| Edge Function `trigger-rebuild` | ✅ | ✅ **déployée (ACTIVE)** | ⛔ Deploy Hook, `WEBHOOK_SECRET` à poser | ✅ live : `unauthorized` (fail-closed) |
+| Database Webhook (games → rebuild) | — | ⛔ à créer | ⛔ | ⛔ |
+| Routage Vercel (`/`→/fr, vraie 404, fiches statiques) | ✅ | ⏳ effectif au prochain déploiement | — | ⏳ `npm run verify:production` (2 bugs confirmés sur la prod actuelle, corrigés par `vercel.json`) |
+
+**Actions utilisateur restantes (ne peuvent pas être automatisées)** :
+1. Poser les secrets des Edge Functions (domaine de prod pour `ALLOWED_ORIGIN`,
+   `RATE_LIMIT_SALT`, `VERCEL_DEPLOY_HOOK_URL`, `WEBHOOK_SECRET`) :
+   `supabase secrets set …` — **valeurs jamais committées**.
+2. Créer le Database Webhook Supabase (games insert/update → `trigger-rebuild`,
+   en-tête `x-webhook-secret`).
+3. Fixer `VITE_SITE_URL` / `SITE_URL` sur le domaine définitif et, pour les
+   builds de production, `REQUIRE_PRERENDER_GAMES=true` (échoue si une fiche
+   attendue n'est pas générée).
+4. Déployer la branche (merge → déploiement Vercel) puis
+   `npm run verify:production https://<domaine>` — doit passer au vert.
+5. Donner un `slug` au jeu publié « Mario » (ou le repasser en brouillon) :
+   il est publié **sans slug**, donc sans fiche partageable — capté par le
+   garde `REQUIRE_PRERENDER_GAMES`.
+
+### Procédure de vérification
+
+```bash
+npm run lint && npm run typecheck && npm test   # qualité
+npm run build && npm run verify:dist            # pré-rendu + absence de secret
+npm run verify:production https://<domaine> [slug-fiche]   # prod HTTP réelle
+```
 
 La CI GitHub Actions (`.github/workflows/ci.yml`) reste la garde qualité
 (audit + lint + tests + build) en amont de tout déploiement ; elle n'a besoin
