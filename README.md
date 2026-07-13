@@ -101,8 +101,11 @@ de reconstruction contrôlée :
 1. créer un **Deploy Hook** Vercel (Settings → Git → Deploy Hooks) ;
 2. déployer l'Edge Function : `supabase functions deploy trigger-rebuild` puis
    `supabase secrets set VERCEL_DEPLOY_HOOK_URL=… WEBHOOK_SECRET=…` ;
-3. brancher un **Database Webhook** Supabase sur la table `games` (insert/update)
-   qui POST vers la fonction avec l'en-tête `x-webhook-secret`.
+3. brancher un **Database Webhook** Supabase sur la table `games`
+   (**INSERT / UPDATE / DELETE** — un DELETE doit aussi retirer la fiche et son
+   entrée de sitemap) qui POST vers la fonction avec l'en-tête `x-webhook-secret`.
+
+Procédure détaillée : `docs/production-runbook.md`.
 
 Le secret du Deploy Hook vit **uniquement** dans les secrets de l'Edge Function :
 jamais dans la base publique, jamais envoyé au navigateur, jamais préfixé
@@ -154,42 +157,57 @@ lecture→calcul→écriture (condition de course). L'Edge Function l'appelle en
 et **échoue fermée** si le limiteur est indisponible (aucune inscription). L'IP
 n'est jamais stockée en clair (haché salé par `RATE_LIMIT_SALT`).
 
-## État réel de production (Sprint 11.1)
+## État réel de production (Sprint 11.1 · Prompt 5)
 
-Distinction stricte entre *code présent* et *réellement opérationnel*. Vérifié
-le 2026-07-13 sur le projet Supabase `vgmqmifgdolccquyjcoc` et le déploiement
-Vercel actuel (`https://ninjasasquacth-frontend.vercel.app`), re-vérifié après la
-fusion de la PR de stabilisation dans `main` : `npm run verify:production` passe
+Distinction stricte entre *code présent*, *migration appliquée*, *fonction
+déployée*, *secret configuré*, *webhook configuré*, *testé en live* et
+*réellement opérationnel*. Vérifié en **live** le 2026-07-13 sur le projet
+Supabase `vgmqmifgdolccquyjcoc` et le déploiement
+`https://ninjasasquacth-frontend.vercel.app` : `npm run verify:production` passe
 au vert (`/`→308→/fr, /fr et /en 200, route inconnue 404, en-têtes présents).
 
-| Élément | Code | Migration/déploiement | Secret/config | Testé |
+> **Réalité du catalogue :** la table `games` est **vide (0 jeu publié)**.
+> Il n'y a donc **aucune fiche à pré-rendre** aujourd'hui, et « Catalogue SEO
+> complet » ne pourra être déclaré qu'après la création d'un vrai jeu publié
+> avec slug (voir `docs/production-runbook.md` §5). Le contenu de marque est une
+> décision du studio — rien n'est inventé.
+
+| Élément | Code | Migration/déploiement | Secret/config | Testé live |
 |---|---|---|---|---|
 | Migrations produit + `game_media` | ✅ | ✅ appliquées | — | ✅ |
-| Migration `newsletter_subscribers` (+ rate_limits) | ✅ | ✅ **appliquée ce sprint** | — | ✅ |
-| Colonnes `consent_version` / `consent_source` | ✅ | ✅ appliquée | — | ✅ |
-| RPC `check_newsletter_rate_limit` | ✅ | ✅ appliquée | — | ✅ vérifié sur la base (5 ok, 6e refusé) |
-| Migration `deploy_rebuilds` | ✅ | ✅ **appliquée ce sprint** | — | ✅ |
-| Edge Function `subscribe-kickstarter` | ✅ | ✅ **déployée (ACTIVE)** | ⛔ `ALLOWED_ORIGIN`, `RATE_LIMIT_SALT` à poser | ✅ live : `not_configured` (fail-closed) |
-| Edge Function `trigger-rebuild` | ✅ | ✅ **déployée (ACTIVE)** | ⛔ Deploy Hook, `WEBHOOK_SECRET` à poser | ✅ live : `unauthorized` (fail-closed) |
-| Database Webhook (games → rebuild) | — | ⛔ à créer | ⛔ | ⛔ |
-| Routage Vercel (`/`→/fr, vraie 404, fiches statiques) | ✅ | ✅ **déployé sur `main`** | — | ✅ `npm run verify:production` vert le 2026-07-13 (redirection, 404 réelle, en-têtes, pré-rendu servi) |
+| Contrainte `games_published_requires_slug` (publication ⇒ slug) | ✅ | ✅ **appliquée ce sprint** | — | ✅ rejet vérifié en base |
+| Colonnes `how_to_play_*` / `rules_summary_*` | ✅ | ✅ **appliquée ce sprint** | — | ✅ |
+| RPC `reorder_game_media` (tri galerie, SECURITY INVOKER) | ✅ | ✅ **appliquée ce sprint** | — | ✅ appel vérifié en base |
+| Migration `newsletter_subscribers` (+ rate_limits, consentement) | ✅ | ✅ appliquée | — | ✅ |
+| RPC `check_newsletter_rate_limit` | ✅ | ✅ appliquée | — | ✅ (5 ok, 6e refusé) |
+| Migration `deploy_rebuilds` | ✅ | ✅ appliquée | — | ✅ |
+| Gestion galerie `game_media` dans `/admin` | ✅ | — | — | ✅ tests (upload/tri/suppression/rollback) |
+| Admin dégradé sans Supabase (aucun appel réseau) | ✅ | — | — | ✅ test |
+| Repli visuel de marque (jeu sans image) | ✅ | — | — | ✅ test |
+| Edge Function `subscribe-kickstarter` | ✅ | ✅ déployée (ACTIVE) | ⛔ `ALLOWED_ORIGIN`, `RATE_LIMIT_SALT` **absents** | ✅ live : `500 not_configured` (fail-closed) |
+| Newsletter **opérationnelle** | ✅ | ✅ | ⛔ | ⛔ **non** — secrets absents, aucune inscription réelle confirmée |
+| Edge Function `trigger-rebuild` | ✅ | ✅ déployée (ACTIVE) | ⛔ Deploy Hook, `WEBHOOK_SECRET` absents | — |
+| Database Webhook (games INSERT/UPDATE/DELETE → rebuild) | — | ⛔ à créer | ⛔ | ⛔ |
+| Rebuild **opérationnel** | ✅ | ⛔ | ⛔ | ⛔ **non** — aucune modif n'a encore déclenché de déploiement |
+| Routage Vercel (`/`→/fr, vraie 404, fiches statiques) | ✅ | ✅ déployé sur `main` | — | ✅ `verify:production` vert le 2026-07-13 |
+| `verify:production` teste une vraie fiche FR+EN | ✅ | — | — | ⏸ en attente d'un jeu publié (auto-détection sitemap) |
+| Workflow CI post-déploiement (`verify-production.yml`) | ✅ | — | ⛔ `PRODUCTION_URL` (variable de dépôt) | — |
 
-**Actions utilisateur restantes (ne peuvent pas être automatisées)** :
-1. Poser les secrets des Edge Functions (domaine de prod pour `ALLOWED_ORIGIN`,
-   `RATE_LIMIT_SALT`, `VERCEL_DEPLOY_HOOK_URL`, `WEBHOOK_SECRET`) :
-   `supabase secrets set …` — **valeurs jamais committées**.
-2. Créer le Database Webhook Supabase (games insert/update → `trigger-rebuild`,
-   en-tête `x-webhook-secret`).
-3. Fixer `VITE_SITE_URL` / `SITE_URL` sur le domaine définitif et, pour les
-   builds de production, `REQUIRE_PRERENDER_GAMES=true` (échoue si une fiche
-   attendue n'est pas générée).
-4. Le routage Vercel est **déployé et vérifié** (`verify:production` vert). Après
-   avoir posé les secrets (point 1) et le webhook (point 2), redéployer une fois
-   pour que la newsletter et le rebuild deviennent réellement opérationnels, puis
-   ré-exécuter `npm run verify:production https://<domaine>`.
-5. Donner un `slug` au jeu publié « Mario » (ou le repasser en brouillon) :
-   il est publié **sans slug**, donc sans fiche partageable — capté par le
-   garde `REQUIRE_PRERENDER_GAMES`.
+**Actions utilisateur restantes (ne peuvent pas être exécutées avec les accès
+disponibles — voir `docs/production-runbook.md` pour la procédure exacte)** :
+
+1. Poser les secrets Edge Functions (`ALLOWED_ORIGIN`, `RATE_LIMIT_SALT`,
+   `VERCEL_DEPLOY_HOOK_URL`, `WEBHOOK_SECRET`) — **valeurs jamais committées**.
+2. Créer le Deploy Hook Vercel et le Database Webhook Supabase
+   (`games` INSERT/UPDATE/DELETE → `trigger-rebuild`, en-tête `x-webhook-secret`).
+3. Fixer les variables Vercel (`SITE_URL`/`VITE_SITE_URL` sur le domaine réel,
+   et `REQUIRE_PRERENDER_GAMES=true` **une fois un jeu publié existant**).
+4. Définir la variable de dépôt GitHub `PRODUCTION_URL`.
+5. **Créer au moins un jeu publié réel avec slug** via `/admin` (contenu de
+   marque = décision studio) pour activer le pré-rendu strict et la vérification
+   de fiche.
+6. Traiter le registre `docs/commercial-claims.md` (valider ou rendre prudentes
+   les allégations « 100 % compostable », « fabriqué au Québec », etc.).
 
 ### Procédure de vérification
 
@@ -212,6 +230,11 @@ gratuit (~1 semaine d'inactivité) ; il requiert les secrets GitHub Actions
 
 - `ROADMAP.md` — source de vérité du workflow : sprints, découvertes, changelog,
   **état des tests** (le compte de tests ne vit que là).
+- `docs/production-runbook.md` — procédure exacte des actions tableau de bord
+  (secrets Edge Functions, Deploy Hook, Database Webhook, variables Vercel,
+  création d'un premier jeu) que le code/MCP ne peuvent pas exécuter.
+- `docs/commercial-claims.md` — registre des allégations commerciales et
+  environnementales à valider ou rendre prudentes avant lancement.
 - `prompt-executer-sprint.md` / `prompt-mise-a-jour-roadmap.md` — les deux
   prompts du workflow de sprint (gouvernés : ne pas modifier sans décision).
 - `CLAUDE.md` — règles et conventions de code.

@@ -16,7 +16,7 @@
 
 - **Dernière mise à jour** : 2026-07-12 — **Sprint 10 clos** : refonte visuelle Ninja Sasquatch Games. Nouvelle palette (Sasquatch roux, vert forêt, crème, charbon) + sous-palettes locales aux jeux (Heroes Rising, Burgle Jack) et typographie (Alfa Slab One, Atkinson Hyperlegible, Black Ops One) centralisées dans `@theme` ; `src/data/gameThemes.ts` (variantes statiques typées) ; **liens sociaux réels** (`src/data/socialLinks.ts` — Facebook/YouTube/LinkedIn, résout D12) ; header à menu mobile **accessible** (aria + Échap + focus) et logo cliquable ; **accueil refondu** (hero Heroes Rising alimenté par Supabase, bandeau de réassurance, univers, créations, fondateur, notification de lancement, contact) ; fiches homogènes (badge « contenu en anglais », accent de sous-palette, crédits). Aucun contenu de marque inventé : logo officiel, photo/biographie du fondateur, photos produits et URLs Kickstarter restent des actions utilisateur (D3/D21/D22).
 - **Sprint courant** : **Sprint 11.1 clos** (2026-07-13) — stabilisation production après fusion du pré-rendu/SEO/newsletter. **Hydratation réelle** (`hydrateRoot` + amorce `__PRERENDER_DATA__` sérialisée + langue initiale depuis l'URL, plus de flash FR→EN) ; **newsletter durcie** (CORS liste blanche, consentement + version prouvés côté serveur, rate-limit atomique par RPC Postgres, secrets obligatoires sans repli faible, opt-in `confirmed`) ; **routage Vercel réel** (`/`→/fr, vraie 404, fichiers pré-rendus servis) ; **intégrité médias** (suppression qui ne perd aucun chemin, `gameError`/`mediaError` séparés, avertissement de nettoyage visible) ; **lecture catalogue unique** sur l'accueil ; **tokens rebrand + faux gras retirés + OG PNG + JSON-LD complexité** ; **build durci** (`REQUIRE_PRERENDER_GAMES`) et `verify-dist`/`verify:production` renforcés. **Migrations newsletter + rate-limit RPC + `deploy_rebuilds` appliquées** au projet, **Edge Functions déployées (ACTIVE, fail-closed)**. Reste utilisateur/infra : poser les secrets des fonctions, créer le Database Webhook, fixer le domaine, déployer la branche puis `npm run verify:production`. Voir README « État réel de production ».
-- **État des tests** : **182/182 verts** (37 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 11.1 — Sprints 11-12 : 163 ; Sprint 10 : 114 ; Sprint 9 : 96 ; Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **État des tests** : **211/211 verts** (41 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Prompt 5 — Sprint 11.1 : 182 ; Sprints 11-12 : 163 ; Sprint 10 : 114 ; Sprint 9 : 96 ; Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS : audit → lint → typecheck → tests → build) + `.github/workflows/supabase-keepalive.yml` (ping REST hebdomadaire, D15).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -833,6 +833,47 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
 | D26 | 🟡 | (Sprint 11.1) **OG en SVG** : les scrapers sociaux (Facebook/LinkedIn/X) ne rendent pas fiablement le SVG. Remplacé par un PNG réel 1200×630 (`public/og/brand.png`, généré par `scripts/generate-og.mjs` — composition de marque sans texte, faute de rasterisation de police). Un OG conçu avec le wordmark peut le remplacer | **Action utilisateur (facultatif)** : fournir un OG conçu (1200×630) avec le logo/wordmark |
 
 ## Changelog
+
+### Prompt 5 — Finalisation production, galerie admin et conformité (2026-07-13)
+
+- **Contexte** : prompt utilisateur — rendre la production réellement
+  opérationnelle. **Réalité constatée en live divergente du prompt** : la table
+  `games` est **vide (0 jeu)** — il n'y a **pas** de jeu « Mario » sans slug ;
+  `game_media` n'a **pas** de colonne `public_url` (seulement `storage_path`) ;
+  les secrets newsletter sont **absents** (fonction live → `500 not_configured`).
+- **Accès** : Supabase MCP (SQL, migrations, edge, advisors) et Vercel MCP
+  (lecture/déploiement) disponibles ; **pas** d'accès pour poser des secrets
+  Edge Function / variables Vercel / Deploy Hook / Database Webhook (tableau de
+  bord ou jeton CLI requis) → documentés en actions utilisateur
+  (`docs/production-runbook.md`).
+- **Baseline** : lint 0, typecheck 0, **182 tests**, build vert, audit high 0
+  (`d8243ef`).
+- **Commits (atomiques)** :
+  - `fix(a11y)` : champ image — `aria-describedby` aide+erreur, `role="alert"`.
+  - `fix(admin)` : garde centralisée — sans Supabase, `/admin` ne monte pas
+    AuthProvider (zéro appel réseau), message localisé.
+  - `fix(games)` : interdiction de publier sans slug (validation conditionnelle
+    + contrainte base `games_published_requires_slug`, appliquée).
+  - `fix(prerender)` : `verify:production` détecte et teste une vraie fiche
+    FR+EN via le sitemap ; strict échoue sans fiche.
+  - `ci(prod)` : workflow `verify-production.yml` (HTTP post-déploiement).
+  - `fix(game)` : `GameArtwork` — repli visuel de marque (jeu sans image).
+  - `fix(content)` : séparation mécaniques / comment jouer / règles ; colonnes
+    `how_to_play_*` + `rules_summary_*` (appliquées) ; `GameMechanics`.
+  - `feat(admin)` : `GameMediaManager` complet (upload multiple, tri clavier via
+    RPC transactionnelle `reorder_game_media`, suppression, rollback, erreurs
+    partielles visibles).
+  - `docs` : `commercial-claims.md` (allégations) + `production-runbook.md` +
+    README/ROADMAP honnêtes.
+- **Migrations appliquées ce sprint** (projet `vgmqmifgdolccquyjcoc`) :
+  `games_require_slug_when_published`, `games_content_fields`,
+  `reorder_game_media_rpc` (+ `search_path` figé). Vérifiées en base.
+- **Tests** : 182 → **211** (+29 ; nouveaux fichiers `admin-degraded-config`,
+  `game-artwork`, `game-content-sections`, `admin-game-media` ; mock Supabase
+  gagne `rpc`). Lint/typecheck/build verts, audit high 0.
+- **NON opérationnel** (secrets/webhook absents, catalogue vide) : newsletter
+  live, rebuild automatique, pré-rendu strict d'une fiche → voir runbook
+  (actions utilisateur bloquantes).
 
 ### Sprint 10 — Refonte visuelle Ninja Sasquatch et accueil Heroes Rising (2026-07-12)
 
