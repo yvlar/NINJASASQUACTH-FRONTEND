@@ -4,6 +4,8 @@
     "loading": "Chargement…",
     "signOut": "Se déconnecter",
     "denied": "Accès refusé : ce compte n'a pas le rôle administrateur.",
+    "notConfigured": "Supabase n'est pas configuré pour l'administration.",
+    "notConfiguredHint": "Définissez VITE_SUPABASE_URL et VITE_SUPABASE_ANON_KEY pour activer la connexion et la gestion des jeux.",
     "login": {
       "email": "Courriel",
       "password": "Mot de passe",

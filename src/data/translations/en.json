@@ -4,6 +4,8 @@
     "loading": "Loading…",
     "signOut": "Sign out",
     "denied": "Access denied: this account does not have the administrator role.",
+    "notConfigured": "Supabase is not configured for administration.",
+    "notConfiguredHint": "Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable sign-in and game management.",
     "login": {
       "email": "Email",
       "password": "Password",
