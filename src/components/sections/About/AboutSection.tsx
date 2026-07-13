@@ -36,7 +36,7 @@ export default function AboutSection() {
             <div className="mt-8 rounded-lg bg-forest p-6">
               <div className="mb-3 flex items-center gap-3">
                 <Leaf size={28} color="var(--color-cream)" />
-                <h3 className="text-xl/[1.6] font-bold text-white">
+                <h3 className="text-xl/[1.6] text-white">
                   {t("about.ecoTitle")}
                 </h3>
               </div>
@@ -55,7 +55,7 @@ export default function AboutSection() {
                 }`}
               >
                 <div
-                  className={`mb-2 font-brand text-4xl/[1.6] font-extrabold ${
+                  className={`mb-2 font-brand text-4xl/[1.6] ${
                     i % 2 === 0 ? "text-roux" : "text-forest"
                   }`}
                 >

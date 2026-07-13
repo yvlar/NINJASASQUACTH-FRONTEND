@@ -11,7 +11,7 @@ export default function NotFoundPage() {
     <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream px-4 text-center">
       <PageMeta input={{ kind: "notFound", lang }} />
       <p className="text-[4rem] font-extrabold leading-none text-roux">404</p>
-      <h1 className="text-2xl font-bold text-charcoal">
+      <h1 className="text-2xl text-charcoal">
         {t("notFound.title")}
       </h1>
       <p className="max-w-md text-charcoal">{t("notFound.message")}</p>

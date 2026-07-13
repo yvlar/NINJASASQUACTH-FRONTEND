@@ -20,7 +20,7 @@ export default function NewsletterSection() {
       : null;
 
   return (
-    <section id="notify" className="bg-brown/5 py-20">
+    <section id="notify" className="bg-roux/5 py-20">
       <div className="mx-auto max-w-3xl px-4 text-left sm:px-6 lg:px-8">
         <h2 className="mb-4 text-[2.25rem] tracking-[-0.01em] text-roux md:text-[2.75rem]">
           {t("newsletter.title")}

@@ -71,12 +71,13 @@ describe("buildMeta — fiche jeu", () => {
       { siteUrl: SITE },
     );
     expect(withImg.image.url).toBe(origines.image_url);
-    // Mission Ninja n'a pas d'image → repli de marque (SVG réel)
+    // Mission Ninja n'a pas d'image → repli de marque (PNG réel 1200×630)
     const noImg = buildMeta(
       { kind: "game", lang: "fr", game: missionNinja },
       { siteUrl: SITE },
     );
-    expect(noImg.image.url).toBe(`${SITE}/og/brand.svg`);
+    expect(noImg.image.url).toBe(`${SITE}/og/brand.png`);
+    expect(noImg.image.type).toBe("image/png");
   });
 });
 

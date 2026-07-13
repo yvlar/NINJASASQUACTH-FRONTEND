@@ -117,7 +117,7 @@ export function gameJsonLd(
   if (game.complexity) {
     extra.push({
       "@type": "PropertyValue",
-      name: lookup(lang, "games.detail.mechanics"),
+      name: lookup(lang, "games.detail.complexity"),
       value: game.complexity,
     });
   }

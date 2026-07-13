@@ -29,13 +29,15 @@ export function getSiteUrl(): string {
 
 export const SITE_NAME = "Ninja Sasquatch Games";
 
-// Image OpenGraph de repli de marque — un fichier RÉEL qui existe dans le
-// dépôt (`public/og/brand.svg`). On n'utilise jamais une image OG inexistante.
+// Image OpenGraph de repli de marque — un PNG RÉEL 1200×630 (les scrapers
+// sociaux ne rendent pas fiablement le SVG). Fichier présent dans le dépôt
+// (`public/og/brand.png`, régénérable via `node scripts/generate-og.mjs`).
+// Le SVG reste disponible pour d'autres usages internes.
 export const BRAND_OG_IMAGE = {
-  path: "/og/brand.svg",
+  path: "/og/brand.png",
   width: 1200,
   height: 630,
-  type: "image/svg+xml",
+  type: "image/png",
 } as const;
 
 // Réseaux sociaux officiels — source des `sameAs` du JSON-LD Organization.
