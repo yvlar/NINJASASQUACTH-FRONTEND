@@ -14,8 +14,11 @@ export interface UseGameBySlugResult {
   game: GameRow | null;
   media: GameMediaRow[];
   loading: boolean;
-  // Erreur applicative (PostgrestError) OU rejet réseau : présence seule testée.
-  error: unknown;
+  // Erreurs SÉPARÉES : une panne de la galerie (game_media) ne doit pas casser
+  // toute la fiche. gameError = échec de lecture du jeu (fiche indisponible) ;
+  // mediaError = échec de la galerie seule (fiche visible, galerie en erreur).
+  gameError: unknown;
+  mediaError: unknown;
   notFound: boolean;
 }
 
@@ -36,9 +39,10 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
     hasSeedForSlug ? (seed.media[seededGame.id] ?? []) : [],
   );
   const [loading, setLoading] = useState(isSupabaseConfigured && !hasSeedForSlug);
-  const [error, setError] = useState<unknown>(
+  const [gameError, setGameError] = useState<unknown>(
     notConfigured ? new Error("supabase-not-configured") : null,
   );
+  const [mediaError, setMediaError] = useState<unknown>(null);
   const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
@@ -58,7 +62,7 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
         if (!active) return;
         if (fetchError) {
           if (!background) {
-            setError(fetchError);
+            setGameError(fetchError);
             setLoading(false);
           }
           return; // arrière-plan : on conserve l'amorce
@@ -76,20 +80,27 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
         }
         setGame(found);
         setNotFound(false);
+        if (!background) setLoading(false);
 
-        const { data: mediaData } = await supabase
+        // Galerie : erreur ISOLÉE. La fiche reste visible ; seule la zone
+        // galerie signalera le problème (mediaError).
+        const { data: mediaData, error: mediaFetchError } = await supabase
           .from("game_media")
           .select("*")
           .eq("game_id", found.id)
           .order("sort_order", { ascending: true });
         if (!active) return;
-        setMedia((Array.isArray(mediaData) ? mediaData : []) as GameMediaRow[]);
-        if (!background) setLoading(false);
+        if (mediaFetchError) {
+          setMediaError(mediaFetchError);
+        } else {
+          setMedia((Array.isArray(mediaData) ? mediaData : []) as GameMediaRow[]);
+          setMediaError(null);
+        }
       } catch (thrown) {
         // Panne réseau AVANT toute réponse (fetch rejeté) : sans ce filet,
         // l'UI resterait bloquée sur « Chargement… ».
         if (active && !background) {
-          setError(thrown);
+          setGameError(thrown);
           setLoading(false);
         }
       }
@@ -100,5 +111,5 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
     };
   }, [slug, seed, hasSeedForSlug]);
 
-  return { game, media, loading, error, notFound };
+  return { game, media, loading, gameError, mediaError, notFound };
 }

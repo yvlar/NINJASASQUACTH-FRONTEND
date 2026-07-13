@@ -39,7 +39,8 @@ function TopBar() {
 
 export default function GameContent({ slug }: { slug: string }) {
   const { t, lang } = useLanguage();
-  const { game, media, loading, error, notFound } = useGameBySlug(slug);
+  const { game, media, loading, gameError, mediaError, notFound } =
+    useGameBySlug(slug);
   // Jeux voisins pour RelatedGames (RLS : publiés seuls pour l'anonyme).
   const { games } = useGames();
 
@@ -63,19 +64,19 @@ export default function GameContent({ slug }: { slug: string }) {
             {t("games.loading")}
           </p>
         )}
-        {!loading && error != null && (
+        {!loading && gameError != null && (
           <p role="alert" className="my-16 text-center font-semibold text-error">
             {t("games.error")}
           </p>
         )}
-        {!loading && error == null && game && (
+        {!loading && gameError == null && game && (
           <>
             <PageMeta input={{ kind: "game", lang, game }} />
             <GameHero game={game} />
             <GameBadges game={game} />
             <NarrativeSummary game={game} />
             <HowToPlay game={game} />
-            <GameGallery media={media} />
+            <GameGallery media={media} hasError={mediaError != null} />
             <RulesDownload game={game} />
             <KickstarterCallToAction game={game} />
             <FullRulesAccordion game={game} />

@@ -5,9 +5,28 @@ import { supabase } from "../../lib/supabase";
 import { GAME_IMAGES_BUCKET } from "../../utils/storagePath";
 import type { GameMediaRow } from "../../types/database";
 
-export default function GameGallery({ media }: { media: GameMediaRow[] }) {
+export default function GameGallery({
+  media,
+  hasError = false,
+}: {
+  media: GameMediaRow[];
+  hasError?: boolean;
+}) {
   const { t, lang } = useLanguage();
   const images = media.filter((item) => item.media_type === "image");
+
+  // Erreur ISOLÉE de la galerie : la fiche reste visible, seule cette zone
+  // signale le problème (localisé). Sans erreur ni image → section masquée.
+  if (hasError) {
+    return (
+      <section className="mx-auto max-w-6xl px-4 py-6">
+        <h2 className="mb-3 text-2xl text-roux">{t("games.detail.gallery")}</h2>
+        <p role="alert" className="font-semibold text-error">
+          {t("games.detail.galleryError")}
+        </p>
+      </section>
+    );
+  }
   if (images.length === 0) return null;
 
   const publicUrl = (path: string) =>

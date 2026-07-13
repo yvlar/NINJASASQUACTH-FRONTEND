@@ -34,7 +34,9 @@ export default function GameForm({
   onCancel,
 }: {
   game?: GameRow | null;
-  onSaved: () => void;
+  // `warning` non vide = enregistrement RÉUSSI mais nettoyage de l'ancienne
+  // image échoué (à signaler sans le présenter comme un échec de sauvegarde).
+  onSaved: (warning?: "oldImageCleanup") => void;
   onCancel: () => void;
 }) {
   const { t } = useLanguage();
@@ -104,23 +106,28 @@ export default function GameForm({
 
     // Écriture réussie AVEC nouvelle image : supprimer l'ancienne SEULEMENT
     // maintenant (jamais avant de savoir la nouvelle opération réussie).
+    let oldImageOrphaned = false;
     if (uploadedPath && oldImageUrl) {
       const oldPath = imagePathFromPublicUrl(oldImageUrl);
       if (oldPath) {
         // L'ancien fichier n'est plus référencé ; son échec de suppression ne
-        // compromet pas la donnée (déjà cohérente) — orphelin journalisé.
+        // compromet pas la donnée (déjà cohérente) — orphelin SIGNALÉ (pas
+        // seulement journalisé) et présenté comme un simple avertissement.
         const { error: removeOldError } = await bucket().remove([oldPath]);
         if (removeOldError) {
           console.error(
             "Ancienne image non supprimée (orphelin Storage) :",
             oldPath,
           );
+          oldImageOrphaned = true;
         }
       }
     }
 
     setStatus("idle");
-    onSaved();
+    // Sauvegarde réussie : on remonte l'avertissement éventuel au gestionnaire
+    // (message non bloquant) plutôt que de le taire.
+    onSaved(oldImageOrphaned ? "oldImageCleanup" : undefined);
   };
 
   const groupProps = { values, errors, onText, onBool, t };

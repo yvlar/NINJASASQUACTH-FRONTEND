@@ -27,10 +27,12 @@ export default function GamesManager() {
   const [editing, setEditing] = useState<GameRow | null>(null);
   // confirmation de suppression en cours
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  // erreur d'action ponctuelle (suppression de ligne, ou nettoyage Storage)
-  const [actionError, setActionError] = useState<"delete" | "cleanup" | null>(
-    null,
-  );
+  // erreur d'action ponctuelle : échec de COLLECTE des médias (aucune
+  // suppression alors effectuée), échec de suppression SQL, ou échec du
+  // nettoyage Storage (jeu supprimé, orphelins signalés) — messages distincts.
+  const [actionError, setActionError] = useState<
+    "mediaCollect" | "delete" | "cleanup" | "saveCleanup" | null
+  >(null);
   // Incrémentée pour relancer la lecture (après création/édition/suppression) :
   // le fetch vit dans l'effet, les setState n'y sont qu'en callbacks
   // asynchrones (règle react-hooks set-state-in-effect).
@@ -78,27 +80,49 @@ export default function GamesManager() {
     setDeletingId(null);
     setActionError(null);
 
+    // 1. Collecte des chemins Storage AVANT toute suppression. Si la lecture
+    //    des médias échoue, on ARRÊTE : ne jamais supprimer le jeu sans avoir
+    //    pu récupérer les chemins (sinon les fichiers deviennent orphelins et
+    //    irrécupérables après le cascade).
+    let media: { storage_path: string | null }[] | null = null;
+    try {
+      const { data, error: mediaError } = await supabase
+        .from("game_media")
+        .select("storage_path")
+        .eq("game_id", game.id);
+      if (mediaError) {
+        setActionError("mediaCollect");
+        return;
+      }
+      media = data as { storage_path: string | null }[] | null;
+    } catch {
+      // Panne réseau avant réponse : même filet, on n'efface rien.
+      setActionError("mediaCollect");
+      return;
+    }
+
     const paths: string[] = [];
     const mainPath = imagePathFromPublicUrl(game.image_url);
     if (mainPath) paths.push(mainPath);
-    const { data: media } = await supabase
-      .from("game_media")
-      .select("storage_path")
-      .eq("game_id", game.id);
-    for (const item of (media as { storage_path: string }[] | null) ?? []) {
+    for (const item of media ?? []) {
       if (item.storage_path) paths.push(item.storage_path);
     }
+    // Déduplication (une photo principale peut aussi figurer en galerie).
+    const uniquePaths = [...new Set(paths)];
 
+    // 2. Suppression SQL (le cascade efface les lignes game_media).
     const { error } = await supabase.from("games").delete().eq("id", game.id);
     if (error) {
       setActionError("delete");
       return;
     }
 
-    if (paths.length > 0) {
+    // 3. Nettoyage Storage APRÈS le succès SQL. Un échec ici laisse un
+    //    orphelin sans compromettre la donnée : signalé distinctement.
+    if (uniquePaths.length > 0) {
       const { error: removeError } = await supabase.storage
         .from(GAME_IMAGES_BUCKET)
-        .remove(paths);
+        .remove(uniquePaths);
       if (removeError) setActionError("cleanup");
     }
     reload();
@@ -108,9 +132,12 @@ export default function GamesManager() {
     return (
       <GameForm
         game={editing}
-        onSaved={() => {
+        onSaved={(warning) => {
           setCreating(false);
           setEditing(null);
+          // Avertissement non bloquant : l'ancienne image n'a pas pu être
+          // supprimée, mais le jeu EST enregistré.
+          setActionError(warning === "oldImageCleanup" ? "saveCleanup" : null);
           reload();
         }}
         onCancel={() => {
@@ -139,11 +166,7 @@ export default function GamesManager() {
       )}
       {actionError && (
         <p className="font-semibold text-error" role="alert">
-          {t(
-            actionError === "cleanup"
-              ? "admin.manager.cleanupError"
-              : "admin.manager.deleteError",
-          )}
+          {t(`admin.manager.${actionError}Error`)}
         </p>
       )}
       {status === "ready" && games.length === 0 && (
