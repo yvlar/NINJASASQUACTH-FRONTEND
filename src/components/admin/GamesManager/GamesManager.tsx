@@ -6,6 +6,7 @@ import {
   imagePathFromPublicUrl,
 } from "../../../utils/storagePath";
 import GameForm from "../GameForm";
+import GameMediaManager from "../GameMediaManager";
 import type { GameRow } from "../../../types/database";
 
 type ManagerStatus = "loading" | "error" | "ready";
@@ -130,21 +131,26 @@ export default function GamesManager() {
 
   if (creating || editing) {
     return (
-      <GameForm
-        game={editing}
-        onSaved={(warning) => {
-          setCreating(false);
-          setEditing(null);
-          // Avertissement non bloquant : l'ancienne image n'a pas pu être
-          // supprimée, mais le jeu EST enregistré.
-          setActionError(warning === "oldImageCleanup" ? "saveCleanup" : null);
-          reload();
-        }}
-        onCancel={() => {
-          setCreating(false);
-          setEditing(null);
-        }}
-      />
+      <div className="flex flex-col gap-10">
+        <GameForm
+          game={editing}
+          onSaved={(warning) => {
+            setCreating(false);
+            setEditing(null);
+            // Avertissement non bloquant : l'ancienne image n'a pas pu être
+            // supprimée, mais le jeu EST enregistré.
+            setActionError(warning === "oldImageCleanup" ? "saveCleanup" : null);
+            reload();
+          }}
+          onCancel={() => {
+            setCreating(false);
+            setEditing(null);
+          }}
+        />
+        {/* La galerie (game_media) n'est administrable que pour un jeu déjà
+            enregistré (elle a besoin de son id) — donc en édition seulement. */}
+        {editing && <GameMediaManager gameId={editing.id} />}
+      </div>
     );
   }
 
