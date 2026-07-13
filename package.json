@@ -9,6 +9,7 @@
     "build:client": "vite build",
     "build:ssr": "vite build --ssr src/entry-prerender.tsx --outDir dist-ssr",
     "prerender": "node scripts/prerender.mjs",
+    "verify:dist": "node scripts/verify-dist.mjs",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "preview": "vite preview",
