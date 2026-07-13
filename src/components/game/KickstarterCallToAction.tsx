@@ -11,7 +11,7 @@ export default function KickstarterCallToAction({ game }: { game: GameRow }) {
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
       <div className="flex flex-col gap-3 rounded-lg border-l-4 border-l-forest bg-forest/10 p-6">
-        <h2 className="text-2xl font-bold text-roux">
+        <h2 className="text-2xl text-roux">
           {t("games.detail.kickstarter")}
         </h2>
         <p className="text-charcoal">

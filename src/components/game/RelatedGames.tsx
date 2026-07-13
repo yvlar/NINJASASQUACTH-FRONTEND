@@ -19,7 +19,7 @@ export default function RelatedGames({
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-10">
-      <h2 className="mb-6 text-2xl font-bold text-roux">
+      <h2 className="mb-6 text-2xl text-roux">
         {t("games.detail.related")}
       </h2>
       <div className="grid grid-cols-[1fr] gap-8 sm:grid-cols-[repeat(2,1fr)] lg:grid-cols-[repeat(3,1fr)]">

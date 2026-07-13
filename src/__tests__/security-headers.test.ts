@@ -7,6 +7,8 @@ import { describe, it, expect } from "vitest";
 import vercelConfig from "../../vercel.json";
 
 const config = vercelConfig as {
+  cleanUrls?: boolean;
+  redirects?: { source: string; destination: string; permanent?: boolean }[];
   rewrites: { source: string; destination: string }[];
   headers: { source: string; headers: { key: string; value: string }[] }[];
 };
@@ -21,9 +23,18 @@ function headersFor(source: string): Record<string, string> {
 describe("vercel.json — headers de sécurité", () => {
   const global = headersFor("/(.*)");
 
-  it("conserve la réécriture SPA (deep-link /admin en prod)", () => {
+  it("sert les fichiers pré-rendus : la SPA n'est réécrite QUE pour /admin", () => {
+    // Plus de catch-all vers /index.html (qui masquait les fichiers pré-rendus
+    // et servait une soft-404 en 200). Seul /admin (rendu client) est réécrit.
     expect(config.rewrites).toEqual([
-      { source: "/(.*)", destination: "/index.html" },
+      { source: "/admin", destination: "/index.html" },
+      { source: "/admin/:path*", destination: "/index.html" },
+    ]);
+  });
+
+  it("redirige la racine « / » vers /fr (redirection HTTP permanente)", () => {
+    expect(config.redirects).toEqual([
+      { source: "/", destination: "/fr", permanent: true },
     ]);
   });
 

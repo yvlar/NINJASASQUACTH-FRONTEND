@@ -3,14 +3,14 @@
 // (NewsletterForm) — jamais d'insertion Supabase publique. Le lien Kickstarter
 // n'apparaît QUE si le jeu vedette expose une URL publique.
 import { ExternalLink } from "lucide-react";
-import { useGames } from "../../../hooks/useGames";
+import { useSharedGames } from "../../../hooks/useSharedGames";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { selectFeaturedGame } from "../../../utils/featuredGame";
 import NewsletterForm from "./NewsletterForm";
 
 export default function NewsletterSection() {
   const { t } = useLanguage();
-  const { games, loading } = useGames();
+  const { games, loading } = useSharedGames();
   const featured = loading ? null : selectFeaturedGame(games);
   const kickstarterUrl =
     featured &&
@@ -20,7 +20,7 @@ export default function NewsletterSection() {
       : null;
 
   return (
-    <section id="notify" className="bg-brown/5 py-20">
+    <section id="notify" className="bg-roux/5 py-20">
       <div className="mx-auto max-w-3xl px-4 text-left sm:px-6 lg:px-8">
         <h2 className="mb-4 text-[2.25rem] tracking-[-0.01em] text-roux md:text-[2.75rem]">
           {t("newsletter.title")}

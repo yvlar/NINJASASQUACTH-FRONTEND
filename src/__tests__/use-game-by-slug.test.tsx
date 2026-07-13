@@ -11,18 +11,24 @@ import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
-  return { supabase: makeSupabaseMock() };
+  return { supabase: makeSupabaseMock(), isSupabaseConfigured: true };
 });
 
 const supabase = supabaseClient as unknown as SupabaseMock;
 const JEU = JEUX_FIXTURES[0];
 
 function Harness({ slug }: { slug: string }) {
-  const { game, loading, error, notFound } = useGameBySlug(slug);
+  const { game, loading, gameError, mediaError, notFound } =
+    useGameBySlug(slug);
   if (loading) return <p>loading</p>;
-  if (error) return <p>error</p>;
+  if (gameError) return <p>error</p>;
   if (notFound) return <p>notFound</p>;
-  return <p>game:{game?.title_fr}</p>;
+  return (
+    <p>
+      game:{game?.title_fr}
+      {mediaError ? " mediaError" : ""}
+    </p>
+  );
 }
 
 beforeEach(() => {
@@ -43,6 +49,18 @@ describe("useGameBySlug", () => {
     });
     render(<Harness slug={JEU.slug!} />);
     expect(await screen.findByText("error")).toBeInTheDocument();
+  });
+
+  it("une erreur de galerie n'empêche PAS la fiche (gameError vs mediaError)", async () => {
+    supabase.__setTable("games", { data: JEUX_FIXTURES, error: null });
+    supabase.__setTable("game_media", {
+      data: null,
+      error: { message: "galerie indisponible" },
+    });
+    render(<Harness slug={JEU.slug!} />);
+    expect(
+      await screen.findByText(`game:${JEU.title_fr} mediaError`),
+    ).toBeInTheDocument();
   });
 
   it("signale un jeu absent (notFound)", async () => {

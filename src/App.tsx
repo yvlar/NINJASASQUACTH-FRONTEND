@@ -7,6 +7,7 @@ import GamesSection from "./components/sections/Games";
 import FounderSection from "./components/sections/Founder";
 import NewsletterSection from "./components/sections/Newsletter";
 import ContactSection from "./components/sections/Contact";
+import GamesProvider from "./hooks/GamesProvider";
 
 function App() {
   const scrollToSection = (id: string) => {
@@ -23,12 +24,16 @@ function App() {
     <div className="min-h-screen bg-cream">
       <Header onNavigate={scrollToSection} />
       <main>
-        <Hero onNavigate={scrollToSection} />
-        <ReassuranceBanner />
-        <AboutSection />
-        <GamesSection />
-        <FounderSection />
-        <NewsletterSection />
+        {/* Catalogue chargé UNE fois et partagé par Hero, GamesSection et
+            NewsletterSection (plus de trois requêtes identiques). */}
+        <GamesProvider>
+          <Hero onNavigate={scrollToSection} />
+          <ReassuranceBanner />
+          <AboutSection />
+          <GamesSection />
+          <FounderSection />
+          <NewsletterSection />
+        </GamesProvider>
         <ContactSection />
       </main>
       <Footer />

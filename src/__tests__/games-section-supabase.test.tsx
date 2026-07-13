@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router-dom";
 import LanguageProvider from "../i18n/LanguageProvider";
+import GamesProvider from "../hooks/GamesProvider";
 import GamesSection from "../components/sections/Games";
 import fr from "../data/translations/fr.json";
 import en from "../data/translations/en.json";
@@ -15,7 +16,7 @@ import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
-  return { supabase: makeSupabaseMock() };
+  return { supabase: makeSupabaseMock(), isSupabaseConfigured: true };
 });
 
 // Cast unique : sous vi.mock, ce module est en réalité le mock complet
@@ -26,7 +27,9 @@ const renderSection = () =>
   render(
     <MemoryRouter>
       <LanguageProvider>
-        <GamesSection />
+        <GamesProvider>
+          <GamesSection />
+        </GamesProvider>
       </LanguageProvider>
     </MemoryRouter>,
   );

@@ -1,62 +1,96 @@
-// Edge Function `subscribe-kickstarter` (Sprint 12, Parties G/H) — Deno.
+// Edge Function `subscribe-kickstarter` (Sprint 12 · durci Sprint 11.1) — Deno.
 // Seul chemin d'écriture de la newsletter : le navigateur n'insère JAMAIS
 // directement dans Supabase (aucune policy d'insert). Cette fonction tourne
 // avec la service-role (secret d'environnement, jamais exposé au client) et
-// applique : validation serveur, normalisation, honeypot, limitation de
-// fréquence, gestion des doublons SANS fuite d'existence, preuve de
-// consentement, réponse générique. L'email complet n'est jamais journalisé.
+// applique : CORS strict, validation serveur, consentement PROUVÉ côté serveur,
+// honeypot, limitation de fréquence ATOMIQUE (RPC), gestion des doublons SANS
+// fuite d'existence, réponse générique. L'email complet n'est jamais journalisé.
 //
 // Déploiement (action utilisateur) :
 //   supabase functions deploy subscribe-kickstarter
-// Secrets à poser (supabase secrets set …) : SERVICE_ROLE_KEY est fourni par
-// la plateforme sous SUPABASE_SERVICE_ROLE_KEY ; définir aussi ALLOWED_ORIGIN
-// et RATE_LIMIT_SALT.
+// Secrets OBLIGATOIRES (supabase secrets set …) — aucun repli faible :
+//   SUPABASE_URL (fourni par la plateforme), SUPABASE_SERVICE_ROLE_KEY (idem),
+//   ALLOWED_ORIGIN (liste blanche d'origines, séparées par des virgules),
+//   RATE_LIMIT_SALT (sel de hachage d'IP). Si l'un manque → erreur de config
+//   générique (jamais la valeur d'un secret dans les logs).
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
   parseSubscription,
-  rateLimitDecision,
+  parseAllowedOrigins,
+  resolveAllowedOrigin,
+  corsHeaders,
   GENERIC_SUCCESS,
-  type RateLimitRecord,
 } from "./logic.ts";
 
-const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
-const SERVICE_ROLE_KEY = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-const ALLOWED_ORIGIN = Deno.env.get("ALLOWED_ORIGIN") ?? "*";
-const RATE_LIMIT_SALT = Deno.env.get("RATE_LIMIT_SALT") ?? "ns-games";
+// Fenêtre de limitation : au plus 5 tentatives par heure et par empreinte d'IP.
+const RATE_LIMIT = { windowSeconds: 60 * 60, maxAttempts: 5 };
 
-const RATE_LIMIT = { windowMs: 60 * 60 * 1000, maxAttempts: 5 };
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
-  "Access-Control-Allow-Methods": "POST, OPTIONS",
-  "Access-Control-Allow-Headers": "content-type",
-};
-
-function json(body: unknown, status = 200): Response {
+function json(
+  body: unknown,
+  status: number,
+  cors: Record<string, string>,
+): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { "content-type": "application/json", ...corsHeaders },
+    headers: { "content-type": "application/json", ...cors },
   });
 }
 
-// Empreinte d'IP (SHA-256 + sel) : on ne stocke jamais l'IP brute.
-async function hashIp(ip: string): Promise<string> {
-  const data = new TextEncoder().encode(`${RATE_LIMIT_SALT}:${ip}`);
+// Empreinte d'IP (SHA-256 + sel secret) : on ne stocke jamais l'IP brute.
+async function hashIp(ip: string, salt: string): Promise<string> {
+  const data = new TextEncoder().encode(`${salt}:${ip}`);
   const digest = await crypto.subtle.digest("SHA-256", data);
   return Array.from(new Uint8Array(digest))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("");
 }
 
-Deno.serve(async (req: Request) => {
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
+// Configuration OBLIGATOIRE : aucun repli faible (« * », sel par défaut…).
+// Retourne null si un secret requis manque → la fonction répond « not_configured »
+// sans jamais divulguer quelle variable ni sa valeur.
+function readConfig(): {
+  supabaseUrl: string;
+  serviceRoleKey: string;
+  allowedOrigins: string[];
+  salt: string;
+} | null {
+  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+  const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  const allowedOrigins = parseAllowedOrigins(Deno.env.get("ALLOWED_ORIGIN"));
+  const salt = Deno.env.get("RATE_LIMIT_SALT") ?? "";
+  if (!supabaseUrl || !serviceRoleKey || allowedOrigins.length === 0 || !salt) {
+    return null;
   }
-  if (req.method !== "POST") {
-    return json({ ok: false, message: "method_not_allowed" }, 405);
+  return { supabaseUrl, serviceRoleKey, allowedOrigins, salt };
+}
+
+Deno.serve(async (req: Request) => {
+  const requestOrigin = req.headers.get("Origin");
+  const config = readConfig();
+
+  // Sans configuration valide, on ne pose aucun entête CORS permissif.
+  if (!config) {
+    console.error("subscribe-kickstarter: configuration incomplète");
+    return json({ ok: false, message: "not_configured" }, 500, corsHeaders(null));
   }
 
-  const supabase = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
+  const allowOrigin = resolveAllowedOrigin(requestOrigin, config.allowedOrigins);
+  const cors = corsHeaders(allowOrigin);
+
+  // Preflight : on répond OK, mais uniquement avec un ACAO si l'origine est
+  // autorisée (sinon le navigateur bloquera de lui-même l'appel réel).
+  if (req.method === "OPTIONS") {
+    return new Response(null, { status: 204, headers: cors });
+  }
+  if (req.method !== "POST") {
+    return json({ ok: false, message: "method_not_allowed" }, 405, cors);
+  }
+  // Origine présente mais non autorisée : refus net (pas de reflet aveugle).
+  if (requestOrigin && !allowOrigin) {
+    return json({ ok: false, message: "forbidden_origin" }, 403, cors);
+  }
+
+  const supabase = createClient(config.supabaseUrl, config.serviceRoleKey, {
     auth: { persistSession: false },
   });
 
@@ -68,50 +102,55 @@ Deno.serve(async (req: Request) => {
       body = {};
     }
 
-    // Limitation de fréquence par empreinte d'IP (fenêtre glissante).
+    // Limitation de fréquence ATOMIQUE (verrou côté Postgres) : lecture,
+    // fenêtre et incrément dans une seule transaction → pas de condition de
+    // course. On ne poursuit JAMAIS si le limiteur est indisponible.
     const ip =
       req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-    const ipHash = await hashIp(ip);
-    const { data: rlRow } = await supabase
-      .from("newsletter_rate_limits")
-      .select("window_start, attempts")
-      .eq("ip_hash", ipHash)
-      .maybeSingle();
-
-    const record: RateLimitRecord | null = rlRow
-      ? {
-          windowStart: new Date(rlRow.window_start).getTime(),
-          attempts: rlRow.attempts,
-        }
-      : null;
-    const decision = rateLimitDecision(Date.now(), record, RATE_LIMIT);
-    await supabase.from("newsletter_rate_limits").upsert({
-      ip_hash: ipHash,
-      window_start: new Date(decision.next.windowStart).toISOString(),
-      attempts: decision.next.attempts,
-    });
-    if (!decision.allowed) {
+    const ipHash = await hashIp(ip, config.salt);
+    const { data: allowed, error: rlError } = await supabase.rpc(
+      "check_newsletter_rate_limit",
+      {
+        p_ip_hash: ipHash,
+        p_window_seconds: RATE_LIMIT.windowSeconds,
+        p_max_attempts: RATE_LIMIT.maxAttempts,
+      },
+    );
+    if (rlError) {
+      // Fail-closed : erreur du limiteur → aucune inscription, code technique seul.
+      console.error("subscribe-kickstarter rate-limit RPC:", rlError.code);
+      return json({ ok: false, message: "subscription.error" }, 503, cors);
+    }
+    if (allowed !== true) {
       // Trop de tentatives : réponse générique, aucune écriture d'abonné.
-      return json(GENERIC_SUCCESS, 200);
+      return json(GENERIC_SUCCESS, 200, cors);
     }
 
     const parsed = parseSubscription(body);
     if (!parsed.ok) {
       // Honeypot → succès générique (on ignore silencieusement le bot).
-      if (parsed.reason === "honeypot") return json(GENERIC_SUCCESS, 200);
+      if (parsed.reason === "honeypot") return json(GENERIC_SUCCESS, 200, cors);
+      // Consentement absent/invalide → refus explicite (aucune fausse preuve).
+      if (parsed.reason === "consent") {
+        return json({ ok: false, message: "subscription.consent" }, 400, cors);
+      }
       // Email invalide → rejet explicite (message générique, sans fuite).
-      return json({ ok: false, message: "subscription.invalid" }, 400);
+      return json({ ok: false, message: "subscription.invalid" }, 400, cors);
     }
 
-    // Insertion idempotente : un doublon ne lève pas d'erreur et ne révèle
-    // rien (on ignore le conflit sur email_normalized).
+    // Insertion idempotente. `consent_at` n'est écrit QU'ICI, après validation
+    // serveur du consentement → aucune fausse preuve. Opt-in simple explicite :
+    // statut « confirmed » (voir README : pas de double opt-in tant qu'aucun
+    // courriel de confirmation n'est envoyé).
     const { error } = await supabase.from("newsletter_subscribers").upsert(
       {
         email_normalized: parsed.value.email,
         locale: parsed.value.locale,
         source: parsed.value.source,
-        status: "pending",
+        status: "confirmed",
         consent_at: new Date().toISOString(),
+        consent_version: parsed.value.consentVersion,
+        consent_source: parsed.value.source,
       },
       { onConflict: "email_normalized", ignoreDuplicates: true },
     );
@@ -119,13 +158,13 @@ Deno.serve(async (req: Request) => {
     if (error) {
       // On ne journalise jamais l'email : seulement le code d'erreur.
       console.error("subscribe-kickstarter insert error:", error.code);
-      return json({ ok: false, message: "subscription.error" }, 500);
+      return json({ ok: false, message: "subscription.error" }, 500, cors);
     }
 
     // Réponse identique pour une nouvelle inscription OU un doublon.
-    return json(GENERIC_SUCCESS, 200);
+    return json(GENERIC_SUCCESS, 200, cors);
   } catch (err) {
     console.error("subscribe-kickstarter error:", (err as Error).name);
-    return json({ ok: false, message: "subscription.error" }, 500);
+    return json({ ok: false, message: "subscription.error" }, 500, cors);
   }
 });

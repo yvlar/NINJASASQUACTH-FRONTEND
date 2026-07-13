@@ -69,6 +69,8 @@ describe("NewsletterForm", () => {
         email: "Fan@Exemple.com",
         locale: "fr",
         source: "notify-launch",
+        consent: true,
+        consentVersion: "newsletter-v1-2026-07",
         website: "",
       },
     });

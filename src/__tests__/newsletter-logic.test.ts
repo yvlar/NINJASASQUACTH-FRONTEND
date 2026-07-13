@@ -12,7 +12,20 @@ import {
   maskEmail,
   rateLimitDecision,
   GENERIC_SUCCESS,
+  CONSENT_VERSION,
+  CORS_ALLOWED_HEADERS,
+  parseAllowedOrigins,
+  resolveAllowedOrigin,
+  corsHeaders,
 } from "../../supabase/functions/subscribe-kickstarter/logic";
+
+// Corps valide minimal (consentement explicite + version) réutilisé ci-dessous.
+const consented = (extra: Record<string, unknown> = {}) => ({
+  email: "fan@exemple.com",
+  consent: true,
+  consentVersion: CONSENT_VERSION,
+  ...extra,
+});
 
 describe("validation et normalisation d'email", () => {
   it("rejette un email invalide", () => {
@@ -32,20 +45,22 @@ describe("validation et normalisation d'email", () => {
 
 describe("parseSubscription", () => {
   it("email invalide → { ok:false, reason:'invalid' }", () => {
-    const r = parseSubscription({ email: "nope" });
+    const r = parseSubscription(consented({ email: "nope" }));
     expect(r).toEqual({ ok: false, reason: "invalid" });
   });
 
   it("honeypot rempli → { ok:false, reason:'honeypot' }", () => {
-    const r = parseSubscription({ email: "a@b.com", website: "http://spam" });
+    const r = parseSubscription(consented({ website: "http://spam" }));
     expect(r).toEqual({ ok: false, reason: "honeypot" });
   });
 
-  it("enregistre la locale et la source", () => {
+  it("email valide AVEC consentement + version → ok, source enregistrée", () => {
     const r = parseSubscription({
       email: "Fan@Exemple.com",
       locale: "en",
       source: "hero-heroes-rising",
+      consent: true,
+      consentVersion: CONSENT_VERSION,
     });
     expect(r).toEqual({
       ok: true,
@@ -53,13 +68,74 @@ describe("parseSubscription", () => {
         email: "fan@exemple.com",
         locale: "en",
         source: "hero-heroes-rising",
+        consentVersion: CONSENT_VERSION,
       },
     });
+  });
+
+  it("email valide SANS consentement → refus 'consent'", () => {
+    const r = parseSubscription({ email: "fan@exemple.com" });
+    expect(r).toEqual({ ok: false, reason: "consent" });
+  });
+
+  it("consent:false → refus 'consent'", () => {
+    const r = parseSubscription(consented({ consent: false }));
+    expect(r).toEqual({ ok: false, reason: "consent" });
+  });
+
+  it("version de consentement absente → refus 'consent'", () => {
+    const r = parseSubscription({ email: "fan@exemple.com", consent: true });
+    expect(r).toEqual({ ok: false, reason: "consent" });
+  });
+
+  it("version de consentement erronée → refus 'consent'", () => {
+    const r = parseSubscription(consented({ consentVersion: "faux" }));
+    expect(r).toEqual({ ok: false, reason: "consent" });
   });
 
   it("locale inconnue → repli 'fr' ; source bornée à 64 caractères", () => {
     expect(normalizeLocale("de")).toBe("fr");
     expect(normalizeSource("x".repeat(200))).toHaveLength(64);
+  });
+});
+
+describe("CORS — preflight et liste blanche d'origines", () => {
+  const ALLOWED = "https://ninja.example, https://preview.example";
+
+  it("autorise les en-têtes envoyés par functions.invoke", () => {
+    // authorization / x-client-info / apikey / content-type : tous requis.
+    for (const h of ["authorization", "x-client-info", "apikey", "content-type"]) {
+      expect(CORS_ALLOWED_HEADERS).toContain(h);
+    }
+  });
+
+  it("liste blanche : ignore les entrées vides et le joker '*'", () => {
+    expect(parseAllowedOrigins("https://a.example, , *, https://b.example")).toEqual([
+      "https://a.example",
+      "https://b.example",
+    ]);
+    expect(parseAllowedOrigins("*")).toEqual([]);
+    expect(parseAllowedOrigins(undefined)).toEqual([]);
+  });
+
+  it("origine autorisée → reflétée ; origine inconnue → aucun ACAO", () => {
+    const allowed = parseAllowedOrigins(ALLOWED);
+    expect(resolveAllowedOrigin("https://ninja.example", allowed)).toBe(
+      "https://ninja.example",
+    );
+    expect(resolveAllowedOrigin("https://evil.example", allowed)).toBeNull();
+    expect(resolveAllowedOrigin(null, allowed)).toBeNull();
+  });
+
+  it("jamais de '*' dans les en-têtes CORS produits", () => {
+    const withOrigin = corsHeaders("https://ninja.example");
+    expect(withOrigin["Access-Control-Allow-Origin"]).toBe("https://ninja.example");
+    expect(JSON.stringify(withOrigin)).not.toContain("*");
+
+    // Origine refusée : pas d'ACAO du tout (le navigateur bloquera).
+    const denied = corsHeaders(null);
+    expect(denied["Access-Control-Allow-Origin"]).toBeUndefined();
+    expect(denied.Vary).toBe("Origin");
   });
 });
 

@@ -15,7 +15,7 @@ import type { SupabaseMock } from "./helpers/supabaseMock";
 
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
-  return { supabase: makeSupabaseMock() };
+  return { supabase: makeSupabaseMock(), isSupabaseConfigured: true };
 });
 
 const supabase = supabaseClient as unknown as SupabaseMock;

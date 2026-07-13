@@ -21,7 +21,9 @@
       "confirmDelete": "Supprimer ce jeu ?",
       "confirm": "Confirmer la suppression",
       "deleteError": "La suppression a échoué. Réessayez.",
-      "cleanupError": "Le jeu a été supprimé, mais certains fichiers image n'ont pas pu être nettoyés. Prévenez un administrateur."
+      "mediaCollectError": "Impossible de récupérer les fichiers du jeu : suppression annulée pour ne perdre aucune image. Réessayez.",
+      "cleanupError": "Le jeu a été supprimé, mais certains fichiers image n'ont pas pu être nettoyés. Prévenez un administrateur.",
+      "saveCleanupError": "Jeu enregistré, mais l'ancienne image n'a pas pu être supprimée. Prévenez un administrateur."
     },
     "form": {
       "createTitle": "Nouveau jeu",
@@ -124,7 +126,7 @@
     "lead": "Envie d'être prévenu dès qu'un nouveau jeu arrive ou qu'une campagne démarre ? Écrivez-nous et nous vous tiendrons au courant.",
     "emailLabel": "Votre courriel",
     "emailPlaceholder": "vous@exemple.com",
-    "consent": "J'accepte de recevoir des nouvelles de Ninja Sasquatch Games. Je peux me désinscrire à tout moment.",
+    "consent": "J'accepte de recevoir des nouvelles de Ninja Sasquatch Games. Je peux me désinscrire à tout moment en nous écrivant.",
     "submit": "M'inscrire",
     "submitting": "Envoi…",
     "success": "Merci ! Vous serez prévenu au lancement.",
@@ -171,9 +173,11 @@
       "comingSoon": "À venir",
       "summary": "Résumé",
       "howToPlay": "Comment jouer",
+      "complexity": "Complexité",
       "mechanics": "Mécaniques",
       "languages": "Langues du matériel",
       "gallery": "Galerie",
+      "galleryError": "La galerie n'a pas pu être chargée.",
       "rules": "Règles du jeu",
       "download": "Télécharger les règles (PDF)",
       "rulesComingSoon": "Règles bientôt disponibles.",

@@ -21,7 +21,9 @@
       "confirmDelete": "Delete this game?",
       "confirm": "Confirm deletion",
       "deleteError": "Deletion failed. Try again.",
-      "cleanupError": "The game was deleted, but some image files could not be cleaned up. Please notify an administrator."
+      "mediaCollectError": "Could not retrieve the game's files: deletion cancelled so no image is lost. Please try again.",
+      "cleanupError": "The game was deleted, but some image files could not be cleaned up. Please notify an administrator.",
+      "saveCleanupError": "Game saved, but the previous image could not be deleted. Please notify an administrator."
     },
     "form": {
       "createTitle": "New game",
@@ -124,7 +126,7 @@
     "lead": "Want to know as soon as a new game arrives or a campaign starts? Write to us and we'll keep you posted.",
     "emailLabel": "Your email",
     "emailPlaceholder": "you@example.com",
-    "consent": "I agree to receive news from Ninja Sasquatch Games. I can unsubscribe at any time.",
+    "consent": "I agree to receive news from Ninja Sasquatch Games. I can unsubscribe at any time by contacting us.",
     "submit": "Notify me",
     "submitting": "Sending…",
     "success": "Thanks! We'll let you know at launch.",
@@ -171,9 +173,11 @@
       "comingSoon": "Coming soon",
       "summary": "Overview",
       "howToPlay": "How to play",
+      "complexity": "Complexity",
       "mechanics": "Mechanics",
       "languages": "Component languages",
       "gallery": "Gallery",
+      "galleryError": "The gallery could not be loaded.",
       "rules": "Game rules",
       "download": "Download the rules (PDF)",
       "rulesComingSoon": "Rules coming soon.",

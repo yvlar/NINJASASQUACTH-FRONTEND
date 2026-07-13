@@ -10,7 +10,7 @@ export default function HowToPlay({ game }: { game: GameRow }) {
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="mb-3 text-2xl font-bold text-roux">
+      <h2 className="mb-3 text-2xl text-roux">
         {t("games.detail.howToPlay")}
       </h2>
       <div className="flex flex-col gap-4">

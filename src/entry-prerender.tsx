@@ -2,6 +2,7 @@
 // pré-rendu Node (scripts/prerender.mjs) a besoin, pour un unique import du
 // bundle compilé — évite d'exécuter du TypeScript/JSX brut sous Node.
 export { render, langFromUrl } from "./entry-server";
+export { serializePrerenderData } from "./ssr/serializeSeed";
 export { planRoutes, NOT_FOUND_URL } from "./prerender/plan";
 export { injectPage } from "./prerender/inject";
 export { buildSitemap, buildRobots } from "./prerender/sitemap";

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { categories } from "../../../data/games";
-import { useGames } from "../../../hooks/useGames";
+import { useSharedGames } from "../../../hooks/useSharedGames";
 import { useLanguage } from "../../../i18n/useLanguage";
 import GameCard from "./GameCard";
 import CategoryFilter from "./CategoryFilters";
@@ -13,7 +13,7 @@ export default function GamesSection() {
   // Les jeux viennent de Supabase (la RLS ne sert que les jeux publiés aux
   // visiteurs anonymes) ; la base peut être vide tant que l'admin n'a rien créé.
   // Plus d'état selectedGame : chaque carte est un lien vers sa fiche.
-  const { games, loading, error } = useGames();
+  const { games, loading, error } = useSharedGames();
 
   const filteredGames =
     selectedCategory === "tous"
@@ -35,7 +35,7 @@ export default function GamesSection() {
   return (
     <section id="jeux" className="bg-cream py-20">
       <div className="mx-auto max-w-[1280px] px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-4 text-center text-[2.5rem] font-extrabold tracking-[-0.01em] text-roux md:text-[3rem]">
+        <h2 className="mb-4 text-center text-[2.5rem] tracking-[-0.01em] text-roux md:text-[3rem]">
           {t("games.title")}
         </h2>
         <p className="mx-auto mb-12 max-w-2xl text-center text-lg/[1.6] text-charcoal">

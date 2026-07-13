@@ -71,7 +71,7 @@ export default function ContactSection() {
   return (
     <section id="contact" className="bg-cream py-20">
       <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-        <h2 className="mb-4 text-center text-[2.5rem] font-extrabold tracking-[-0.01em] text-roux md:text-[3rem]">
+        <h2 className="mb-4 text-center text-[2.5rem] tracking-[-0.01em] text-roux md:text-[3rem]">
           {t("contact.title")}
         </h2>
         <p className="mb-12 text-center text-lg/[1.6] text-charcoal">
@@ -182,7 +182,7 @@ export default function ContactSection() {
 
             <button
               type="submit"
-              className="w-full cursor-pointer rounded-lg bg-forest px-8 py-4 font-brand text-[1rem] font-bold tracking-[0.02em] text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+              className="w-full cursor-pointer rounded-lg bg-forest px-8 py-4 font-brand text-[1rem] tracking-[0.02em] text-white shadow-[0_10px_15px_-3px_rgba(0,0,0,0.1)] transition-opacity duration-300 hover:opacity-90 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
             >
               {t("contact.send")}
             </button>

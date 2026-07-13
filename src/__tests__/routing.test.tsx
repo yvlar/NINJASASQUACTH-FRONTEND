@@ -15,7 +15,7 @@ import en from "../data/translations/en.json";
 // (aucun test ne touche le réseau, aucune env requise).
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
-  return { supabase: makeSupabaseMock() };
+  return { supabase: makeSupabaseMock(), isSupabaseConfigured: true };
 });
 
 function renderAt(path: string) {

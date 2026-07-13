@@ -10,7 +10,7 @@ import LanguageProvider from "../i18n/LanguageProvider";
 // GamesSection lit les jeux via Supabase : client mocké (aucun réseau).
 vi.mock("../lib/supabase", async () => {
   const { makeSupabaseMock } = await import("./helpers/supabaseMock");
-  return { supabase: makeSupabaseMock() };
+  return { supabase: makeSupabaseMock(), isSupabaseConfigured: true };
 });
 
 // jsdom n'implémente pas scrollIntoView : on l'espionne pour observer
