@@ -46,6 +46,18 @@ async function main() {
   const supabaseKey =
     process.env.SUPABASE_ANON_KEY || process.env.VITE_SUPABASE_ANON_KEY;
 
+  // Garde-fou de PRODUCTION : quand REQUIRE_PRERENDER_GAMES=true, le pré-rendu
+  // des fiches est obligatoire. La CI générique peut rester sans Supabase (mode
+  // dégradé accueil-only), mais un build de production doit ÉCHOUER si la
+  // configuration manque ou si les fiches attendues ne peuvent être générées.
+  const requireGames = process.env.REQUIRE_PRERENDER_GAMES === "true";
+  if (requireGames && (!supabaseUrl || !supabaseKey)) {
+    throw new Error(
+      "REQUIRE_PRERENDER_GAMES : configuration Supabase de build obligatoire " +
+        "(SUPABASE_URL / SUPABASE_ANON_KEY absente).",
+    );
+  }
+
   let games = [];
   const mediaByGame = {};
 
@@ -83,6 +95,24 @@ async function main() {
       }
     }
     console.log(`[prerender] ${games.length} jeu(x) publié(s) chargé(s).`);
+
+    if (requireGames) {
+      // Zéro jeu alors que des jeux publiés sont attendus → erreur.
+      if (games.length === 0) {
+        throw new Error(
+          "REQUIRE_PRERENDER_GAMES : aucun jeu publié chargé alors que des " +
+            "fiches sont attendues.",
+        );
+      }
+      // Tout jeu publié DOIT avoir un slug (sinon sa fiche n'est pas générée).
+      const sansSlug = games.filter((g) => !g.slug);
+      if (sansSlug.length > 0) {
+        throw new Error(
+          `REQUIRE_PRERENDER_GAMES : ${sansSlug.length} jeu(x) publié(s) sans ` +
+            "slug — fiche impossible à pré-rendre.",
+        );
+      }
+    }
   } else {
     console.warn(
       "[prerender] Config Supabase absente (SUPABASE_URL/ANON_KEY) : " +
@@ -111,6 +141,18 @@ async function main() {
     await mkdir(dirname(outPath), { recursive: true });
     await writeFile(outPath, html, "utf8");
     console.log(`[prerender] ${route.url} → dist/${route.outFile}`);
+  }
+
+  if (requireGames) {
+    // Chaque jeu publié doit avoir produit sa fiche FR ET EN (sinon échec).
+    const gameRoutes = routes.filter((r) => r.meta.kind === "game");
+    const expected = games.length * 2; // FR + EN par jeu
+    if (gameRoutes.length !== expected) {
+      throw new Error(
+        `REQUIRE_PRERENDER_GAMES : ${gameRoutes.length} fiche(s) générée(s) ` +
+          `pour ${games.length} jeu(x) publié(s) (attendu ${expected}).`,
+      );
+    }
   }
 
   // Shell racine « / » : mêmes métadonnées d'accueil FR (le corps reste le
