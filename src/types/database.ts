@@ -44,6 +44,10 @@ export interface Database {
           short_desc_en: string;
           full_desc_fr: string;
           full_desc_en: string;
+          how_to_play_fr: string | null;
+          how_to_play_en: string | null;
+          rules_summary_fr: string | null;
+          rules_summary_en: string | null;
           image_url: string | null;
           players: string;
           duration: string;
@@ -80,6 +84,10 @@ export interface Database {
           short_desc_en: string;
           full_desc_fr: string;
           full_desc_en: string;
+          how_to_play_fr?: string | null;
+          how_to_play_en?: string | null;
+          rules_summary_fr?: string | null;
+          rules_summary_en?: string | null;
           image_url?: string | null;
           players: string;
           duration: string;
@@ -116,6 +124,10 @@ export interface Database {
           short_desc_en?: string;
           full_desc_fr?: string;
           full_desc_en?: string;
+          how_to_play_fr?: string | null;
+          how_to_play_en?: string | null;
+          rules_summary_fr?: string | null;
+          rules_summary_en?: string | null;
           image_url?: string | null;
           players?: string;
           duration?: string;

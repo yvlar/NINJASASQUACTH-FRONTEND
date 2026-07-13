@@ -22,6 +22,10 @@ export const JEUX_FIXTURES: [GameRow, GameRow, GameRow] = [
       "Un jeu de découverte familial où les joueurs explorent les origines du Sasquatch.",
     full_desc_en:
       "A family discovery game where players explore the origins of the Sasquatch.",
+    how_to_play_fr: null,
+    how_to_play_en: null,
+    rules_summary_fr: null,
+    rules_summary_en: null,
     image_url: "https://exemple.supabase.co/public/game-images/origines.webp",
     players: "2-6",
     duration: "30-45 min",
@@ -62,6 +66,10 @@ export const JEUX_FIXTURES: [GameRow, GameRow, GameRow] = [
       "Un jeu de stratégie où chaque décision compte pour accomplir la mission.",
     full_desc_en:
       "A strategy game where every decision counts to complete the mission.",
+    how_to_play_fr: null,
+    how_to_play_en: null,
+    rules_summary_fr: null,
+    rules_summary_en: null,
     image_url: null,
     players: "2-4",
     duration: "45-60 min",
@@ -100,6 +108,10 @@ export const JEUX_FIXTURES: [GameRow, GameRow, GameRow] = [
       "Un jeu d'ambiance rapide où l'on compose le festin le plus fou de la forêt.",
     full_desc_en:
       "A fast party game about building the wildest feast in the forest.",
+    how_to_play_fr: null,
+    how_to_play_en: null,
+    rules_summary_fr: null,
+    rules_summary_en: null,
     image_url: "https://exemple.supabase.co/public/game-images/festin.webp",
     players: "3-8",
     duration: "20-30 min",

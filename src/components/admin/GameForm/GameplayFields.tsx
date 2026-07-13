@@ -77,6 +77,46 @@ export default function GameplayFields({
         optional
       />
 
+      {/* Étapes réelles de déroulement (une par ligne) — jamais dérivées du
+          marketing ; masquées sur la fiche tant qu'elles sont vides. */}
+      <FormField
+        name="how_to_play_fr"
+        values={values}
+        errors={errors}
+        onText={onText}
+        t={t}
+        multiline
+        optional
+      />
+      <FormField
+        name="how_to_play_en"
+        values={values}
+        errors={errors}
+        onText={onText}
+        t={t}
+        multiline
+        optional
+      />
+      {/* Synthèse de règles réelles (objectif, mise en place, tour, fin…). */}
+      <FormField
+        name="rules_summary_fr"
+        values={values}
+        errors={errors}
+        onText={onText}
+        t={t}
+        multiline
+        optional
+      />
+      <FormField
+        name="rules_summary_en"
+        values={values}
+        errors={errors}
+        onText={onText}
+        t={t}
+        multiline
+        optional
+      />
+
       <div className="flex items-center gap-2">
         <input
           id="game-form-eco"

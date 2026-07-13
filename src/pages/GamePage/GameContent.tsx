@@ -15,6 +15,7 @@ import GameHero from "../../components/game/GameHero";
 import GameBadges from "../../components/game/GameBadges";
 import NarrativeSummary from "../../components/game/NarrativeSummary";
 import HowToPlay from "../../components/game/HowToPlay";
+import GameMechanics from "../../components/game/GameMechanics";
 import GameGallery from "../../components/game/GameGallery";
 import RulesDownload from "../../components/game/RulesDownload";
 import KickstarterCallToAction from "../../components/game/KickstarterCallToAction";
@@ -76,6 +77,7 @@ export default function GameContent({ slug }: { slug: string }) {
             <GameBadges game={game} />
             <NarrativeSummary game={game} />
             <HowToPlay game={game} />
+            <GameMechanics game={game} />
             <GameGallery media={media} hasError={mediaError != null} />
             <RulesDownload game={game} />
             <KickstarterCallToAction game={game} />

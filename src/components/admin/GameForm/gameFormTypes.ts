@@ -20,6 +20,10 @@ export interface GameFormValues {
   short_desc_en: string;
   full_desc_fr: string;
   full_desc_en: string;
+  how_to_play_fr: string;
+  how_to_play_en: string;
+  rules_summary_fr: string;
+  rules_summary_en: string;
   category: GameCategory;
   players_min: string;
   players_max: string;
@@ -82,6 +86,10 @@ export const INITIAL_VALUES: GameFormValues = {
   short_desc_en: "",
   full_desc_fr: "",
   full_desc_en: "",
+  how_to_play_fr: "",
+  how_to_play_en: "",
+  rules_summary_fr: "",
+  rules_summary_en: "",
   category: "famille",
   players_min: "",
   players_max: "",
@@ -118,6 +126,10 @@ export function valuesFromGame(game: GameRow): GameFormValues {
     short_desc_en: game.short_desc_en,
     full_desc_fr: game.full_desc_fr,
     full_desc_en: game.full_desc_en,
+    how_to_play_fr: game.how_to_play_fr ?? "",
+    how_to_play_en: game.how_to_play_en ?? "",
+    rules_summary_fr: game.rules_summary_fr ?? "",
+    rules_summary_en: game.rules_summary_en ?? "",
     category: game.category,
     players_min: numToStr(game.players_min),
     players_max: numToStr(game.players_max),
@@ -197,6 +209,10 @@ export function buildGamePayload(
     short_desc_en: values.short_desc_en.trim(),
     full_desc_fr: values.full_desc_fr.trim(),
     full_desc_en: values.full_desc_en.trim(),
+    how_to_play_fr: strOrNull(values.how_to_play_fr),
+    how_to_play_en: strOrNull(values.how_to_play_en),
+    rules_summary_fr: strOrNull(values.rules_summary_fr),
+    rules_summary_en: strOrNull(values.rules_summary_en),
     category: values.category,
     players: derivePlayers(values.players_min, values.players_max),
     duration: deriveDuration(values.duration_min, values.duration_max),

@@ -1,45 +1,27 @@
-// Comment jouer : mécaniques et langues du matériel. Masqué si aucune donnée.
+// Comment jouer : les ÉTAPES RÉELLES de déroulement (how_to_play_*), une par
+// ligne, présentées comme une liste ordonnée. Masqué si aucune étape réelle —
+// on n'y met JAMAIS les mécaniques à la place (celles-ci ont leur propre
+// section GameMechanics). Aucune règle inventée.
 import { useLanguage } from "../../i18n/useLanguage";
 import type { GameRow } from "../../types/database";
 
 export default function HowToPlay({ game }: { game: GameRow }) {
-  const { t } = useLanguage();
-  const mechanics = game.mechanics ?? [];
-  const languages = game.game_languages ?? [];
-  if (mechanics.length === 0 && languages.length === 0) return null;
+  const { t, lang } = useLanguage();
+  const raw = (lang === "en" ? game.how_to_play_en : game.how_to_play_fr) ?? "";
+  const steps = raw
+    .split("\n")
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
+  if (steps.length === 0) return null;
 
   return (
     <section className="mx-auto max-w-6xl px-4 py-6">
-      <h2 className="mb-3 text-2xl text-roux">
-        {t("games.detail.howToPlay")}
-      </h2>
-      <div className="flex flex-col gap-4">
-        {mechanics.length > 0 && (
-          <div>
-            <h3 className="mb-2 font-semibold text-charcoal">
-              {t("games.detail.mechanics")}
-            </h3>
-            <ul className="flex flex-wrap gap-2">
-              {mechanics.map((mechanic) => (
-                <li
-                  key={mechanic}
-                  className="rounded-full bg-forest/10 px-3 py-1 text-sm text-charcoal"
-                >
-                  {mechanic}
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
-        {languages.length > 0 && (
-          <div>
-            <h3 className="mb-2 font-semibold text-charcoal">
-              {t("games.detail.languages")}
-            </h3>
-            <p className="text-charcoal">{languages.join(" · ")}</p>
-          </div>
-        )}
-      </div>
+      <h2 className="mb-3 text-2xl text-roux">{t("games.detail.howToPlay")}</h2>
+      <ol className="flex list-decimal flex-col gap-2 pl-6 text-charcoal">
+        {steps.map((step, index) => (
+          <li key={index}>{step}</li>
+        ))}
+      </ol>
     </section>
   );
 }
