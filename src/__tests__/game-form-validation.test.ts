@@ -30,10 +30,9 @@ describe("validateGameForm", () => {
     expect(validateGameForm(VALIDE, null)).toEqual({});
   });
 
-  it("exige les champs de parité FR/EN et le slug", () => {
+  it("exige les champs de parité FR/EN (hors slug)", () => {
     const errors = validateGameForm(INITIAL_VALUES, null);
     for (const champ of [
-      "slug",
       "title_fr",
       "title_en",
       "short_desc_fr",
@@ -53,6 +52,29 @@ describe("validateGameForm", () => {
       "admin.form.errors.slug",
     );
     expect(validateGameForm({ ...VALIDE, slug: "ok-123" }, null).slug).toBeUndefined();
+  });
+
+  it("accepte un brouillon sans slug", () => {
+    // published=false + slug vide : aucun blocage sur le slug.
+    const errors = validateGameForm(
+      { ...VALIDE, slug: "", published: false },
+      null,
+    );
+    expect(errors.slug).toBeUndefined();
+  });
+
+  it("refuse la publication sans slug", () => {
+    const errors = validateGameForm(
+      { ...VALIDE, slug: "", published: true },
+      null,
+    );
+    expect(errors.slug).toBe("admin.form.errors.slugRequiredWhenPublished");
+  });
+
+  it("accepte un jeu publié avec un slug valide", () => {
+    expect(
+      validateGameForm({ ...VALIDE, slug: "ok-123", published: true }, null).slug,
+    ).toBeUndefined();
   });
 
   it("rejette un nombre de joueurs non entier ou négatif", () => {

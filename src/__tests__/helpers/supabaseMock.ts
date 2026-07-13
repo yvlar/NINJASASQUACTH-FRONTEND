@@ -90,6 +90,7 @@ interface MockState {
   removeError: unknown;
   publicUrl: string;
   invokeResult: InvokeResult;
+  rpcResult: TableResult;
 }
 
 export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
@@ -103,6 +104,7 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
       initial.publicUrl ??
       "https://exemple.supabase.co/storage/v1/object/public/game-images/photo.webp",
     invokeResult: { data: { ok: true }, error: null },
+    rpcResult: { data: null, error: null },
   });
 
   let state = initialState();
@@ -137,8 +139,17 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
     ),
   };
 
+  // RPC (ex. reorder_game_media) : résout le résultat configuré, ou rejette
+  // (panne réseau) si { reject } est fourni. Hoisté pour être nettoyable.
+  const rpcFn = vi.fn(async () => {
+    const r = state.rpcResult;
+    if (r.reject) return Promise.reject(r.reject);
+    return { data: r.data ?? null, error: r.error ?? null };
+  });
+
   return {
     from: vi.fn((table: string) => getBuilder(table)),
+    rpc: rpcFn,
     auth: {
       getSession: vi.fn(async () => ({ data: { session: state.session } })),
       onAuthStateChange: vi.fn((callback: AuthListener) => {
@@ -197,6 +208,9 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
     __setInvokeResult(result: InvokeResult) {
       state.invokeResult = result;
     },
+    __setRpcResult(result: TableResult) {
+      state.rpcResult = result;
+    },
     __emitAuthChange(session: MockSession | null) {
       state.session = session;
       emit(session ? "SIGNED_IN" : "SIGNED_OUT", session);
@@ -213,6 +227,7 @@ export function makeSupabaseMock(initial: SupabaseMockInit = {}) {
         storageBucket.upload,
         storageBucket.getPublicUrl,
         storageBucket.remove,
+        rpcFn,
       ]) {
         fn.mockClear();
       }

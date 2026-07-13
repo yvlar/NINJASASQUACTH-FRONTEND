@@ -181,6 +181,28 @@ describe("GameForm (création)", () => {
     expect(supabase.__builders.games?.insert ?? vi.fn()).not.toHaveBeenCalled();
   });
 
+  it("associe l'aide ET l'erreur au champ image (aria-describedby + role alert)", async () => {
+    renderForm();
+    remplirRequis();
+    const champ = screen.getByLabelText(fr.admin.form.image);
+    // Sans erreur : le champ n'est décrit que par l'aide.
+    expect(champ).toHaveAttribute("aria-describedby", "game-form-image-aide");
+
+    const mauvais = new File(["x"], "regles.pdf", { type: "application/pdf" });
+    fireEvent.change(champ, { target: { files: [mauvais] } });
+    soumettre();
+
+    const erreur = await screen.findByText(fr.admin.form.errors.imageType);
+    expect(erreur).toHaveAttribute("id", "game-form-image-erreur");
+    expect(erreur).toHaveAttribute("role", "alert");
+    // En erreur : le champ référence l'aide ET le message d'erreur.
+    expect(champ).toHaveAttribute(
+      "aria-describedby",
+      "game-form-image-aide game-form-image-erreur",
+    );
+    expect(champ).toHaveAttribute("aria-invalid", "true");
+  });
+
   it("refuse un fichier de plus de 5 Mo sans lancer d'upload", async () => {
     renderForm();
     remplirRequis();

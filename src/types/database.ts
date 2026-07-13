@@ -44,6 +44,10 @@ export interface Database {
           short_desc_en: string;
           full_desc_fr: string;
           full_desc_en: string;
+          how_to_play_fr: string | null;
+          how_to_play_en: string | null;
+          rules_summary_fr: string | null;
+          rules_summary_en: string | null;
           image_url: string | null;
           players: string;
           duration: string;
@@ -80,6 +84,10 @@ export interface Database {
           short_desc_en: string;
           full_desc_fr: string;
           full_desc_en: string;
+          how_to_play_fr?: string | null;
+          how_to_play_en?: string | null;
+          rules_summary_fr?: string | null;
+          rules_summary_en?: string | null;
           image_url?: string | null;
           players: string;
           duration: string;
@@ -116,6 +124,10 @@ export interface Database {
           short_desc_en?: string;
           full_desc_fr?: string;
           full_desc_en?: string;
+          how_to_play_fr?: string | null;
+          how_to_play_en?: string | null;
+          rules_summary_fr?: string | null;
+          rules_summary_en?: string | null;
           image_url?: string | null;
           players?: string;
           duration?: string;
@@ -208,6 +220,13 @@ export interface Database {
       is_admin: {
         Args: Record<string, never>;
         Returns: boolean;
+      };
+      // Réordonne les médias d'un jeu en une opération atomique (voir migration
+      // 20260713140000_reorder_game_media_rpc). SECURITY INVOKER : soumis à la
+      // RLS de game_media (writes admin).
+      reorder_game_media: {
+        Args: { p_game_id: string; p_ids: string[] };
+        Returns: undefined;
       };
     };
     Enums: Record<string, never>;

@@ -29,13 +29,23 @@ export default function MediaFields({
           accept={IMAGE_TYPES.join(",")}
           onChange={(event) => onFile(event.target.files?.[0] ?? null)}
           aria-invalid={Boolean(errors.image)}
-          aria-describedby="game-form-image-aide"
+          // En erreur, le champ est décrit par l'aide ET le message d'erreur
+          // (sinon un lecteur d'écran n'annonce pas la raison du refus).
+          aria-describedby={
+            errors.image
+              ? "game-form-image-aide game-form-image-erreur"
+              : "game-form-image-aide"
+          }
         />
         <p className="text-sm" id="game-form-image-aide">
           {t("admin.form.imageHelp")}
         </p>
         {errors.image && (
-          <p className="font-semibold text-error" id="game-form-image-erreur">
+          <p
+            className="font-semibold text-error"
+            id="game-form-image-erreur"
+            role="alert"
+          >
             {t(errors.image)}
           </p>
         )}

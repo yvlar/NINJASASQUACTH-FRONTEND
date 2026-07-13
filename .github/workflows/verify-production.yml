@@ -1,0 +1,56 @@
+# Vérification HTTP POST-DÉPLOIEMENT de la production (Prompt 5, item 7).
+# Interroge le site en ligne (redirection, HTML pré-rendu, fiche FR+EN réelle,
+# vraie 404, en-têtes de sécurité) via `npm run verify:production`. AUCUN secret
+# applicatif n'est requis ni journalisé : seule l'URL publique est utilisée.
+#
+# L'URL de production est lue depuis la variable de dépôt PRODUCTION_URL
+# (Settings → Actions → Variables), avec repli sur le domaine Vercel connu.
+name: Vérification production
+
+on:
+  # Manuel : bouton « Run workflow » (permet de passer une URL ponctuelle).
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL de production à vérifier (sinon variable PRODUCTION_URL)"
+        required: false
+        type: string
+  # Après un déploiement de production réussi (déclenché par un autre workflow).
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+    branches: [main]
+
+jobs:
+  verifier:
+    name: verify:production (HTTP)
+    runs-on: ubuntu-latest
+    # Sur workflow_run, ne s'exécute que si la CI amont a réussi.
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+
+      - name: Installer les dépendances
+        run: npm ci
+
+      - name: Déterminer l'URL de production
+        id: cible
+        env:
+          # Variable de dépôt (non secrète) ; repli sur le domaine Vercel.
+          PRODUCTION_URL: ${{ vars.PRODUCTION_URL }}
+          INPUT_URL: ${{ github.event.inputs.url }}
+        run: |
+          URL="${INPUT_URL:-${PRODUCTION_URL:-https://ninjasasquacth-frontend.vercel.app}}"
+          echo "url=$URL" >> "$GITHUB_OUTPUT"
+          echo "Vérification de : $URL"
+
+      # Vérifie le déploiement réel. En strict (REQUIRE_PRERENDER_GAMES=true),
+      # une fiche FR+EN est obligatoire ; sans jeu publié, laisser la variable
+      # non définie pour ne pas faire échouer un catalogue encore vide.
+      - name: verify:production
+        run: npm run verify:production -- "${{ steps.cible.outputs.url }}"

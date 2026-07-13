@@ -49,8 +49,14 @@ export function validateGameForm(
     }
   }
 
-  // 2. slug bien formé
-  if (values.slug.trim() && !SLUG_RE.test(values.slug.trim())) {
+  // 2. slug : requis SEULEMENT à la publication (un brouillon peut ne pas en
+  //    avoir), sinon bien formé s'il est renseigné. Miroir de la contrainte
+  //    base `published = false OR slug IS NOT NULL` : un jeu publié DOIT avoir
+  //    un slug (sans lui, sa fiche partageable ne peut pas être pré-rendue).
+  const slug = values.slug.trim();
+  if (values.published && !slug) {
+    errors.slug = "admin.form.errors.slugRequiredWhenPublished";
+  } else if (slug && !SLUG_RE.test(slug)) {
     errors.slug = "admin.form.errors.slug";
   }
 
