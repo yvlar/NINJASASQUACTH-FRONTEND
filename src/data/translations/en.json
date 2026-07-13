@@ -87,6 +87,7 @@
       "errors": {
         "required": "This field is required.",
         "slug": "Invalid identifier: lowercase letters, digits and single hyphens only.",
+        "slugRequiredWhenPublished": "A published game must have a URL identifier (slug). Add one or keep the game as a draft.",
         "positiveInt": "Enter a positive whole number.",
         "playersRange": "The maximum number of players must be greater than or equal to the minimum.",
         "durationRange": "The maximum duration must be greater than or equal to the minimum.",

@@ -87,6 +87,7 @@
       "errors": {
         "required": "Ce champ est requis.",
         "slug": "Identifiant invalide : minuscules, chiffres et tirets simples uniquement.",
+        "slugRequiredWhenPublished": "Un jeu publié doit avoir un identifiant d'URL (slug). Renseignez-le ou laissez le jeu en brouillon.",
         "positiveInt": "Entrez un nombre entier positif.",
         "playersRange": "Le nombre maximum de joueurs doit être supérieur ou égal au minimum.",
         "durationRange": "La durée maximum doit être supérieure ou égale à la minimum.",

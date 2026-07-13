@@ -58,8 +58,9 @@ export interface FieldGroupProps {
 // Champs texte obligatoires (miroir des NOT NULL + parité FR/EN de la base).
 // players_min/duration_min/minimum_age alimentent les colonnes texte héritées
 // players/duration/age (toujours NOT NULL), d'où leur caractère requis.
+// Le slug N'EST PAS ici : il n'est requis QUE lorsque le jeu est publié (un
+// brouillon peut exister sans slug) — voir validateGameForm.
 export const REQUIRED_TEXT_FIELDS = [
-  "slug",
   "title_fr",
   "title_en",
   "short_desc_fr",
