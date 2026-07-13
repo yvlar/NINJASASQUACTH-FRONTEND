@@ -6,24 +6,9 @@
 // slug (clé de route) : l'état de chargement se réinitialise proprement sans
 // setState synchrone dans l'effet.
 import { useEffect, useState } from "react";
-import { supabase } from "../lib/supabase";
+import { supabase, isSupabaseConfigured } from "../lib/supabase";
 import { usePrerenderData } from "../ssr/prerenderContext";
 import type { GameMediaRow, GameRow } from "../types/database";
-
-// Résout un jeu (et ses médias) depuis l'amorce de pré-rendu, sans réseau.
-function fromSeed(
-  seed: { games: GameRow[]; media: Record<string, GameMediaRow[]> },
-  slug: string,
-): Omit<UseGameBySlugResult, "loading"> {
-  const game = seed.games.find((row) => row.slug === slug) ?? null;
-  if (!game) return { game: null, media: [], error: null, notFound: true };
-  return {
-    game,
-    media: seed.media[game.id] ?? [],
-    error: null,
-    notFound: false,
-  };
-}
 
 export interface UseGameBySlugResult {
   game: GameRow | null;
@@ -35,19 +20,34 @@ export interface UseGameBySlugResult {
 }
 
 export function useGameBySlug(slug: string): UseGameBySlugResult {
-  // Amorce de pré-rendu : résolution synchrone, sans réseau (voir useGames).
+  // Amorce de pré-rendu : le jeu de CE slug y est-il présent ? Seul ce cas
+  // affiche le contenu SYNCHRONEMENT (hydratation à l'identique). Une
+  // navigation client vers un slug absent de l'amorce (jeu publié après le
+  // build) NE fait PAS confiance à l'amorce et va chercher la donnée fraîche.
   const seed = usePrerenderData();
-  const seeded = seed != null ? fromSeed(seed, slug) : null;
+  const seededGame = seed?.games.find((row) => row.slug === slug) ?? null;
+  const hasSeedForSlug = seed != null && seededGame != null;
+  // Non configuré et slug non amorcé : erreur locale immédiate (état initial),
+  // aucun appel réseau (.invalid).
+  const notConfigured = !isSupabaseConfigured && !hasSeedForSlug;
 
-  const [game, setGame] = useState<GameRow | null>(seeded?.game ?? null);
-  const [media, setMedia] = useState<GameMediaRow[]>(seeded?.media ?? []);
-  const [loading, setLoading] = useState(seeded == null);
-  const [error, setError] = useState<unknown>(null);
-  const [notFound, setNotFound] = useState(seeded?.notFound ?? false);
+  const [game, setGame] = useState<GameRow | null>(seededGame);
+  const [media, setMedia] = useState<GameMediaRow[]>(
+    hasSeedForSlug ? (seed.media[seededGame.id] ?? []) : [],
+  );
+  const [loading, setLoading] = useState(isSupabaseConfigured && !hasSeedForSlug);
+  const [error, setError] = useState<unknown>(
+    notConfigured ? new Error("supabase-not-configured") : null,
+  );
+  const [notFound, setNotFound] = useState(false);
 
   useEffect(() => {
-    if (seed != null) return; // pré-rendu : donnée déjà en place
+    // Non configuré : l'erreur (ou l'amorce conservée) est déjà en place.
+    if (!isSupabaseConfigured) return;
     let active = true;
+    // Slug amorcé → rafraîchissement en arrière-plan : ni chargement affiché,
+    // ni disparition du contenu si la requête échoue.
+    const background = hasSeedForSlug;
 
     (async () => {
       try {
@@ -57,20 +57,25 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
           .eq("slug", slug);
         if (!active) return;
         if (fetchError) {
-          setError(fetchError);
-          setLoading(false);
-          return;
+          if (!background) {
+            setError(fetchError);
+            setLoading(false);
+          }
+          return; // arrière-plan : on conserve l'amorce
         }
         // Le filtre serveur `.eq("slug")` est doublé côté client (ceinture et
         // bretelles avec un mock qui renvoie la table entière).
         const rows = (Array.isArray(data) ? data : []) as GameRow[];
         const found = rows.find((row) => row.slug === slug) ?? rows[0] ?? null;
         if (!found) {
-          setNotFound(true);
-          setLoading(false);
+          if (!background) {
+            setNotFound(true);
+            setLoading(false);
+          }
           return;
         }
         setGame(found);
+        setNotFound(false);
 
         const { data: mediaData } = await supabase
           .from("game_media")
@@ -79,11 +84,11 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
           .order("sort_order", { ascending: true });
         if (!active) return;
         setMedia((Array.isArray(mediaData) ? mediaData : []) as GameMediaRow[]);
-        setLoading(false);
+        if (!background) setLoading(false);
       } catch (thrown) {
         // Panne réseau AVANT toute réponse (fetch rejeté) : sans ce filet,
         // l'UI resterait bloquée sur « Chargement… ».
-        if (active) {
+        if (active && !background) {
           setError(thrown);
           setLoading(false);
         }
@@ -93,7 +98,7 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
     return () => {
       active = false;
     };
-  }, [slug, seed]);
+  }, [slug, seed, hasSeedForSlug]);
 
   return { game, media, loading, error, notFound };
 }

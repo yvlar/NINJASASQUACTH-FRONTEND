@@ -9,11 +9,10 @@ import LanguageProvider from "./i18n/LanguageProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AppRoutes from "./AppRoutes";
 import { PrerenderContext, type PrerenderData } from "./ssr/prerenderContext";
-import type { Lang } from "./i18n/context";
+import { langFromUrl } from "./i18n/langFromUrl";
 
-export function langFromUrl(url: string): Lang {
-  return /^\/en(\/|$)/.test(url) ? "en" : "fr";
-}
+// Ré-exporté pour l'entrée de pré-rendu (rétro-compat des imports du bundle).
+export { langFromUrl };
 
 const EMPTY_DATA: PrerenderData = { games: [], media: {} };
 

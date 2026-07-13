@@ -35,6 +35,7 @@ async function main() {
     buildMeta,
     renderHeadTags,
     normalizeSiteUrl,
+    serializePrerenderData,
   } = bundle;
 
   const siteUrl = normalizeSiteUrl(
@@ -92,6 +93,8 @@ async function main() {
 
   const template = await readFile(join(DIST, "index.html"), "utf8");
   const seed = { games, media: mediaByGame };
+  // Amorce sérialisée une fois : le client la relit pour hydrater à l'identique.
+  const seedJson = serializePrerenderData(seed);
 
   const routes = planRoutes(games);
   for (const route of routes) {
@@ -102,6 +105,7 @@ async function main() {
       headHtml,
       bodyHtml,
       lang: meta.lang,
+      seedJson,
     });
     const outPath = join(DIST, route.outFile);
     await mkdir(dirname(outPath), { recursive: true });
@@ -116,6 +120,7 @@ async function main() {
     headHtml: renderHeadTags(homeMeta),
     bodyHtml: "",
     lang: "fr",
+    seedJson,
   });
   await writeFile(join(DIST, "index.html"), rootHtml, "utf8");
 
