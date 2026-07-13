@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { categories } from "../../../data/games";
-import { useGames } from "../../../hooks/useGames";
+import { useSharedGames } from "../../../hooks/useSharedGames";
 import { useLanguage } from "../../../i18n/useLanguage";
 import GameCard from "./GameCard";
 import CategoryFilter from "./CategoryFilters";
@@ -13,7 +13,7 @@ export default function GamesSection() {
   // Les jeux viennent de Supabase (la RLS ne sert que les jeux publiés aux
   // visiteurs anonymes) ; la base peut être vide tant que l'admin n'a rien créé.
   // Plus d'état selectedGame : chaque carte est un lien vers sa fiche.
-  const { games, loading, error } = useGames();
+  const { games, loading, error } = useSharedGames();
 
   const filteredGames =
     selectedCategory === "tous"

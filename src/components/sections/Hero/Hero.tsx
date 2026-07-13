@@ -5,7 +5,7 @@
 // composition de marque sobre — jamais de fausse boîte de jeu.
 import { Link } from "react-router-dom";
 import { ExternalLink, Bell, Leaf } from "lucide-react";
-import { useGames } from "../../../hooks/useGames";
+import { useSharedGames } from "../../../hooks/useSharedGames";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { localizeGame } from "../../../utils/localizeGame";
 import { selectFeaturedGame, isEnglishOnly } from "../../../utils/featuredGame";
@@ -151,7 +151,7 @@ export default function Hero({
 }: {
   onNavigate: (id: string) => void;
 }) {
-  const { games, loading } = useGames();
+  const { games, loading } = useSharedGames();
   const featured = loading ? null : selectFeaturedGame(games);
 
   return featured ? (
