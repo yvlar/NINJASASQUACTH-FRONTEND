@@ -6,7 +6,10 @@
 import { useId, useState } from "react";
 import { Bell } from "lucide-react";
 import { useLanguage } from "../../../i18n/useLanguage";
-import { subscribeNewsletter } from "../../../utils/subscribeNewsletter";
+import {
+  subscribeNewsletter,
+  CONSENT_VERSION,
+} from "../../../utils/subscribeNewsletter";
 
 type Status = "idle" | "loading" | "success" | "error";
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -42,6 +45,9 @@ export default function NewsletterForm({ source }: { source: string }) {
       email: trimmed,
       locale: lang,
       source,
+      // La case est cochée (garde ci-dessus) : consentement explicite + version.
+      consent: true,
+      consentVersion: CONSENT_VERSION,
       website,
     });
     // Succès UNIQUEMENT sur confirmation de l'Edge Function.
