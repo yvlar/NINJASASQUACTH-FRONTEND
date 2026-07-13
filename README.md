@@ -46,25 +46,70 @@ appliquées, dont le modèle produit des jeux et la table `game_media`).
 **En production** : https://ninjasasquacth-frontend.vercel.app
 (intégration Git Vercel — chaque push sur `main` redéploie la production).
 
-Le site est un build statique Vite (`npm run build` → `dist/`) déployé par
-l'intégration Git Vercel : chaque push sur `main` déclenche un déploiement de
-production, chaque branche une preview.
+Le site est **pré-rendu au build** (`npm run build`) : build client Vite +
+bundle SSR + génération d'un HTML statique par route (`dist/fr/index.html`,
+`dist/en/index.html`, une fiche par jeu publié, `404.html`, `sitemap.xml`,
+`robots.txt`). Le HTML produit contient réellement le H1, le texte, les liens,
+le canonical, les hreflang, l'OpenGraph et le JSON-LD — pas seulement après
+hydratation (Sprint 11). Déployé par l'intégration Git Vercel : chaque push sur
+`main` déclenche un déploiement de production, chaque branche une preview.
 
-**Variables d'environnement requises** (dashboard Vercel → Settings →
-Environment Variables, pour Production et Preview) :
+**Architecture de pré-rendu** : SSG maison (`react-dom/server` +
+`StaticRouter`), pilotée par `scripts/prerender.mjs`. `vite-ssg` (cible Vue) et
+`react-snap` (Puppeteer, fiabilité douteuse sous React 19/Vite 7) ont été
+écartés ; le *framework mode* de React Router aurait imposé une réécriture
+invasive de l'app en library mode. Le SSG maison n'ajoute aucune dépendance
+(React core + StaticRouter déjà présent) et se teste sans réseau.
 
-| Variable | Valeur |
+**Variables d'environnement** (dashboard Vercel → Settings → Environment
+Variables, pour Production et Preview) :
+
+| Variable | Rôle |
 |---|---|
-| `VITE_SUPABASE_URL` | l'URL d'API du projet Supabase `ninja-sasquatch-games` |
-| `VITE_SUPABASE_ANON_KEY` | la clé publiable (« publishable ») du même projet |
+| `VITE_SUPABASE_URL` | URL d'API du projet Supabase `ninja-sasquatch-games` |
+| `VITE_SUPABASE_ANON_KEY` | clé publiable (« publishable ») du même projet |
+| `VITE_SITE_URL` / `SITE_URL` | domaine final (canonical, sitemap, JSON-LD) — défaut : le domaine Vercel actuel ; **à remplacer par le domaine personnalisé définitif** |
+| `SUPABASE_URL` / `SUPABASE_ANON_KEY` (build) | lus par `scripts/prerender.mjs` pour pré-rendre les **fiches jeux** publiées ; sans eux, seuls l'accueil FR/EN et la 404 sont pré-rendus (les fiches restent rendues côté client) |
 
 Après avoir posé (ou changé) ces variables, relancer un déploiement — Vite
 les fige dans le bundle au moment du build. Sans elles, le site se déploie
-mais le catalogue et `/admin` affichent une erreur.
+mais le catalogue affiche une erreur localisée (le reste de la vitrine reste
+visible — plus d'écran blanc, Sprint 11 Partie B).
 
-`vercel.json` contient le rewrite SPA (`/(.*) → /index.html`) qui rend
-`/admin` accessible en accès direct (sans lui, Vercel répondrait 404 sur
-toute URL profonde).
+`vercel.json` contient le rewrite SPA (`/(.*) → /index.html`) — les fichiers
+statiques pré-rendus ont priorité (Vercel sert le disque avant la réécriture) —
+ainsi que les **headers de sécurité** (CSP stricte, HSTS, X-Frame-Options,
+Referrer-Policy, Permissions-Policy) et `X-Robots-Tag: noindex` sur `/admin`.
+
+### Reconstruction après publication admin (Deploy Hook)
+
+Le contenu pré-rendu se périme après une modification dans `/admin`. Stratégie
+de reconstruction contrôlée :
+
+1. créer un **Deploy Hook** Vercel (Settings → Git → Deploy Hooks) ;
+2. déployer l'Edge Function : `supabase functions deploy trigger-rebuild` puis
+   `supabase secrets set VERCEL_DEPLOY_HOOK_URL=… WEBHOOK_SECRET=…` ;
+3. brancher un **Database Webhook** Supabase sur la table `games` (insert/update)
+   qui POST vers la fonction avec l'en-tête `x-webhook-secret`.
+
+Le secret du Deploy Hook vit **uniquement** dans les secrets de l'Edge Function :
+jamais dans la base publique, jamais envoyé au navigateur, jamais préfixé
+`VITE_`, jamais committé. La fonction applique un **délai minimal** entre deux
+rebuilds (anti-rafale) et journalise chaque demande dans `deploy_rebuilds`
+(lisible par l'admin) sans aucun secret.
+
+### Newsletter Kickstarter (Edge Function)
+
+La capture courriel passe par l'Edge Function `subscribe-kickstarter` — jamais
+une insertion Supabase publique. Déploiement :
+`supabase functions deploy subscribe-kickstarter`, puis
+`supabase secrets set ALLOWED_ORIGIN=… RATE_LIMIT_SALT=…`
+(`SUPABASE_SERVICE_ROLE_KEY` est fourni par la plateforme). Appliquer d'abord
+la migration `20260712140000_newsletter_subscribers.sql`. La table des abonnés
+n'est **jamais** lisible publiquement (RLS : lecture admin seule, aucune
+écriture navigateur). Antispam : honeypot + limitation de fréquence + validation
+serveur ; réponse toujours générique (aucune fuite d'existence) ; l'email n'est
+jamais journalisé.
 
 La CI GitHub Actions (`.github/workflows/ci.yml`) reste la garde qualité
 (audit + lint + tests + build) en amont de tout déploiement ; elle n'a besoin

@@ -1,17 +1,14 @@
 // Section notification de lancement (ancre #notify, cible du CTA « Être notifié
-// au lancement » du hero). Sobre : sans backend d'infolettre, l'action renvoie
-// vers le formulaire de contact. Le lien Kickstarter n'apparaît QUE si le jeu
-// vedette expose une URL publique (jamais de lien Kickstarter sans URL).
-import { ExternalLink, Bell } from "lucide-react";
+// au lancement » du hero). Capture courriel réelle via l'Edge Function
+// (NewsletterForm) — jamais d'insertion Supabase publique. Le lien Kickstarter
+// n'apparaît QUE si le jeu vedette expose une URL publique.
+import { ExternalLink } from "lucide-react";
 import { useGames } from "../../../hooks/useGames";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { selectFeaturedGame } from "../../../utils/featuredGame";
+import NewsletterForm from "./NewsletterForm";
 
-export default function NewsletterSection({
-  onNavigate,
-}: {
-  onNavigate: (id: string) => void;
-}) {
+export default function NewsletterSection() {
   const { t } = useLanguage();
   const { games, loading } = useGames();
   const featured = loading ? null : selectFeaturedGame(games);
@@ -31,27 +28,20 @@ export default function NewsletterSection({
         <p className="mb-8 max-w-2xl text-lg/[1.6] text-charcoal">
           {t("newsletter.lead")}
         </p>
-        <div className="flex flex-wrap gap-4">
-          <button
-            type="button"
-            onClick={() => onNavigate("contact")}
-            className="inline-flex items-center gap-2 rounded-lg bg-forest px-6 py-3.5 font-brand text-lg/[1.4] text-cream shadow-[0_10px_15px_-3px_rgba(0,0,0,0.15)] transition-transform duration-300 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+
+        <NewsletterForm source="notify-launch" />
+
+        {kickstarterUrl && (
+          <a
+            href={kickstarterUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-6 inline-flex items-center gap-2 rounded-lg border-2 border-roux px-6 py-3.5 font-brand text-lg/[1.4] text-roux transition-transform duration-300 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           >
-            <Bell size={18} aria-hidden />
-            {t("home.hero.notify")}
-          </button>
-          {kickstarterUrl && (
-            <a
-              href={kickstarterUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-lg border-2 border-roux px-6 py-3.5 font-brand text-lg/[1.4] text-roux transition-transform duration-300 hover:-translate-y-0.5 motion-reduce:transition-none motion-reduce:hover:translate-y-0 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-            >
-              {t("games.detail.kickstarterCta")}
-              <ExternalLink size={18} aria-hidden />
-            </a>
-          )}
-        </div>
+            {t("games.detail.kickstarterCta")}
+            <ExternalLink size={18} aria-hidden />
+          </a>
+        )}
       </div>
     </section>
   );

@@ -121,7 +121,16 @@
   },
   "newsletter": {
     "title": "Ne manquez pas le lancement",
-    "lead": "Envie d'être prévenu dès qu'un nouveau jeu arrive ou qu'une campagne démarre ? Écrivez-nous et nous vous tiendrons au courant."
+    "lead": "Envie d'être prévenu dès qu'un nouveau jeu arrive ou qu'une campagne démarre ? Écrivez-nous et nous vous tiendrons au courant.",
+    "emailLabel": "Votre courriel",
+    "emailPlaceholder": "vous@exemple.com",
+    "consent": "J'accepte de recevoir des nouvelles de Ninja Sasquatch Games. Je peux me désinscrire à tout moment.",
+    "submit": "M'inscrire",
+    "submitting": "Envoi…",
+    "success": "Merci ! Vous serez prévenu au lancement.",
+    "error": "Un problème est survenu. Réessayez plus tard.",
+    "invalidEmail": "Entrez une adresse courriel valide.",
+    "consentRequired": "Veuillez cocher le consentement pour continuer."
   },
   "nav": {
     "home": "Accueil",
@@ -248,5 +257,20 @@
     "copyright": "© 2026 Ninja Sasquatch Games.",
     "rights": "Tous droits réservés.",
     "tagline": "Fièrement québécois et 100% compostable"
+  },
+  "seo": {
+    "siteName": "Ninja Sasquatch Games",
+    "home": {
+      "title": "Ninja Sasquatch Games — Jeux de société originaux conçus au Québec",
+      "description": "Des jeux de société originaux, amusants et accessibles à tous — pensés au Québec, 100 % compostables."
+    },
+    "game": {
+      "titleSuffix": "Ninja Sasquatch Games"
+    },
+    "notFound": {
+      "title": "Page introuvable — Ninja Sasquatch Games",
+      "description": "La page que vous cherchez n'existe pas ou a été déplacée."
+    },
+    "ogImageAlt": "Ninja Sasquatch Games — studio de jeux de société québécois"
   }
 }

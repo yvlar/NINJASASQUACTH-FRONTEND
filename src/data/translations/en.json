@@ -121,7 +121,16 @@
   },
   "newsletter": {
     "title": "Don't miss the launch",
-    "lead": "Want to know as soon as a new game arrives or a campaign starts? Write to us and we'll keep you posted."
+    "lead": "Want to know as soon as a new game arrives or a campaign starts? Write to us and we'll keep you posted.",
+    "emailLabel": "Your email",
+    "emailPlaceholder": "you@example.com",
+    "consent": "I agree to receive news from Ninja Sasquatch Games. I can unsubscribe at any time.",
+    "submit": "Notify me",
+    "submitting": "Sending…",
+    "success": "Thanks! We'll let you know at launch.",
+    "error": "Something went wrong. Please try again later.",
+    "invalidEmail": "Enter a valid email address.",
+    "consentRequired": "Please check the consent box to continue."
   },
   "nav": {
     "home": "Home",
@@ -248,5 +257,20 @@
     "copyright": "© 2026 Ninja Sasquatch Games.",
     "rights": "All rights reserved.",
     "tagline": "Proudly Quebecois and 100% compostable"
+  },
+  "seo": {
+    "siteName": "Ninja Sasquatch Games",
+    "home": {
+      "title": "Ninja Sasquatch Games — Original board games designed in Quebec",
+      "description": "Original, fun and accessible board games — designed in Quebec, 100% compostable."
+    },
+    "game": {
+      "titleSuffix": "Ninja Sasquatch Games"
+    },
+    "notFound": {
+      "title": "Page not found — Ninja Sasquatch Games",
+      "description": "The page you are looking for does not exist or has been moved."
+    },
+    "ogImageAlt": "Ninja Sasquatch Games — a Quebec board game studio"
   }
 }

@@ -7,7 +7,10 @@ import jsxA11y from 'eslint-plugin-jsx-a11y'
 import { defineConfig, globalIgnores } from 'eslint/config'
 
 export default defineConfig([
-  globalIgnores(['dist']),
+  // Le code des Edge Functions Supabase tourne sous Deno (globals Deno,
+  // imports `npm:`/URL) : hors périmètre ESLint côté navigateur. La logique
+  // PURE (logic.ts) reste couverte par les tests Vitest.
+  globalIgnores(['dist', 'dist-ssr', 'supabase/functions']),
   // Migration TypeScript terminée (item 7.5) : ce bloc ne couvre plus que
   // les fichiers JS de configuration à la racine (eslint.config.js).
   {
@@ -39,6 +42,25 @@ export default defineConfig([
         'error',
         { varsIgnorePattern: '^[A-Z_]' },
       ],
+    },
+  },
+  // Entrées de build/SSR (pré-rendu) : ce ne sont pas des modules de composants
+  // soumis au Fast Refresh — elles exportent volontairement des fonctions.
+  {
+    files: ['src/entry-server.tsx', 'src/entry-prerender.tsx'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
+  },
+  // Scripts Node du dépôt (pré-rendu) : globals Node, pas de règles React.
+  {
+    files: ['scripts/**/*.mjs'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
     },
   },
 ])

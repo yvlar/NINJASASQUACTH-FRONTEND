@@ -33,8 +33,17 @@ jobs:
       - name: Typecheck (tsc --noEmit)
         run: npm run typecheck
 
+      # Inclut les tests de pré-rendu (prerender.test.tsx : H1 dans le HTML,
+      # canonical/hreflang, JSON-LD valide, /admin hors sitemap, 404) et de
+      # sécurité (security-headers, newsletter).
       - name: Tests (Vitest)
         run: npm test
 
-      - name: Build de production (Vite)
+      # Build client + bundle SSR + pré-rendu (dist/<route>, sitemap, robots).
+      - name: Build de production + pré-rendu (Vite SSG)
         run: npm run build
+
+      # Vérifie le HTML PRODUIT (contenu réel, pas seulement après hydratation)
+      # et l'absence de tout secret dans le bundle livré.
+      - name: Vérifier le pré-rendu et l'absence de secrets
+        run: npm run verify:dist

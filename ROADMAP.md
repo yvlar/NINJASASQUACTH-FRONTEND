@@ -15,8 +15,8 @@
 | **Production**   | 80        | 30 — pas de CI, pas de déploiement documenté, README quasi vide (typo dans le titre) |
 
 - **Dernière mise à jour** : 2026-07-12 — **Sprint 10 clos** : refonte visuelle Ninja Sasquatch Games. Nouvelle palette (Sasquatch roux, vert forêt, crème, charbon) + sous-palettes locales aux jeux (Heroes Rising, Burgle Jack) et typographie (Alfa Slab One, Atkinson Hyperlegible, Black Ops One) centralisées dans `@theme` ; `src/data/gameThemes.ts` (variantes statiques typées) ; **liens sociaux réels** (`src/data/socialLinks.ts` — Facebook/YouTube/LinkedIn, résout D12) ; header à menu mobile **accessible** (aria + Échap + focus) et logo cliquable ; **accueil refondu** (hero Heroes Rising alimenté par Supabase, bandeau de réassurance, univers, créations, fondateur, notification de lancement, contact) ; fiches homogènes (badge « contenu en anglais », accent de sous-palette, crédits). Aucun contenu de marque inventé : logo officiel, photo/biographie du fondateur, photos produits et URLs Kickstarter restent des actions utilisateur (D3/D21/D22).
-- **Sprint courant** : **Sprint 11 — à définir** (candidats : E2E Playwright 8.1, headers de sécurité D19/8.2, actions utilisateur en attente 8.3, backend de contact D6/8.4 ; contenu réel des jeux via `/admin` + spec `brand-seo-spec.md` D21 ; logo/portrait fondateur D22).
-- **État des tests** : **114/114 verts** (27 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture du Sprint 10 — Sprint 9 : 96 ; Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
+- **Sprint courant** : **Sprints 11 & 12 clos** (2026-07-12) — pré-rendu (SSG maison), pack SEO complet, headers de sécurité, résilience de config, et newsletter Kickstarter sécurisée (migration + Edge Functions). Reste utilisateur/infra : appliquer les migrations, déployer les Edge Functions, poser les secrets (Deploy Hook, `RATE_LIMIT_SALT`, `WEBHOOK_SECRET`), fixer le domaine final (`VITE_SITE_URL`), et brancher le lien Kickstarter réel.
+- **État des tests** : **163/163 verts** (35 fichiers dans `src/__tests__/`, sortie réelle de `npm test` à la clôture des Sprints 11-12 — Sprint 10 : 114 ; Sprint 9 : 96 ; Sprint 7 : 64 ; Sprint 6 : 62 ; Sprint 5 : 62 ; Sprint 4 : 24 ; Sprint 3 : 21 ; Sprint 1 : 16 ; baseline : 0). À recalibrer à chaque sprint sur la sortie réelle de `npm test`.
 - **Environnement de référence** : Node ≥ 20 + npm (`npm install`, `npm run lint`, `npm run typecheck`, `npm test`, `npm run build`). Pas de conteneur dédié. CI : `.github/workflows/ci.yml` (Node LTS : audit → lint → typecheck → tests → build) + `.github/workflows/supabase-keepalive.yml` (ping REST hebdomadaire, D15).
 
 ## Audit Phase 0 — constats (2026-07-07)
@@ -1490,3 +1490,79 @@ validé côté client (`mailto:`). L'architecture est saine et documentée dans
    - **Production 55 (+25)** : CI verte, README exploitable, favicon/metas prêts
      pour la mise en ligne ; pas encore de déploiement documenté ni de politique
      de dépendances (D11).
+
+---
+
+# 🟢 SPRINTS 11 & 12 — Pré-rendu, SEO, sécurité et newsletter Kickstarter ✅ (clos le 2026-07-12)
+
+> **Objectif** (PROMPT 3) : rendre les pages publiques réellement présentes dans
+> le HTML produit au build (pré-rendu), livrer le pack SEO complet, durcir la
+> configuration et la sécurité, puis créer une capture courriel sécurisée pour
+> le prélancement Kickstarter. L'administration reste privée et côté client.
+> Aucun secret committé ni livré dans le bundle ; aucun contenu SEO inventé.
+
+**Livré (code, testé, vert) :**
+
+- **A — Pré-rendu** `face26d` : SSG maison (`react-dom/server` + `StaticRouter`),
+  script `scripts/prerender.mjs`, bundle SSR (`vite build --ssr`). Un HTML par
+  route (`/fr`, `/en`, fiche par jeu publié, 404) avec H1/texte/liens/canonical/
+  hreflang/OG/JSON-LD **dans le HTML produit** (vérifié à la main + tests). Choix
+  documentés : `vite-ssg` (Vue) et `react-snap` (Puppeteer/React 19) écartés,
+  framework mode RR écarté (réécriture invasive). Amorce de données via contexte
+  (`src/ssr/prerenderContext.ts`) — client inchangé sans Provider.
+- **B — Config résiliente** `9326e5a` : `lib/supabase.ts` ne throw plus à
+  l'import ; `isSupabaseConfigured` + client de repli `.invalid`. Vitrine
+  toujours visible, catalogue en erreur localisée — plus d'écran blanc.
+- **C/D — SEO + JSON-LD** `a28a7d9` : `src/seo/*` (buildMeta pur, renderHead,
+  jsonLd) + `src/components/seo/*` (PageMeta React 19, JsonLd). Title/desc/
+  canonical/alternates FR-EN-x-default/OG complet/Twitter par page ; JSON-LD
+  Organization/WebSite/Product+Game/Breadcrumb — **jamais** de prix, offre, avis,
+  note, disponibilité ; uniquement les champs réels du jeu. Image OG de repli
+  **réelle** (`public/og/brand.svg`).
+- **E — sitemap/robots/404** (même commit que A) : `sitemap.xml` (accueil FR/EN
+  + jeux publiés FR/EN + alternates ; exclut `/admin` et les brouillons),
+  `robots.txt` (Disallow `/admin` + Sitemap), 404 pré-rendue avec `noindex`.
+- **F — Headers de sécurité** `c4639d7` : `vercel.json` complété (CSP stricte
+  self+Supabase+Google Fonts, HSTS, X-Frame-Options DENY, Referrer-Policy,
+  Permissions-Policy) + `X-Robots-Tag: noindex` sur `/admin`.
+- **G — Newsletter (migration + Edge Functions)** `d358b9c` :
+  `newsletter_subscribers` + `newsletter_rate_limits` (empreinte d'IP hachée) +
+  `deploy_rebuilds` ; RLS = aucune lecture/écriture publique, lecture admin
+  seule. Edge Function `subscribe-kickstarter` (validation serveur, honeypot,
+  rate limiting, doublon sans fuite, réponse générique, email jamais journalisé)
+  et `trigger-rebuild` (Deploy Hook secret hors dépôt, anti-rafale). Logique
+  pure testée en Vitest.
+- **H — CTA newsletter** `9b931e7` : `NewsletterForm` accessible (email,
+  consentement, langue, chargement/succès/erreur) → `functions.invoke`, jamais
+  d'insertion publique ; succès seulement après confirmation de la fonction.
+- **I/J — CI + vérification** : `npm test` exécute les tests de pré-rendu ;
+  `npm run build` pré-rend ; `scripts/verify-dist.mjs` (`npm run verify:dist`,
+  étape CI) vérifie le contenu du HTML produit ET l'absence de tout secret dans
+  `dist/`. `npm audit --audit-level=high` = 0.
+
+**Découvertes :**
+
+- **D23** 🟡 `docs/brand-seo-spec.md` cité par le prompt et l'item D21 **n'existe
+  pas** dans le dépôt : le SEO a été dérivé du copy réel existant (hero, fiches)
+  — rien d'inventé. À fournir/valider par l'utilisateur si une spec de marque
+  précise doit primer.
+- **D24** 🟢 Le `throw` à l'import de `lib/supabase.ts`, documenté comme
+  fail-fast intentionnel (Sprint 7, D18), était en réalité un risque d'écran
+  blanc — corrigé en Partie B (décision du prompt PROMPT 3).
+
+**Actions utilisateur / infra restantes (jamais faites à sa place) :**
+
+1. Appliquer les migrations `20260712140000_*` et `20260712150000_*` au projet
+   Supabase (`apply_migration` / `supabase db push`), prouver la RLS sous rôle
+   anon + JWT admin.
+2. Déployer les Edge Functions `subscribe-kickstarter` et `trigger-rebuild` ;
+   poser leurs secrets (`ALLOWED_ORIGIN`, `RATE_LIMIT_SALT`,
+   `VERCEL_DEPLOY_HOOK_URL`, `WEBHOOK_SECRET`) — jamais committés, jamais `VITE_`.
+3. Créer le Deploy Hook Vercel + le Database Webhook Supabase sur `games`.
+4. Poser `VITE_SITE_URL` = domaine final (canonical/sitemap/JSON-LD) et, pour
+   pré-rendre les fiches jeux au build, `SUPABASE_URL`/`SUPABASE_ANON_KEY`.
+5. Fournir le lien Kickstarter public réel (fiche jeu) et une image OG raster
+   (PNG/JPG 1200×630) si une compatibilité scraper maximale est souhaitée
+   (le SVG de repli existe et fonctionne).
+6. Vérifier en preview/production : headers HTTP réels, `sitemap.xml`/`robots.txt`
+   servis, `/admin` en `noindex`, HTML des fiches jeux pré-rendues.

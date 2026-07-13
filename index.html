@@ -14,24 +14,20 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Alfa+Slab+One&family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400;1,700&family=Black+Ops+One&display=swap"
     />
-    <title>Ninja Sasquatch Games — Jeux de société québécois écoresponsables</title>
+    <!-- Métadonnées SEO par page :
+         - au build, le pré-rendu REMPLACE le bloc entre les marqueurs
+           app-head par les balises de la route (seo/renderHead.ts) ;
+         - au runtime client, les composants React 19 de src/components/seo/
+           (PageMeta) hissent les mêmes balises vers ce <head>.
+         Le bloc de repli sert au shell « / » (redirige vers /fr) et à tout
+         chargement avant hydratation. -->
+    <!--app-head-start-->
+    <title>Ninja Sasquatch Games — Jeux de société originaux du Québec</title>
     <meta
       name="description"
-      content="Une jeune compagnie québécoise qui sort des sentiers battus pour vous offrir des jeux de société originaux, amusants et accessibles à tous. 100% compostable."
+      content="Des jeux de société originaux, amusants et accessibles à tous — pensés au Québec, 100 % compostables."
     />
-    <!-- OpenGraph — pas de og:image tant que les vraies photos produits
-         ne sont pas fournies (découverte D3 de ROADMAP.md). -->
-    <meta property="og:type" content="website" />
-    <meta property="og:site_name" content="Ninja Sasquatch Games" />
-    <meta
-      property="og:title"
-      content="Ninja Sasquatch Games — Jeux de société québécois écoresponsables"
-    />
-    <meta
-      property="og:description"
-      content="Une jeune compagnie québécoise qui sort des sentiers battus pour vous offrir des jeux de société originaux, amusants et accessibles à tous. 100% compostable."
-    />
-    <meta property="og:locale" content="fr_CA" />
+    <!--app-head-end-->
   </head>
   <body>
     <div id="root"></div>

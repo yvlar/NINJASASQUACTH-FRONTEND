@@ -7,7 +7,23 @@
 // setState synchrone dans l'effet.
 import { useEffect, useState } from "react";
 import { supabase } from "../lib/supabase";
+import { usePrerenderData } from "../ssr/prerenderContext";
 import type { GameMediaRow, GameRow } from "../types/database";
+
+// Résout un jeu (et ses médias) depuis l'amorce de pré-rendu, sans réseau.
+function fromSeed(
+  seed: { games: GameRow[]; media: Record<string, GameMediaRow[]> },
+  slug: string,
+): Omit<UseGameBySlugResult, "loading"> {
+  const game = seed.games.find((row) => row.slug === slug) ?? null;
+  if (!game) return { game: null, media: [], error: null, notFound: true };
+  return {
+    game,
+    media: seed.media[game.id] ?? [],
+    error: null,
+    notFound: false,
+  };
+}
 
 export interface UseGameBySlugResult {
   game: GameRow | null;
@@ -19,13 +35,18 @@ export interface UseGameBySlugResult {
 }
 
 export function useGameBySlug(slug: string): UseGameBySlugResult {
-  const [game, setGame] = useState<GameRow | null>(null);
-  const [media, setMedia] = useState<GameMediaRow[]>([]);
-  const [loading, setLoading] = useState(true);
+  // Amorce de pré-rendu : résolution synchrone, sans réseau (voir useGames).
+  const seed = usePrerenderData();
+  const seeded = seed != null ? fromSeed(seed, slug) : null;
+
+  const [game, setGame] = useState<GameRow | null>(seeded?.game ?? null);
+  const [media, setMedia] = useState<GameMediaRow[]>(seeded?.media ?? []);
+  const [loading, setLoading] = useState(seeded == null);
   const [error, setError] = useState<unknown>(null);
-  const [notFound, setNotFound] = useState(false);
+  const [notFound, setNotFound] = useState(seeded?.notFound ?? false);
 
   useEffect(() => {
+    if (seed != null) return; // pré-rendu : donnée déjà en place
     let active = true;
 
     (async () => {
@@ -72,7 +93,7 @@ export function useGameBySlug(slug: string): UseGameBySlugResult {
     return () => {
       active = false;
     };
-  }, [slug]);
+  }, [slug, seed]);
 
   return { game, media, loading, error, notFound };
 }

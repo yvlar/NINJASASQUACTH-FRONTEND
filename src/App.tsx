@@ -28,7 +28,7 @@ function App() {
         <AboutSection />
         <GamesSection />
         <FounderSection />
-        <NewsletterSection onNavigate={scrollToSection} />
+        <NewsletterSection />
         <ContactSection />
       </main>
       <Footer />
