@@ -75,17 +75,27 @@ Deno.serve(async (req: Request) => {
     return json({ ok: false, message: "not_configured" }, 500);
   }
 
-  // Anti-rafale : dernière demande récente ?
-  const { data: last } = await supabase
+  // Anti-rafale : dernière demande récente ? La LECTURE du journal est
+  // vérifiée : en cas d'erreur, on N'APPELLE PAS le Deploy Hook (éviter une
+  // rafale si l'anti-rafale est aveugle) et on répond par une erreur générique.
+  const { data: last, error: readError } = await supabase
     .from("deploy_rebuilds")
     .select("requested_at")
     .order("requested_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
+  if (readError) {
+    console.error("trigger-rebuild: lecture deploy_rebuilds", readError.code);
+    return json({ ok: false, status: "error" }, 503);
+  }
+
   const lastAt = last ? new Date(last.requested_at).getTime() : null;
   if (!shouldTriggerRebuild(Date.now(), lastAt, { minIntervalMs: DEFAULT_MIN_INTERVAL_MS })) {
-    await supabase.from("deploy_rebuilds").insert({ outcome: "debounced" });
+    const { error: wErr } = await supabase
+      .from("deploy_rebuilds")
+      .insert({ outcome: "debounced" });
+    if (wErr) console.error("trigger-rebuild: écriture debounced", wErr.code);
     return json({ ok: true, status: "debounced" }, 200);
   }
 
@@ -93,14 +103,20 @@ Deno.serve(async (req: Request) => {
     // On appelle le Deploy Hook ; on ne journalise JAMAIS l'URL (secret).
     const res = await fetch(DEPLOY_HOOK_URL, { method: "POST" });
     const outcome = res.ok ? "triggered" : "error";
-    await supabase.from("deploy_rebuilds").insert({ outcome });
+    const { error: wErr } = await supabase
+      .from("deploy_rebuilds")
+      .insert({ outcome });
+    if (wErr) console.error("trigger-rebuild: écriture outcome", wErr.code);
     if (!res.ok) {
       console.error("trigger-rebuild: Deploy Hook a répondu", res.status);
       return json({ ok: false, status: "error" }, 502);
     }
     return json({ ok: true, status: "triggered" }, 200);
   } catch (err) {
-    await supabase.from("deploy_rebuilds").insert({ outcome: "error" });
+    const { error: wErr } = await supabase
+      .from("deploy_rebuilds")
+      .insert({ outcome: "error" });
+    if (wErr) console.error("trigger-rebuild: écriture error", wErr.code);
     console.error("trigger-rebuild: échec de l'appel", (err as Error).name);
     return json({ ok: false, status: "error" }, 502);
   }
