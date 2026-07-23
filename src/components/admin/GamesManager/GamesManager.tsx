@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
 import {
   Clock,
   ExternalLink,
@@ -248,15 +247,15 @@ export default function GamesManager() {
 
                     <div className="mt-auto flex flex-wrap gap-2 border-t border-charcoal/10 pt-4">
                       {previewable && game.slug && (
-                        <Link
-                          to={gamePath(lang, game.slug)}
+                        <a
+                          href={gamePath(lang, game.slug)}
                           target="_blank"
                           rel="noreferrer"
                           className={actionButton}
                         >
                           <ExternalLink size={16} aria-hidden />
                           {t("games.viewGame")}
-                        </Link>
+                        </a>
                       )}
                       <button
                         className={actionButton}
