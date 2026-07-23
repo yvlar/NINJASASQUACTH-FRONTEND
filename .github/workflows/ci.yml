@@ -37,17 +37,7 @@ jobs:
       # canonical/hreflang, JSON-LD valide, /admin hors sitemap, 404) et de
       # sécurité (security-headers, newsletter).
       - name: Tests (Vitest)
-        run: npm test -- --reporter=junit --outputFile=vitest-results.xml
-
-      # Diagnostic temporaire de la PR : rend les assertions Vitest accessibles
-      # même lorsque le journal Actions est tronqué par l'interface.
-      - name: Publier le diagnostic Vitest
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: vitest-results
-          path: vitest-results.xml
-          if-no-files-found: ignore
+        run: npm test
 
       # Build client + bundle SSR + pré-rendu (dist/<route>, sitemap, robots).
       - name: Build de production + pré-rendu (Vite SSG)
