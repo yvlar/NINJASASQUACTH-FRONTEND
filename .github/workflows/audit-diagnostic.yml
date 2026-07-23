@@ -21,14 +21,12 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci
-      - name: Produire le rapport npm audit
+      - name: Corriger le lockfile et vérifier l'audit
         run: |
-          npm audit --json > npm-audit.json || true
-          npm audit --audit-level=high > npm-audit.txt || true
+          npm audit fix --package-lock-only
+          npm audit --audit-level=high
       - uses: actions/upload-artifact@v4
         with:
-          name: npm-audit-report
-          path: |
-            npm-audit.json
-            npm-audit.txt
+          name: npm-audit-fixed-lock
+          path: package-lock.json
           retention-days: 1
