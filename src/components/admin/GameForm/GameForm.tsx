@@ -120,9 +120,11 @@ export default function GameForm({
   const bucket = () => supabase.storage.from(GAME_IMAGES_BUCKET);
 
   const scrollToSection = (section: FormSection) => {
-    document
-      .getElementById(`admin-form-${section}`)
-      ?.scrollIntoView({ behavior: "smooth", block: "start" });
+    const target = document.getElementById(`admin-form-${section}`);
+    if (!target) return;
+
+    target.scrollIntoView?.({ behavior: "smooth", block: "start" });
+    target.focus({ preventScroll: true });
   };
 
   const focusFirstErrorSection = (nextErrors: GameFormErrors) => {
