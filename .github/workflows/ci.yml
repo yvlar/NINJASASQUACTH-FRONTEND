@@ -5,7 +5,20 @@ name: CI
 
 on:
   push:
+    branches:
+      - main
   pull_request:
+    branches:
+      - main
+
+# Permissions minimales : le workflow ne fait que lire le dépôt.
+permissions:
+  contents: read
+
+# Évite les runs parallèles/périmés sur une même PR.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   qualite:
@@ -16,7 +29,8 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: lts/*
+          # Version fixe pour rendre npm ci et npm audit reproductibles.
+          node-version: 24
           cache: npm
 
       - name: Installer les dépendances
