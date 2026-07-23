@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import type { FormEvent, ReactNode } from "react";
 import { ExternalLink, Save } from "lucide-react";
-import { Link } from "react-router-dom";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { supabase } from "../../../lib/supabase";
 import { gamePath } from "../../../utils/routes";
@@ -235,15 +234,15 @@ export default function GameForm({
         </div>
 
         {previewPath && (
-          <Link
-            to={previewPath}
+          <a
+            href={previewPath}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center justify-center gap-2 self-start rounded-lg border border-charcoal/25 bg-white px-4 py-2.5 font-semibold text-charcoal transition-colors duration-200 hover:border-roux hover:text-roux motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
           >
             {t("games.viewGame")}
             <ExternalLink size={17} aria-hidden />
-          </Link>
+          </a>
         )}
       </div>
 
