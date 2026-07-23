@@ -10,36 +10,51 @@ import { AuthContext } from "./context";
 import type { ProfileRole } from "../types/database";
 
 interface RoleInfo {
-  session: Session | null;
+  userId: string | null;
   role: ProfileRole | null;
 }
 
 export default function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  // Rôle mémorisé AVEC la session qui l'a produit : le rôle exposé est dérivé
-  // au rendu (null tant que la session courante n'a pas son rôle), ce qui
-  // évite un setState synchrone dans l'effet (règle react-hooks).
+  // Le rôle est associé à l'identité stable de l'utilisateur, pas à l'objet
+  // Session. Supabase peut recréer cet objet lors d'un retour de focus ou d'un
+  // rafraîchissement de jeton sans que l'utilisateur ait changé.
   const [roleInfo, setRoleInfo] = useState<RoleInfo>({
-    session: null,
+    userId: null,
     role: null,
   });
-  const role = roleInfo.session === session ? roleInfo.role : null;
+  const userId = session?.user.id ?? null;
+  const role = roleInfo.userId === userId ? roleInfo.role : null;
 
   useEffect(() => {
     let active = true;
 
-    supabase.auth.getSession().then(({ data }) => {
-      if (active) {
-        setSession(data.session ?? null);
-        setLoading(false);
-      }
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data }) => {
+        if (active) setSession(data.session ?? null);
+      })
+      .catch(() => {
+        if (active) setSession(null);
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
 
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, nextSession) => {
-      setSession(nextSession ?? null);
+    } = supabase.auth.onAuthStateChange((event, nextSession) => {
+      // Seul un vrai SIGNED_OUT doit retirer l'administration de l'arbre React.
+      // Certains événements de synchronisation peuvent être transitoires ; les
+      // traiter comme une déconnexion détruirait le formulaire en cours.
+      if (event === "SIGNED_OUT") {
+        setRoleInfo({ userId: null, role: null });
+        setSession(null);
+        return;
+      }
+
+      if (nextSession) setSession(nextSession);
     });
 
     return () => {
@@ -49,7 +64,7 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    if (!session) {
+    if (!userId) {
       return undefined;
     }
     let active = true;
@@ -57,17 +72,19 @@ export default function AuthProvider({ children }: { children: ReactNode }) {
     supabase
       .from("profiles")
       .select("role")
-      .eq("id", session.user.id)
+      .eq("id", userId)
       .single()
       .then(({ data }) => {
         // profil absent ou illisible → « client » (jamais de promotion par défaut)
-        if (active) setRoleInfo({ session, role: data?.role ?? "client" });
+        if (active) {
+          setRoleInfo({ userId, role: data?.role ?? "client" });
+        }
       });
 
     return () => {
       active = false;
     };
-  }, [session]);
+  }, [userId]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     const { error } = await supabase.auth.signInWithPassword({

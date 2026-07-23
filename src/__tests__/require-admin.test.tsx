@@ -1,8 +1,9 @@
 // Verrou de la garde d'accès admin (RequireAdmin) : anonyme → login,
 // connecté non-admin → accès refusé, admin → contenu. Le rôle vient de la
 // table `profiles` (mockée) — la barrière réelle reste la RLS côté Supabase.
+import { useState, type ReactNode } from "react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import LanguageProvider from "../i18n/LanguageProvider";
 import AuthProvider from "../auth/AuthProvider";
 import RequireAdmin from "../components/admin/RequireAdmin";
@@ -19,13 +20,26 @@ vi.mock("../lib/supabase", async () => {
 // (méthodes __* incluses), pas le client Supabase typé.
 const supabase = supabaseClient as unknown as SupabaseMock;
 
-function renderGarde() {
+function BrouillonAdmin() {
+  const [titre, setTitre] = useState("");
+  return (
+    <label>
+      Titre du brouillon
+      <input
+        value={titre}
+        onChange={(event) => setTitre(event.target.value)}
+      />
+    </label>
+  );
+}
+
+function renderGarde(
+  children: ReactNode = <p>contenu réservé aux admins</p>,
+) {
   return render(
     <LanguageProvider>
       <AuthProvider>
-        <RequireAdmin>
-          <p>contenu réservé aux admins</p>
-        </RequireAdmin>
+        <RequireAdmin>{children}</RequireAdmin>
       </AuthProvider>
     </LanguageProvider>,
   );
@@ -68,5 +82,49 @@ describe("garde RequireAdmin", () => {
     expect(
       await screen.findByText("contenu réservé aux admins"),
     ).toBeInTheDocument();
+  });
+
+  it("conserve le brouillon quand Supabase renouvelle la session du même admin", async () => {
+    const userId = "admin-test";
+    supabase.__setTable("profiles", { data: { role: "admin" }, error: null });
+    supabase.__emitAuthChange({ user: { id: userId } });
+    renderGarde(<BrouillonAdmin />);
+
+    const input = await screen.findByLabelText("Titre du brouillon");
+    fireEvent.change(input, { target: { value: "Jeu en cours de création" } });
+    expect(input).toHaveValue("Jeu en cours de création");
+
+    await act(async () => {
+      // Nouvel objet Session, même user.id : cas observé au retour du focus.
+      supabase.__emitAuthChange({ user: { id: userId } });
+      await Promise.resolve();
+    });
+
+    expect(await screen.findByLabelText("Titre du brouillon")).toHaveValue(
+      "Jeu en cours de création",
+    );
+  });
+
+  it("retire le contenu admin et revient au login après SIGNED_OUT", async () => {
+    supabase.__setTable("profiles", { data: { role: "admin" }, error: null });
+    supabase.__emitAuthChange({ user: { id: "admin-test" } });
+    renderGarde();
+
+    expect(
+      await screen.findByText("contenu réservé aux admins"),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      // Le mock traduit une session nulle en événement SIGNED_OUT.
+      supabase.__emitAuthChange(null);
+      await Promise.resolve();
+    });
+
+    expect(
+      await screen.findByLabelText(fr.admin.login.email),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("contenu réservé aux admins"),
+    ).not.toBeInTheDocument();
   });
 });
