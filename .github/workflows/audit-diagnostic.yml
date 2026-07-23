@@ -1,0 +1,31 @@
+name: Audit diagnostic
+
+on:
+  push:
+    branches:
+      - agent/fix-admin-session-focus
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Produire le rapport npm audit
+        run: |
+          npm audit --json > npm-audit.json || true
+          npm audit --audit-level=high > npm-audit.txt || true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-audit-report
+          path: |
+            npm-audit.json
+            npm-audit.txt
+          retention-days: 1
