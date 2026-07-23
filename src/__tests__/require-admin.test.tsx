@@ -104,4 +104,27 @@ describe("garde RequireAdmin", () => {
       "Jeu en cours de création",
     );
   });
+
+  it("retire le contenu admin et revient au login après SIGNED_OUT", async () => {
+    supabase.__setTable("profiles", { data: { role: "admin" }, error: null });
+    supabase.__emitAuthChange({ user: { id: "admin-test" } });
+    renderGarde();
+
+    expect(
+      await screen.findByText("contenu réservé aux admins"),
+    ).toBeInTheDocument();
+
+    await act(async () => {
+      // Le mock traduit une session nulle en événement SIGNED_OUT.
+      supabase.__emitAuthChange(null);
+      await Promise.resolve();
+    });
+
+    expect(
+      await screen.findByLabelText(fr.admin.login.email),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByText("contenu réservé aux admins"),
+    ).not.toBeInTheDocument();
+  });
 });
