@@ -1,15 +1,13 @@
 // Champ texte réutilisable du formulaire de jeu : label + input/textarea +
-// message d'erreur i18n accessible (aria-invalid/aria-describedby). N'est
-// utilisé que pour les champs à valeur chaîne (les booléens ont leurs cases).
+// message d'erreur i18n accessible (aria-invalid/aria-describedby).
 import type { GameFormErrors, GameFormValues } from "./gameFormTypes";
 
-// Clés dont la valeur est une chaîne (exclut les booléens eco/published/…).
 type StringFieldName = {
   [K in keyof GameFormValues]: GameFormValues[K] extends string ? K : never;
 }[keyof GameFormValues];
 
 const inputBase =
-  "rounded-lg border border-charcoal bg-white px-3 py-2.5 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
+  "w-full rounded-xl border-2 bg-white px-4 py-3 text-charcoal transition-colors duration-200 placeholder:text-charcoal/45 motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest";
 
 export default function FormField({
   name,
@@ -33,6 +31,9 @@ export default function FormField({
   const id = `game-form-${name}`;
   const idErreur = `${id}-erreur`;
   const error = errors[name];
+  const inputClass = `${inputBase} ${
+    error ? "border-error/70" : "border-charcoal/20 hover:border-roux/50"
+  }`;
   const shared = {
     id,
     name,
@@ -45,22 +46,26 @@ export default function FormField({
   };
 
   return (
-    <div className="flex flex-col gap-1.5">
-      <label className="font-semibold" htmlFor={id}>
+    <div className="flex min-w-0 flex-col gap-1.5">
+      <label className="font-semibold text-charcoal" htmlFor={id}>
         {t(`admin.form.${name}`)}
         {optional && (
-          <span className="ml-1 font-normal text-charcoal/60">
+          <span className="ml-1 font-normal text-charcoal/55">
             {t("admin.form.optional")}
           </span>
         )}
       </label>
       {multiline ? (
-        <textarea className={`${inputBase} resize-y`} rows={4} {...shared} />
+        <textarea
+          className={`${inputClass} min-h-32 resize-y`}
+          rows={5}
+          {...shared}
+        />
       ) : (
-        <input className={inputBase} type={type} {...shared} />
+        <input className={inputClass} type={type} {...shared} />
       )}
       {error && (
-        <p className="font-semibold text-error" id={idErreur}>
+        <p className="font-semibold text-error" id={idErreur} role="alert">
           {t(error)}
         </p>
       )}
