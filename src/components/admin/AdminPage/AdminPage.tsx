@@ -1,74 +1,97 @@
 import type { ReactNode } from "react";
+import { ExternalLink, LogOut } from "lucide-react";
 import AuthProvider from "../../../auth/AuthProvider";
 import { useAuth } from "../../../auth/useAuth";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { isSupabaseConfigured } from "../../../lib/supabase";
+import { homePath } from "../../../utils/routes";
 import GamesManager from "../GamesManager";
 import RequireAdmin from "../RequireAdmin";
 
-// Coquille commune (h1 + contenu) réutilisée par l'admin et l'état « non
-// configuré » — un seul gabarit, une seule largeur.
-function AdminShell({ children }: { children: ReactNode }) {
-  const { t } = useLanguage();
+function AdminShell({
+  children,
+  canSignOut = false,
+  onSignOut,
+}: {
+  children: ReactNode;
+  canSignOut?: boolean;
+  onSignOut?: () => void;
+}) {
+  const { t, lang } = useLanguage();
+
   return (
-    <main className="min-h-screen bg-cream px-4 py-8 text-charcoal md:px-8 md:py-12">
-      <div className="mx-auto mb-6 flex max-w-[60rem] items-center justify-between gap-4">
-        <h1 className="text-roux">{t("admin.title")}</h1>
-      </div>
-      {children}
-    </main>
+    <div className="min-h-screen bg-roux/5 text-charcoal">
+      <header className="border-b border-charcoal/10 bg-cream/95 backdrop-blur-[10px]">
+        <div className="mx-auto flex max-w-[72rem] flex-col gap-5 px-4 py-5 sm:px-6 md:flex-row md:items-center md:justify-between lg:px-8">
+          <div>
+            <p className="mb-1 font-brand text-sm tracking-[0.08em] text-forest">
+              Ninja Sasquatch Games
+            </p>
+            <h1 className="text-3xl tracking-[-0.01em] text-roux md:text-4xl">
+              {t("admin.title")}
+            </h1>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <a
+              href={homePath(lang)}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-lg border border-charcoal/25 bg-white px-4 py-2.5 font-semibold text-charcoal transition-colors duration-200 hover:border-roux hover:text-roux motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+            >
+              {t("nav.home")}
+              <ExternalLink size={17} aria-hidden />
+            </a>
+
+            {canSignOut && onSignOut && (
+              <button
+                className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-charcoal/25 bg-transparent px-4 py-2.5 font-semibold text-charcoal transition-colors duration-200 hover:border-error hover:text-error motion-reduce:transition-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+                type="button"
+                onClick={onSignOut}
+              >
+                <LogOut size={17} aria-hidden />
+                {t("admin.signOut")}
+              </button>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-[72rem] px-4 py-8 sm:px-6 md:py-10 lg:px-8">
+        {children}
+      </main>
+    </div>
   );
 }
 
-// Garde de configuration CENTRALISÉE : sans VITE_SUPABASE_URL/ANON_KEY, on ne
-// monte JAMAIS AuthProvider (seul déclencheur des appels Auth) ni aucun
-// composant admin (GamesManager, GameForm, GameMediaManager n'apparaissent que
-// derrière une session, impossible sans config). Résultat : zéro appel réseau
-// (Auth, Storage, PostgREST), aucune erreur DNS, un message clair localisé —
-// plutôt que de répéter le garde dans chaque composant.
 function AdminUnavailable() {
   const { t } = useLanguage();
   return (
     <AdminShell>
-      <p className="mx-auto max-w-[60rem] font-semibold text-error" role="alert">
-        {t("admin.notConfigured")}
-      </p>
-      <p className="mx-auto mt-2 max-w-[60rem] text-charcoal">
-        {t("admin.notConfiguredHint")}
-      </p>
+      <div className="rounded-xl border border-error/25 bg-white p-6 shadow-[0_8px_24px_-18px_rgba(43,36,32,0.35)]">
+        <p className="font-semibold text-error" role="alert">
+          {t("admin.notConfigured")}
+        </p>
+        <p className="mt-2 text-charcoal">{t("admin.notConfiguredHint")}</p>
+      </div>
     </AdminShell>
   );
 }
 
 function AdminContent() {
-  const { t } = useLanguage();
   const { session, signOut } = useAuth();
 
   return (
-    <main className="min-h-screen bg-cream px-4 py-8 text-charcoal md:px-8 md:py-12">
-      <div className="mx-auto mb-6 flex max-w-[60rem] items-center justify-between gap-4">
-        <h1 className="text-roux">{t("admin.title")}</h1>
-        {session && (
-          <button
-            className="cursor-pointer rounded-lg border border-charcoal bg-transparent px-[0.9rem] py-2 text-charcoal focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-            type="button"
-            onClick={signOut}
-          >
-            {t("admin.signOut")}
-          </button>
-        )}
-      </div>
+    <AdminShell canSignOut={Boolean(session)} onSignOut={signOut}>
       <RequireAdmin>
         <GamesManager />
       </RequireAdmin>
-    </main>
+    </AdminShell>
   );
 }
 
 // AuthProvider vit ici (et pas dans AppRoutes) : la session n'est montée
 // que sous /admin, le site vitrine ne fait aucun appel d'authentification.
-// Sans configuration Supabase, AuthProvider n'est pas monté du tout (voir
-// AdminUnavailable) → aucun appel réseau depuis l'administration.
 export default function AdminPage() {
   if (!isSupabaseConfigured) {
     return <AdminUnavailable />;
