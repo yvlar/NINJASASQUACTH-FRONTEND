@@ -2,8 +2,8 @@
 // connecté non-admin → accès refusé, admin → contenu. Le rôle vient de la
 // table `profiles` (mockée) — la barrière réelle reste la RLS côté Supabase.
 import { useState, type ReactNode } from "react";
-import { act, beforeEach, describe, expect, it, vi } from "vitest";
-import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { act, fireEvent, render, screen } from "@testing-library/react";
 import LanguageProvider from "../i18n/LanguageProvider";
 import AuthProvider from "../auth/AuthProvider";
 import RequireAdmin from "../components/admin/RequireAdmin";
