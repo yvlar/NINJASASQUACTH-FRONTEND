@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import BrandLogo from "../../brand/BrandLogo";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { homePath } from "../../../utils/routes";
 import LanguageToggle from "../LanguageToggle";
@@ -54,15 +55,12 @@ export default function Header({
       className="fixed top-0 left-0 right-0 z-[1000] w-full bg-cream/95 backdrop-blur-[10px] shadow-[0_2px_8px_rgba(0,0,0,0.05)]"
     >
       <div className="mx-auto flex h-16 max-w-[1280px] items-center justify-between px-4">
-        {/* Pas de logo officiel fourni → repli textuel propre en police de
-            marque, cliquable vers l'accueil localisé (/fr ou /en). */}
         <Link
           to={homePath(lang)}
           aria-label={t("nav.homeLink")}
-          className="select-none font-brand text-2xl tracking-[0.02em] transition-transform duration-300 hover:scale-[1.03] motion-reduce:transition-none motion-reduce:hover:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
+          className="select-none transition-transform duration-300 hover:scale-[1.03] motion-reduce:transition-none motion-reduce:hover:scale-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
         >
-          <span className="text-roux">Ninja </span>
-          <span className="text-charcoal">Sasquatch</span>
+          <BrandLogo className="max-h-12 max-w-[190px] text-2xl" />
         </Link>
 
         <div className="hidden gap-8 md:flex md:items-center">
