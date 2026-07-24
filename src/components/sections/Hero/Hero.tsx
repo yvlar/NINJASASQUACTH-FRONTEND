@@ -55,9 +55,7 @@ function FeaturedHero({
     <section id="accueil" className={SECTION_CLASS}>
       <div className="mx-auto grid w-full max-w-[1280px] grid-cols-[1fr] items-center gap-10 px-4 py-20 sm:px-6 md:grid-cols-[repeat(2,1fr)] lg:px-8">
         <div className="flex flex-col gap-5 text-left">
-          <span
-            className={`w-fit rounded-full px-3 py-1 text-sm font-semibold ${theme.accentBadge}`}
-          >
+          <span className="w-fit rounded-full bg-forest px-3 py-1 text-sm font-semibold text-cream">
             {t("home.hero.featured")}
           </span>
           <h1 className="text-[2.75rem] tracking-[-0.01em] text-roux md:text-[4rem]">
