@@ -3,7 +3,7 @@
 // <section id="..."> réellement rendue par App, sinon le clic ne fait rien.
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 

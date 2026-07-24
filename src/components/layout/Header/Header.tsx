@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import BrandLogo from "../../brand/BrandLogo";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { homePath } from "../../../utils/routes";

@@ -3,7 +3,7 @@
 // choisi parmi les jeux publiés (selectFeaturedGame). Si aucun jeu vedette
 // n'est disponible (base vide, chargement, erreur), on retombe sur une
 // composition de marque sobre — jamais de fausse boîte de jeu.
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { ExternalLink, Bell, Leaf } from "lucide-react";
 import { useSharedGames } from "../../../hooks/useSharedGames";
 import { useLanguage } from "../../../i18n/useLanguage";

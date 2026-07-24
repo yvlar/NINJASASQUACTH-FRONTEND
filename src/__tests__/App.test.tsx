@@ -1,7 +1,7 @@
 // Smoke test : l'application se monte sans erreur sous le LanguageProvider.
 import { describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 

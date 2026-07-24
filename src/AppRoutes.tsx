@@ -5,7 +5,7 @@
 //   /admin     → espace d'administration (chargé à la demande)
 //   *          → vraie page 404 (plus de redirection muette vers l'accueil)
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes } from "react-router-dom";
+import { Navigate, Route, Routes } from "react-router";
 import { useLanguage } from "./i18n/useLanguage";
 import HomePage from "./pages/HomePage";
 import GamePage from "./pages/GamePage";

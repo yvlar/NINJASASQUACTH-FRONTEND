@@ -1,7 +1,7 @@
 // Page fiche jeu localisée : /fr/jeux/:slug et /en/games/:slug. Synchronise
 // la langue sur l'URL et remonte le contenu par slug (clé) pour un état de
 // chargement propre entre deux fiches.
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { useSyncLang } from "../../i18n/useSyncLang";
 import GameContent from "./GameContent";
 import type { Lang } from "../../i18n/context";
