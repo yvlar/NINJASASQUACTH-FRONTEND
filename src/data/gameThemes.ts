@@ -37,7 +37,7 @@ export const GAME_THEMES: Record<GameThemeKey, GameTheme> = {
     accentBadge: "bg-hr-gold text-charcoal",
     accentBar: "border-t-hr-orange",
     cardRing: "hover:shadow-[0_12px_20px_-8px_rgba(255,122,0,0.45)]",
-    accentButton: "bg-hr-red text-cream",
+    accentButton: "bg-hr-orange text-charcoal hover:bg-hr-orange/90",
   },
   "burgle-jack": {
     accentBadge: "bg-bj-yellow text-bj-black",

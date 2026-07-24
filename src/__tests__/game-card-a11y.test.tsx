@@ -5,7 +5,7 @@
 // Les jeux viennent de Supabase (mocké, fixtures au format table).
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 import { JEUX_FIXTURES } from "./fixtures/games";

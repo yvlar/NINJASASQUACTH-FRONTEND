@@ -3,7 +3,7 @@
 // présent/absent, changement de langue conservant le slug. Supabase mocké.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import LanguageProvider from "../i18n/LanguageProvider";
 import AppRoutes from "../AppRoutes";
 import fr from "../data/translations/fr.json";

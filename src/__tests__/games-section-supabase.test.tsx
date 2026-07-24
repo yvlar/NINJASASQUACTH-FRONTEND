@@ -3,7 +3,7 @@
 // cartes selon la langue. Client 100 % mocké — aucun réseau.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import LanguageProvider from "../i18n/LanguageProvider";
 import GamesProvider from "../hooks/GamesProvider";
 import GamesSection from "../components/sections/Games";

@@ -4,7 +4,7 @@
 // Aucun écran blanc.
 import { afterEach, describe, it, expect, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 import type { SupabaseMock } from "./helpers/supabaseMock";

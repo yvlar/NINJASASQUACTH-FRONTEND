@@ -2,7 +2,7 @@
 // chargement se réinitialise proprement à chaque navigation. Les sections
 // reçoivent la donnée Supabase — aucun jeu (Heroes Rising, Burgle Jack…)
 // n'est codé en dur ici.
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useGames } from "../../hooks/useGames";
 import { useGameBySlug } from "../../hooks/useGameBySlug";
 import { useLanguage } from "../../i18n/useLanguage";
