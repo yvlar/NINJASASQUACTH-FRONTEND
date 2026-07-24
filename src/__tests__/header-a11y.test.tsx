@@ -3,7 +3,7 @@
 // focus, et logo cliquable vers l'accueil localisé.
 import { describe, it, expect, vi } from "vitest";
 import { render, screen, fireEvent } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import LanguageProvider from "../i18n/LanguageProvider";
 import Header from "../components/layout/Header";
 

@@ -3,7 +3,7 @@
 // GamesProvider) — plus trois requêtes `from("games")` identiques.
 import { describe, it, expect, vi } from "vitest";
 import { render } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import App from "../App";
 import LanguageProvider from "../i18n/LanguageProvider";
 import { supabase as supabaseClient } from "../lib/supabase";

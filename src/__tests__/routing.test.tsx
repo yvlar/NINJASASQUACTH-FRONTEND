@@ -5,7 +5,7 @@
 //   chemin inconnu → VRAIE page 404 (plus de redirection muette vers l'accueil)
 import { describe, expect, it, vi } from "vitest";
 import { render, screen } from "@testing-library/react";
-import { MemoryRouter } from "react-router-dom";
+import { MemoryRouter } from "react-router";
 import LanguageProvider from "../i18n/LanguageProvider";
 import AppRoutes from "../AppRoutes";
 import fr from "../data/translations/fr.json";

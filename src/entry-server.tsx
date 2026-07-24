@@ -4,7 +4,7 @@
 // effets ne s'exécutent pas au rendu serveur, donc /en doit être seedé en
 // anglais). L'amorce de données rend le vrai contenu (H1, texte, liens).
 import { renderToString } from "react-dom/server";
-import { StaticRouter } from "react-router-dom";
+import { StaticRouter } from "react-router";
 import LanguageProvider from "./i18n/LanguageProvider";
 import ErrorBoundary from "./components/ErrorBoundary";
 import AppRoutes from "./AppRoutes";

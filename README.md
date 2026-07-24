@@ -32,7 +32,8 @@ trouvent dans le tableau de bord Supabase du projet `ninja-sasquatch-games`
 Sans ces variables, le build passe (la CI n'a pas de secrets) mais le
 catalogue et l'admin afficheront une erreur à l'exécution.
 
-Stack : **React 19 + Vite 7 + TypeScript strict**, `react-router-dom`
+Stack : **React 19 + Vite 7 + TypeScript strict**, `react-router` (v8 ;
+`react-router-dom` a été fusionné dans `react-router`)
 (routes localisées `/fr` · `/en` · `/fr/jeux/:slug` · `/en/games/:slug`,
 `/admin` protégé par login, et une vraie page 404), **Tailwind CSS v4**
 (`@tailwindcss/vite`, palette de marque en tokens `@theme`), **Supabase**

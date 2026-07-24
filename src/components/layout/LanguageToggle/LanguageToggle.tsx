@@ -1,7 +1,7 @@
 // Bouton FR/EN : navigue vers la route équivalente dans l'autre langue en
 // conservant le slug (la langue est portée par l'URL). Pilule bordée brune,
 // identique à l'ancien bouton du Header.
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router";
 import { useLanguage } from "../../../i18n/useLanguage";
 import { otherLangPath } from "../../../utils/routes";
 

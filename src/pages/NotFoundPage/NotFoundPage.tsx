@@ -1,5 +1,5 @@
 // Vraie page 404 : les chemins inconnus n'atterrissent plus sur l'accueil.
-import { Link } from "react-router-dom";
+import { Link } from "react-router";
 import { useLanguage } from "../../i18n/useLanguage";
 import { homePath } from "../../utils/routes";
 import PageMeta from "../../components/seo/PageMeta";
