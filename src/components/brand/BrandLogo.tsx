@@ -9,7 +9,7 @@ interface BrandLogoProps {
 
 /**
  * Logo officiel Ninja Sasquatch. Le repli textuel protège la navigation si
- * l'asset n'a pas encore été déployé ou si son chargement échoue.
+ * l'asset ne peut pas être chargé.
  */
 export default function BrandLogo({
   className = "",
